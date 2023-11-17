@@ -1,22 +1,20 @@
 import clsx from 'clsx';
+import { useModalStore } from '../../../store/modalStore';
 
 interface Props extends React.PropsWithChildren {
   className?: string;
   isActive?: boolean;
-  onClick?: () => void;
   header?: boolean;
 }
 
-const Cell: React.FC<Props> = ({
-  onClick,
-  children,
-  className,
-  isActive = false,
-  header,
-}) => {
+const Cell: React.FC<Props> = ({ children, className, header }) => {
+  const { isCreateModalOpen, setModalOpen } = useModalStore();
+  const date: Date = new Date();
+
   return (
     <div
-      onClick={!isActive ? onClick : undefined}
+      onClick={() => setModalOpen(true, date)}
+      // onClick={!isActive ? onClick : undefined}
       className={clsx(
         'flex select-none flex-col items-start border-b border-r',
         // {

@@ -1,11 +1,10 @@
-import { Button, ButtonGroup } from '@nextui-org/react';
+import { Button } from '@nextui-org/react';
 
 const styles = {
   container: 'w-full h-16 flex justify-between items-center',
   borderButton: 'text-base border-1 hover:bg-gray-200 hover:cursor-pointer',
   regularButton:
-    'text-base p-2 min-w-0 w-8 h-8 rounded-2xl bg-white hover:bg-gray-200 hover:cursor-pointer',
-
+    'text-base p-2 min-w-0 w-8 h-8 rounded-full bg-white hover:bg-gray-200 hover:cursor-pointer',
   wrapper: 'flex items-center',
   title: 'font-bold mx-2 text-xl',
   viewButton:
@@ -36,9 +35,9 @@ function Navigation() {
         </Button>
       </div>
       <div>
-          <Button className={styles.viewButton}>Monthly </Button>｜
-          <Button className={styles.viewButton}>Weekly</Button>｜
-          <Button className={styles.viewButton}>List</Button>
+        <Button className={styles.viewButton}>Monthly </Button>｜
+        <Button className={styles.viewButton}>Weekly</Button>｜
+        <Button className={styles.viewButton}>List</Button>
       </div>
     </div>
   );

@@ -19,8 +19,8 @@ const Calendar: React.FC<Props> = ({ value = new Date() }) => {
   return (
     <div className='mt-1 w-full border-l border-t'>
       <div className='grid grid-cols-7 items-center justify-center text-center'>
-        {weeks.map((week) => (
-          <Cell className='text-base font-bold uppercase' header>
+        {weeks.map((week, index) => (
+          <Cell key={index} className='text-base font-bold uppercase' header>
             {week}
           </Cell>
         ))}
@@ -34,7 +34,7 @@ const Calendar: React.FC<Props> = ({ value = new Date() }) => {
           const isCurrentDate = date === value.getDate();
 
           return (
-            <Cell key={date} isActive={isCurrentDate}>
+            <Cell key={date}>
               <div
                 className={clsx('w-6', {
                   [isCurrentDate ? 'rounded-xl bg-amber-800 text-white' : '']:
