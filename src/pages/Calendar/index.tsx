@@ -6,7 +6,7 @@ import CreateEventModal from '../../components/EventModals/Create';
 function Calendar() {
   return (
     <>
-      <Header />{' '}
+      <Header />
       <div className='flex'>
         <SideBar />
         <CalendarView />

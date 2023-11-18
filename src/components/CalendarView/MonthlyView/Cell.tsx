@@ -8,12 +8,12 @@ interface Props extends React.PropsWithChildren {
 }
 
 const Cell: React.FC<Props> = ({ children, className, header }) => {
-  const { isCreateModalOpen, setModalOpen } = useModalStore();
+  const { isCreateModalOpen, setIsCreateModalOpen } = useModalStore();
   const date: Date = new Date();
 
   return (
     <div
-      onClick={() => setModalOpen(true, date)}
+      onClick={() => setIsCreateModalOpen(true, date)}
       // onClick={!isActive ? onClick : undefined}
       className={clsx(
         'flex select-none flex-col items-start border-b border-r',
