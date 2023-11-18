@@ -11,15 +11,15 @@ import {
   SelectItem,
   Switch,
 } from '@nextui-org/react';
+import { addDoc, collection, doc } from 'firebase/firestore';
 import { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useModalStore } from '../../store/modalStore';
+import { db } from '../../utils/firebase';
 
 export default function Create() {
   const { isCreateModalOpen, setIsCreateModalOpen } = useModalStore();
-  const [startDate, setStartDate] = useState<Date | null>(new Date());
-  const [endDate, setEndDate] = useState<Date | null>(new Date());
   const colors = [
     { color: 'blue', name: 'work' },
     { color: 'orange', name: 'study' },
@@ -34,11 +34,11 @@ export default function Create() {
 
   interface Input {
     title: string;
-    startAt: Date | null;
-    endAt: Date | null;
+    startAt: Date;
+    endAt: Date;
     isAllDay: boolean;
     isMemo: boolean;
-    tag: string | undefined;
+    tag: string;
     note: string;
     createdAt: Date | null;
     updatedAt: Date | null;
@@ -47,11 +47,11 @@ export default function Create() {
 
   const initialInput: Input = {
     title: '',
-    startAt: startDate,
-    endAt: endDate,
+    startAt: new Date(),
+    endAt: new Date(),
     isAllDay: false,
     isMemo: false,
-    tag: undefined,
+    tag: '0',
     note: '',
     createdAt: null,
     updatedAt: null,
@@ -60,17 +60,24 @@ export default function Create() {
 
   const [userInput, setUserInput] = useState(initialInput);
 
-  const updateUserInput = (label: string, value: any) => {
-    setUserInput({ ...userInput, [label]: value });
-    if (label === 'startAt') {
-      setStartDate(value);
-      if (endDate && value > endDate) {
-        setEndDate(value);
+  const updateUserInput = (label: keyof Input, value: any) => {
+    setUserInput((prev) => {
+      if (prev[label] === value) {
+        return prev;
       }
-    }
-    if (label === 'endAt') {
-      setEndDate(value);
-    }
+      const updatedInput = { ...prev, [label]: value };
+      if (
+        label === 'startAt' &&
+        updatedInput.endAt &&
+        value > updatedInput.endAt
+      ) {
+        updatedInput.endAt = value;
+      }
+      if (label === 'isAllDay' || label === 'isMemo') {
+        updatedInput[label] = !prev[label];
+      }
+      return updatedInput;
+    });
   };
 
   // =====================================================
@@ -118,8 +125,6 @@ export default function Create() {
     );
   };
 
-  console.log(userInput);
-
   const renderDatePicker = (type: string) => {
     if (type === 'allDay') {
       return (
@@ -127,7 +132,7 @@ export default function Create() {
           <label className='w-12'>Time</label>
           <DatePicker
             aria-label='startDate'
-            selected={startDate}
+            selected={userInput.startAt}
             selectsStart
             dateFormat='MMM dd, yyyy'
             className='border rounded-md h-8 w-40 text-center text-base'
@@ -136,9 +141,9 @@ export default function Create() {
           <span>－</span>
           <DatePicker
             aria-label='endDate'
-            selected={endDate}
+            selected={userInput.endAt}
             selectsEnd
-            minDate={startDate}
+            minDate={userInput.startAt}
             dateFormat='MMM dd, yyyy'
             className='border rounded-md h-8 w-40 text-center text-base'
             onChange={(e) => updateUserInput('endAt', e)}
@@ -154,7 +159,7 @@ export default function Create() {
         <label className='w-12'>Time</label>
         <DatePicker
           aria-label='startDate'
-          selected={startDate}
+          selected={userInput.startAt}
           selectsStart
           showTimeSelect
           timeFormat='HH:mm'
@@ -167,9 +172,9 @@ export default function Create() {
         <span>－</span>
         <DatePicker
           aria-label='endDate'
-          selected={endDate}
+          selected={userInput.endAt}
           selectsEnd
-          minDate={startDate}
+          minDate={userInput.startAt}
           showTimeSelect
           timeFormat='HH:mm'
           timeIntervals={15}
@@ -185,17 +190,37 @@ export default function Create() {
   // =====================================================
   // Handle button clicking
   // =====================================================
+
+  const eventsCollection = collection(
+    db,
+    'Calendars',
+    'nWryB1DvoYBEv1oKdc0L',
+    'events',
+  );
+
+  const addEvent = async (data: object) => {
+    const newEventRef = await addDoc(eventsCollection, data);
+  };
+
   const handleSubmit = () => {
     const currentTime = new Date();
-    console.log(currentTime);
+    const eventRef = doc(eventsCollection);
+    const eventUUID = eventRef.id;
+
     const data = {
       ...userInput,
       createdAt: currentTime,
       updatedAt: currentTime,
+      eventId: eventUUID,
     };
-    console.log(data);
+    addEvent(data);
     setUserInput(initialInput);
     setIsCreateModalOpen(false, null);
+  };
+
+  const handleCancel = () => {
+    setIsCreateModalOpen(false, null);
+    setUserInput(initialInput);
   };
 
   return (
@@ -206,132 +231,78 @@ export default function Create() {
         size='lg'
       >
         <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className='py-3'>New Event</ModalHeader>
-              <Divider />
-              <ModalBody>
-                <Input
-                  aria-label='title'
-                  type='text'
-                  variant='underlined'
-                  placeholder='Title'
-                  value={userInput.title}
-                  onChange={(e) => updateUserInput('title', e.target.value)}
-                />
-                {userInput.isAllDay &&
-                  !userInput.isMemo &&
-                  renderDatePicker('allDay')}
-                {userInput.isMemo && renderDatePicker('memo')}
-                {!userInput.isAllDay &&
-                  !userInput.isMemo &&
-                  renderDatePicker('normal')}
+          <>
+            <ModalHeader className='py-3'>New Event</ModalHeader>
+            <Divider />
+            <ModalBody>
+              <Input
+                aria-label='title'
+                type='text'
+                variant='underlined'
+                placeholder='Title'
+                value={userInput.title}
+                onChange={(e) => updateUserInput('title', e.target.value)}
+              />
+              {userInput.isAllDay &&
+                !userInput.isMemo &&
+                renderDatePicker('allDay')}
+              {userInput.isMemo && renderDatePicker('memo')}
+              {!userInput.isAllDay &&
+                !userInput.isMemo &&
+                renderDatePicker('normal')}
 
-                {/* <div className='flex items-center gap-2'>
-                  <label className='w-12'>Time</label>
-                  <DatePicker
-                    aria-label='startDate'
-                    selected={startDate}
-                    selectsStart
-                    showTimeSelect
-                    timeFormat='HH:mm'
-                    timeIntervals={15}
-                    timeCaption='Time'
-                    dateFormat='MMM dd, yyyy HH:mm'
-                    className='border rounded-md h-8 w-40 text-center text-base'
-                    onChange={(e) => updateUserInput('startAt', e)}
-                  />
-                  <span>－</span>
-                  <DatePicker
-                    aria-label='endDate'
-                    selected={endDate}
-                    selectsEnd
-                    minDate={startDate}
-                    showTimeSelect
-                    timeFormat='HH:mm'
-                    timeIntervals={15}
-                    timeCaption='Time'
-                    dateFormat='MMM dd, yyyy HH:mm'
-                    className='border rounded-md h-8 w-40 text-center text-base'
-                    onChange={(e) => updateUserInput('endAt', e)}
-                  />
-                </div> */}
-
-                {!userInput.isMemo && (
-                  <Switch
-                    size='sm'
-                    className='pl-14'
-                    aria-label='allDay'
-                    isSelected={userInput.isAllDay}
-                    onChange={() => {
-                      setUserInput((prev) => ({
-                        ...prev,
-                        isAllDay: !prev.isAllDay,
-                      }));
-                    }}
-                  >
-                    All-day
-                  </Switch>
-                )}
-
+              {!userInput.isMemo && (
                 <Switch
                   size='sm'
                   className='pl-14'
-                  aria-label='saveAsMemo'
-                  isSelected={userInput.isMemo}
-                  onChange={() => {
-                    setUserInput((prev) => ({
-                      ...prev,
-                      isMemo: !prev.isMemo,
-                    }));
-                  }}
+                  aria-label='allDay'
+                  isSelected={userInput.isAllDay}
+                  onChange={(e) => updateUserInput('isAllDay', e)}
                 >
-                  Save as memo
+                  All-day
                 </Switch>
+              )}
 
-                <div className='flex items-center gap-2'>
-                  <label className='w-12'>Tag</label>
-                  {renderTags()}
-                </div>
+              <Switch
+                size='sm'
+                className='pl-14'
+                aria-label='saveAsMemo'
+                isSelected={userInput.isMemo}
+                onChange={(e) => updateUserInput('isMemo', e)}
+              >
+                Save as memo
+              </Switch>
 
-                <div className='flex items-center gap-2'>
-                  <label className='w-12'>Note</label>
-                  <Input
-                    type='text'
-                    className='w-80'
-                    aria-label='note'
-                    value={userInput.note}
-                    onChange={(e) => updateUserInput('note', e.target.value)}
-                  />
-                </div>
-              </ModalBody>
+              <div className='flex items-center gap-2'>
+                <label className='w-12'>Tag</label>
+                {renderTags()}
+              </div>
 
-              <ModalFooter>
-                <Button
-                  color='primary'
-                  onPress={() => {
-                    // onClose;
-                    setUserInput(initialInput);
-                    handleSubmit();
-                  }}
-                  className='w-1/2'
-                >
-                  送出
-                </Button>
-                <Button
-                  variant='bordered'
-                  onPress={() => {
-                    setIsCreateModalOpen(false, null);
-                    // setUserInput(initialInput);
-                  }}
-                  // onPress={onClose}
-                  className='w-1/2'
-                >
-                  取消
-                </Button>
-              </ModalFooter>
-            </>
-          )}
+              <div className='flex items-center gap-2'>
+                <label className='w-12'>Note</label>
+                <Input
+                  type='text'
+                  className='w-80'
+                  aria-label='note'
+                  value={userInput.note}
+                  onChange={(e) => updateUserInput('note', e.target.value)}
+                />
+              </div>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button color='primary' onPress={handleSubmit} className='w-1/2'>
+                送出
+              </Button>
+              <Button
+                variant='bordered'
+                onPress={handleCancel}
+                className='w-1/2'
+              >
+                取消
+              </Button>
+            </ModalFooter>
+          </>
         </ModalContent>
       </Modal>
     </>
