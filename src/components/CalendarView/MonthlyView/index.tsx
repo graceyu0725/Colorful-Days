@@ -55,15 +55,20 @@ const MonthlyView: React.FC<Props> = ({
             dayCounts={
               lastDateOfMonth + firstDayOfMonth + 7 - firstDayOfNextMonth
             }
+            firstDayOfNextMonth={firstDayOfNextMonth}
           >
-            {lastDateOfLastMonth - firstDayOfMonth + 1 + index}
+            <div className='w-6'>
+              {lastDateOfLastMonth - firstDayOfMonth + 1 + index}
+            </div>
           </Cell>
         ))}
 
         {Array.from({ length: lastDateOfMonth }).map((_, index) => {
           const date = index + 1;
           const isCurrentDate =
-            currentMonth === new Date().getMonth() && date === value.getDate();
+            currentYear === new Date().getFullYear() &&
+            currentMonth === new Date().getMonth() &&
+            date === value.getDate();
 
           return (
             <Cell
@@ -71,6 +76,7 @@ const MonthlyView: React.FC<Props> = ({
               dayCounts={
                 lastDateOfMonth + firstDayOfMonth + 7 - firstDayOfNextMonth
               }
+              firstDayOfNextMonth={firstDayOfNextMonth}
             >
               <div
                 className={clsx('w-6', {
@@ -92,8 +98,9 @@ const MonthlyView: React.FC<Props> = ({
               dayCounts={
                 lastDateOfMonth + firstDayOfMonth + 7 - firstDayOfNextMonth
               }
+              firstDayOfNextMonth={firstDayOfNextMonth}
             >
-              {index + 1}
+              <div className='w-6'>{index + 1}</div>
             </Cell>
           ))}
       </div>

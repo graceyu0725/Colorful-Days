@@ -6,9 +6,16 @@ interface Props extends React.PropsWithChildren {
   isActive?: boolean;
   header?: boolean;
   dayCounts?: number;
+  firstDayOfNextMonth?: number;
 }
 
-const Cell: React.FC<Props> = ({ children, className, header, dayCounts }) => {
+const Cell: React.FC<Props> = ({
+  children,
+  className,
+  header,
+  dayCounts,
+  firstDayOfNextMonth,
+}) => {
   const { setIsCreateModalOpen } = useModalStore();
   const date: Date = new Date();
   console.log('dayCounts:', dayCounts);
@@ -21,7 +28,10 @@ const Cell: React.FC<Props> = ({ children, className, header, dayCounts }) => {
         {
           [header
             ? 'h-10 items-center justify-center'
-            : dayCounts && dayCounts > 35
+            : dayCounts &&
+                dayCounts > 35 &&
+                firstDayOfNextMonth &&
+                firstDayOfNextMonth > 0
               ? 'h-24 px-3 py-2 hover:bg-gray-200 active:bg-gray-200'
               : 'h-28 px-3 py-2 hover:bg-gray-200 active:bg-gray-200']: true,
         },
