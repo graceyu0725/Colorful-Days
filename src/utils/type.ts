@@ -17,3 +17,17 @@ export interface Event {
   updatedAt: Date | null;
   messages: EventMessages[];
 }
+
+export const initialEvent = {
+  eventId: 0,
+  title: '',
+  startAt: new Date(),
+  endAt: new Date(),
+  isAllDay: false,
+  isMemo: false,
+  tag: '0',
+  note: '',
+  createdAt: null,
+  updatedAt: null,
+  messages: [],
+};

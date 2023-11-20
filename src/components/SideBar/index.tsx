@@ -1,66 +1,12 @@
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { getAllEvents, useEventsStore } from '../../store/eventsStore';
 import { useModalStore } from '../../store/modalStore';
-import { db } from '../../utils/firebase';
 import { Event } from '../../utils/type';
 
 function SideBar() {
-  const eventsCollection = collection(
-    db,
-    'Calendars',
-    'nWryB1DvoYBEv1oKdc0L',
-    'events',
-  );
+  const { allEvents } = useEventsStore();
+  getAllEvents();
 
-  const [allEvents, setAllEvents] = useState<Event[]>([]);
-
-  useEffect(() => {
-    const orderedEventsCollection = query(
-      eventsCollection,
-      orderBy('createdAt', 'asc'),
-    );
-
-    const unsubscribe = onSnapshot(orderedEventsCollection, (snapshot) => {
-      snapshot.docChanges().forEach((change) => {
-        if (change.type === 'added') {
-          const newEvents = snapshot.docs.map((doc) => ({
-            ...doc.data(),
-            startAt: doc.data().startAt.toDate(),
-            endAt: doc.data().endAt.toDate(),
-            // createdAt: doc.data().createdAt.toDate(),
-            // updatedAt: doc.data().updatedAt.toDate(),
-          })) as Event[];
-
-          setAllEvents(newEvents);
-          console.log('Added: ', change.doc.data());
-        }
-        if (change.type === 'modified') {
-          const newEvents = snapshot.docs.map((doc) => ({
-            ...doc.data(),
-            startAt: doc.data().startAt.toDate(),
-            endAt: doc.data().endAt.toDate(),
-            // createdAt: doc.data().createdAt.toDate(),
-            // updatedAt: doc.data().updatedAt.toDate(),
-          })) as Event[];
-          setAllEvents(newEvents);
-          console.log('Modified: ', change.doc.data());
-        }
-        if (change.type === 'removed') {
-          console.log('Removed: ', change.doc.data());
-          setAllEvents((prev) =>
-            prev.filter((event) => event.eventId.toString() !== change.doc.id),
-          );
-        }
-      });
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  const { isEditModalOpen, setIsEditModalOpen, selectedEvent } =
-    useModalStore();
+  const { setIsEditModalOpen } = useModalStore();
 
   const handleClick = (event: Event) => {
     setIsEditModalOpen(true, event);

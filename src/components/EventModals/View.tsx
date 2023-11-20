@@ -7,8 +7,9 @@ import {
 } from '@nextui-org/react';
 import { format } from 'date-fns';
 import { collection, deleteDoc, doc } from 'firebase/firestore';
-import { initialEvent, useModalStore } from '../../store/modalStore';
+import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
+import { initialEvent } from '../../utils/type';
 
 interface Props {
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
@@ -50,7 +51,6 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
 
   const handleEdit = () => {
     setIsEditing(true);
-    console.log(selectedEvent);
   };
 
   const handleDelete = async () => {

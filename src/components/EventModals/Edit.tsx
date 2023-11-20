@@ -52,7 +52,6 @@ export default function Edit() {
   const [userInput, setUserInput] = useState<Event>(selectedEvent);
 
   useEffect(() => {
-    console.log('hi', selectedEvent);
     setUserInput(selectedEvent);
   }, [selectedEvent]);
 
@@ -89,7 +88,6 @@ export default function Edit() {
         aria-label='selectColor'
         onChange={(e) => {
           setUserInput((prev) => ({ ...prev, tag: e.target.value }));
-          console.log(typeof e.target.value);
         }}
         value={userInput.tag}
         placeholder={colors[Number(userInput.tag)].name}
@@ -209,15 +207,11 @@ export default function Edit() {
 
   const handleSubmit = () => {
     const currentTime = serverTimestamp();
-    console.log('time', currentTime);
-    console.log('id', selectedEvent.eventId);
-
     const data = {
       ...userInput,
       updatedAt: currentTime,
     };
     updateEvent(data);
-    // setUserInput(initialEvent);
     setIsEditModalOpen(false, userInput);
     setIsEditing(false);
   };
