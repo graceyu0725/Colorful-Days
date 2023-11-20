@@ -11,23 +11,31 @@ import {
   SelectItem,
   Switch,
 } from '@nextui-org/react';
-import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { useState } from 'react';
+import {
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
 import { Event } from '../../utils/type';
+import { View } from './View';
 
-export default function Create() {
-  const { isCreateModalOpen, setIsCreateModalOpen } = useModalStore();
+export default function Edit() {
+  const { isEditModalOpen, setIsEditModalOpen, selectedEvent } =
+    useModalStore();
+  const [isEditing, setIsEditing] = useState(false);
   const colors = [
     { color: 'blue', name: 'work' },
     { color: 'orange', name: 'study' },
     { color: 'green', name: 'travel' },
   ];
 
-  const initialInput: Event = {
+  const initialEvent = {
     eventId: 0,
     title: '',
     startAt: new Date(),
@@ -41,7 +49,12 @@ export default function Create() {
     messages: [],
   };
 
-  const [userInput, setUserInput] = useState(initialInput);
+  const [userInput, setUserInput] = useState<Event>(selectedEvent);
+
+  useEffect(() => {
+    console.log('hi', selectedEvent);
+    setUserInput(selectedEvent);
+  }, [selectedEvent]);
 
   const updateUserInput = (label: keyof Event, value: any) => {
     setUserInput((prev) => {
@@ -76,12 +89,20 @@ export default function Create() {
         aria-label='selectColor'
         onChange={(e) => {
           setUserInput((prev) => ({ ...prev, tag: e.target.value }));
+          console.log(typeof e.target.value);
         }}
         value={userInput.tag}
+        placeholder={colors[Number(userInput.tag)].name}
+        renderValue={() => (
+          <>
+            <div>{colors[Number(userInput.tag)].color}</div>
+            <div>{colors[Number(userInput.tag)].name}</div>
+          </>
+        )}
       >
         <SelectItem
           key={0}
-          value={0}
+          value='0'
           startContent={
             <div className='w-4 h-4 rounded-full bg-amber-500'></div>
           }
@@ -90,7 +111,7 @@ export default function Create() {
         </SelectItem>
         <SelectItem
           key={1}
-          value={1}
+          value='1'
           startContent={
             <div className='w-4 h-4 rounded-full bg-lime-500'></div>
           }
@@ -99,7 +120,7 @@ export default function Create() {
         </SelectItem>
         <SelectItem
           key={2}
-          value={2}
+          value='2'
           startContent={<div className='w-4 h-4 rounded-full bg-sky-500'></div>}
         >
           color3
@@ -174,119 +195,126 @@ export default function Create() {
   // Handle button clicking
   // =====================================================
 
-  const addEvent = async (id: string, data: object) => {
-    const calendarRef = doc(db, 'Calendars', 'nWryB1DvoYBEv1oKdc0L');
-    const eventRef = doc(calendarRef, 'events', id);
-    await setDoc(eventRef, data);
+  const eventsCollection = collection(
+    db,
+    'Calendars',
+    'nWryB1DvoYBEv1oKdc0L',
+    'events',
+  );
+
+  const updateEvent = async (data: object) => {
+    const eventRef = doc(eventsCollection, selectedEvent.eventId.toString());
+    await updateDoc(eventRef, data);
   };
 
   const handleSubmit = () => {
     const currentTime = serverTimestamp();
-    const eventsCollection = collection(
-      db,
-      'Calendars',
-      'nWryB1DvoYBEv1oKdc0L',
-      'events',
-    );
-    const eventRef = doc(eventsCollection);
-    const eventUUID = eventRef.id;
+    console.log('time', currentTime);
+    console.log('id', selectedEvent.eventId);
 
     const data = {
       ...userInput,
-      createdAt: currentTime,
       updatedAt: currentTime,
-      eventId: eventUUID,
     };
-    addEvent(eventUUID, data);
-    setUserInput(initialInput);
-    setIsCreateModalOpen(false, null);
+    updateEvent(data);
+    // setUserInput(initialEvent);
+    setIsEditModalOpen(false, userInput);
+    setIsEditing(false);
   };
 
   const handleCancel = () => {
-    setIsCreateModalOpen(false, null);
-    setUserInput(initialInput);
+    setIsEditing(false);
   };
 
   return (
     <>
       <Modal
-        isOpen={isCreateModalOpen}
-        onOpenChange={(isOpen) => setIsCreateModalOpen(isOpen, null)}
+        isOpen={isEditModalOpen}
+        onOpenChange={(isOpen) => setIsEditModalOpen(isOpen, userInput)}
         size='lg'
       >
         <ModalContent>
-          <>
-            <ModalHeader className='py-3'>New Event</ModalHeader>
-            <Divider />
-            <ModalBody>
-              <Input
-                aria-label='title'
-                type='text'
-                variant='underlined'
-                placeholder='Title'
-                value={userInput.title}
-                onChange={(e) => updateUserInput('title', e.target.value)}
-              />
-              {userInput.isAllDay &&
-                !userInput.isMemo &&
-                renderDatePicker('allDay')}
-              {userInput.isMemo && renderDatePicker('memo')}
-              {!userInput.isAllDay &&
-                !userInput.isMemo &&
-                renderDatePicker('normal')}
+          {!isEditing ? (
+            <View setIsEditing={setIsEditing} />
+          ) : (
+            <>
+              <ModalHeader className='py-3'>Update Event</ModalHeader>
+              <Divider />
+              <ModalBody>
+                <Input
+                  isReadOnly={!isEditing}
+                  aria-label='title'
+                  type='text'
+                  variant='underlined'
+                  placeholder='Title'
+                  value={userInput.title}
+                  onChange={(e) => updateUserInput('title', e.target.value)}
+                />
+                {userInput.isAllDay &&
+                  !userInput.isMemo &&
+                  renderDatePicker('allDay')}
+                {userInput.isMemo && renderDatePicker('memo')}
+                {!userInput.isAllDay &&
+                  !userInput.isMemo &&
+                  renderDatePicker('normal')}
 
-              {!userInput.isMemo && (
+                {!userInput.isMemo && (
+                  <Switch
+                    size='sm'
+                    className='pl-14'
+                    aria-label='allDay'
+                    isSelected={userInput.isAllDay}
+                    onChange={(e) => updateUserInput('isAllDay', e)}
+                  >
+                    All-day
+                  </Switch>
+                )}
+
                 <Switch
                   size='sm'
                   className='pl-14'
-                  aria-label='allDay'
-                  isSelected={userInput.isAllDay}
-                  onChange={(e) => updateUserInput('isAllDay', e)}
+                  aria-label='saveAsMemo'
+                  isSelected={userInput.isMemo}
+                  onChange={(e) => updateUserInput('isMemo', e)}
                 >
-                  All-day
+                  Save as memo
                 </Switch>
-              )}
 
-              <Switch
-                size='sm'
-                className='pl-14'
-                aria-label='saveAsMemo'
-                isSelected={userInput.isMemo}
-                onChange={(e) => updateUserInput('isMemo', e)}
-              >
-                Save as memo
-              </Switch>
+                <div className='flex items-center gap-2'>
+                  <label className='w-12'>Tag</label>
+                  {renderTags()}
+                </div>
 
-              <div className='flex items-center gap-2'>
-                <label className='w-12'>Tag</label>
-                {renderTags()}
-              </div>
+                <div className='flex items-center gap-2'>
+                  <label className='w-12'>Note</label>
+                  <Input
+                    type='text'
+                    className='w-80'
+                    aria-label='note'
+                    value={userInput.note}
+                    onChange={(e) => updateUserInput('note', e.target.value)}
+                  />
+                </div>
+              </ModalBody>
 
-              <div className='flex items-center gap-2'>
-                <label className='w-12'>Note</label>
-                <Input
-                  type='text'
-                  className='w-80'
-                  aria-label='note'
-                  value={userInput.note}
-                  onChange={(e) => updateUserInput('note', e.target.value)}
-                />
-              </div>
-            </ModalBody>
-
-            <ModalFooter>
-              <Button color='primary' onPress={handleSubmit} className='w-1/2'>
-                送出
-              </Button>
-              <Button
-                variant='bordered'
-                onPress={handleCancel}
-                className='w-1/2'
-              >
-                取消
-              </Button>
-            </ModalFooter>
-          </>
+              <ModalFooter>
+                <Button
+                  color='primary'
+                  onPress={handleSubmit}
+                  className='w-1/2'
+                >
+                  送出
+                </Button>
+                <Button
+                  variant='bordered'
+                  onPress={handleCancel}
+                  className='w-1/2'
+                >
+                  取消
+                </Button>
+              </ModalFooter>
+            </>
+          )}
         </ModalContent>
       </Modal>
     </>

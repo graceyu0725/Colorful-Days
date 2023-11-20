@@ -1,6 +1,8 @@
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
+import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
+import { Event } from '../../utils/type';
 
 function SideBar() {
   const eventsCollection = collection(
@@ -9,25 +11,6 @@ function SideBar() {
     'nWryB1DvoYBEv1oKdc0L',
     'events',
   );
-
-  interface EventMessages {
-    arthur: object;
-    content: string;
-    createdAt: Date | null;
-  }
-
-  interface Event {
-    title: string;
-    startAt: Date;
-    endAt: Date;
-    isAllDay: boolean;
-    isMemo: boolean;
-    tag: string;
-    note: string;
-    createdAt: Date;
-    updatedAt: Date;
-    messages: EventMessages[];
-  }
 
   const [allEvents, setAllEvents] = useState<Event[]>([]);
 
@@ -44,22 +27,30 @@ function SideBar() {
             ...doc.data(),
             startAt: doc.data().startAt.toDate(),
             endAt: doc.data().endAt.toDate(),
-            createdAt: doc.data().createdAt.toDate(),
-            updatedAt: doc.data().updatedAt.toDate(),
+            // createdAt: doc.data().createdAt.toDate(),
+            // updatedAt: doc.data().updatedAt.toDate(),
           })) as Event[];
 
           setAllEvents(newEvents);
           console.log('Added: ', change.doc.data());
         }
-        // if (change.type === 'modified') {
-        //   console.log('Modified: ', change.doc.data());
-        // }
-        // if (change.type === 'removed') {
-        //   console.log('Removed: ', change.doc.data());
-        //   setAllArticles((prev) =>
-        //     prev.filter((article) => article.id !== change.doc.id),
-        //   );
-        // }
+        if (change.type === 'modified') {
+          const newEvents = snapshot.docs.map((doc) => ({
+            ...doc.data(),
+            startAt: doc.data().startAt.toDate(),
+            endAt: doc.data().endAt.toDate(),
+            // createdAt: doc.data().createdAt.toDate(),
+            // updatedAt: doc.data().updatedAt.toDate(),
+          })) as Event[];
+          setAllEvents(newEvents);
+          console.log('Modified: ', change.doc.data());
+        }
+        if (change.type === 'removed') {
+          console.log('Removed: ', change.doc.data());
+          setAllEvents((prev) =>
+            prev.filter((event) => event.eventId.toString() !== change.doc.id),
+          );
+        }
       });
     });
 
@@ -68,16 +59,23 @@ function SideBar() {
     };
   }, []);
 
+  const { isEditModalOpen, setIsEditModalOpen, selectedEvent } =
+    useModalStore();
+
+  const handleClick = (event: Event) => {
+    setIsEditModalOpen(true, event);
+  };
+
   return (
     <>
       <div className='border-r-3 fixed h-screen w-72 border-slate-300 p-4'>
         Events (old to new)
-        
         <div className='flex flex-col w-fit	gap-1'>
-          {allEvents.map((event, index) => (
+          {allEvents.map((event) => (
             <div
-              key={index}
+              key={event.eventId}
               className='underline underline-offset-4 cursor-pointer'
+              onClick={() => handleClick(event)}
             >
               {event.title}
             </div>

@@ -1,7 +1,8 @@
 import CalendarView from '../../components/CalendarView';
+import CreateEventModal from '../../components/EventModals/Create';
+import EditEventModal from '../../components/EventModals/Edit';
 import Header from '../../components/Header';
 import SideBar from '../../components/SideBar';
-import CreateEventModal from '../../components/EventModals/Create';
 
 function Calendar() {
   return (
@@ -10,7 +11,8 @@ function Calendar() {
       <div className='flex'>
         <SideBar />
         <CalendarView />
-        <CreateEventModal/>
+        <CreateEventModal />
+        <EditEventModal />
       </div>
     </>
   );
