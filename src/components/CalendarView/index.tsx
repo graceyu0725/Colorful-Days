@@ -8,7 +8,7 @@ function CalendarView() {
   const [formateDate, setFormateDate] = useState(format(date, 'MMMM, yyyy'));
 
   return (
-    <div className='ml-72 flex w-full flex-col px-6 py-2'>
+    <div className='ml-64 flex w-full flex-col px-6 py-2'>
       <Navigation
         date={date}
         setDate={setDate}

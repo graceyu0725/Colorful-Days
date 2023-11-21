@@ -5,8 +5,10 @@ interface Props extends React.PropsWithChildren {
   className?: string;
   isActive?: boolean;
   header?: boolean;
-  dayCounts?: number;
+  dayCounts: number;
   firstDayOfNextMonth?: number;
+  cellDate: Date;
+  date: Date;
 }
 
 const Cell: React.FC<Props> = ({
@@ -14,26 +16,28 @@ const Cell: React.FC<Props> = ({
   className,
   header,
   dayCounts,
-  firstDayOfNextMonth,
+  date,
+  cellDate,
 }) => {
   const { setIsCreateModalOpen } = useModalStore();
-  const date: Date = new Date();
-  console.log('dayCounts:', dayCounts);
 
   return (
     <div
-      onClick={() => setIsCreateModalOpen(true, date)}
+      id='cell'
+      onClick={() => {
+        if (!header) {
+          setIsCreateModalOpen(true, cellDate);
+          console.log('cellDate:', cellDate, date);
+        }
+      }}
       className={clsx(
-        'flex select-none flex-col items-start border-b border-r text-sm',
+        'flex select-none flex-col items-start border-b  text-sm w-5',
         {
           [header
             ? 'h-10 items-center justify-center'
-            : dayCounts &&
-                dayCounts > 35 &&
-                firstDayOfNextMonth &&
-                firstDayOfNextMonth > 0
-              ? 'h-24 px-3 py-2 hover:bg-gray-200 active:bg-gray-200'
-              : 'h-28 px-3 py-2 hover:bg-gray-200 active:bg-gray-200']: true,
+            : dayCounts > 35
+              ? 'h-24 px-2 py-1 hover:bg-gray-200 active:bg-gray-200'
+              : 'h-28 px-2 py-1 hover:bg-gray-200 active:bg-gray-200']: true,
         },
         className,
       )}

@@ -7,8 +7,8 @@ export interface EventMessages {
 export interface Event {
   eventId: number;
   title: string;
-  startAt: Date;
-  endAt: Date;
+  startAt: Date | null;
+  endAt: Date | null;
   isAllDay: boolean;
   isMemo: boolean;
   tag: string;

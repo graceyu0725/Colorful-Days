@@ -5,7 +5,6 @@ import { useModalStore } from '../../store/modalStore';
 
 function Header() {
   const { setIsCreateModalOpen } = useModalStore();
-  const date: Date = new Date();
 
   return (
     <>
@@ -19,7 +18,7 @@ function Header() {
         </div>
         <div className='flex items-center'>
           <TdesignAdd
-            onClick={() => setIsCreateModalOpen(true, date)}
+            onClick={() => setIsCreateModalOpen(true, new Date())}
             className='mr-5 text-xl text-[#5a3a1b] hover:cursor-pointer'
           />
           <User className='mr-5 text-xl text-[#5a3a1b] hover:cursor-pointer' />

@@ -1,11 +1,18 @@
 import clsx from 'clsx';
-import { differenceInDays, endOfMonth, startOfMonth } from 'date-fns';
+import { useEventsStore } from '../../../store/eventsStore';
+import {
+  generateMonthDates,
+  getSplitEvents,
+  isSameDay,
+  isSameMonth,
+  splitDatesIntoWeeks,
+} from '../../../utils/handleDatesAndEvents';
 import Cell from './Cell';
+import EventCells from './EventCells';
 
-const weeks = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 type Props = {
-  value?: Date;
   date: Date;
   setDate: React.Dispatch<React.SetStateAction<Date>>;
   formateDate: string;
@@ -13,7 +20,6 @@ type Props = {
 };
 
 const MonthlyView: React.FC<Props> = ({
-  value = new Date(),
   date,
   setDate,
   formateDate,
@@ -21,89 +27,98 @@ const MonthlyView: React.FC<Props> = ({
 }) => {
   const currentYear = date.getFullYear();
   const currentMonth = date.getMonth();
-  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-  const lastDateOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  const lastDateOfLastMonth = new Date(currentYear, currentMonth, 0).getDate();
-  const firstDayOfNextMonth = new Date(
-    currentYear,
-    currentMonth + 1,
-    1,
-  ).getDay();
+  const { allEvents } = useEventsStore();
 
-  console.log(lastDateOfMonth + firstDayOfMonth + firstDayOfNextMonth);
+  // 生成當前月份的日期陣列 []
+  const monthDates: Date[] = generateMonthDates(currentYear, currentMonth);
+  const splitEvents = getSplitEvents(monthDates, allEvents);
 
-  const startDate = startOfMonth(value);
-  const endDate = endOfMonth(value);
-  const numDays = differenceInDays(endDate, startDate) + 1;
+  // 用 Wrapper 包住日曆格子＆事件格子
+  interface WrapperProps {
+    children: React.ReactNode;
+    id: string;
+  }
 
-  const prefixDays = startDate.getDay();
-  const suffixDays = 6 - endDate.getDay();
+  interface CalendarViewProps {
+    monthDates: Date[];
+  }
+
+  const WeekWrapper: React.FC<WrapperProps> = ({ children }) => (
+    <div className='flex-auto relative px-px' id='weekWrapper'>
+      {children}
+    </div>
+  );
+
+  const DayCellsWrapper: React.FC<WrapperProps> = ({ children }) => (
+    <div className='flex w-full' id='dayCellsWrapper'>
+      {children}
+    </div>
+  );
+
+  // 生成日曆格子，每一週用 DayCellWrapper 包住 DayCells
+  const CalendarView: React.FC<CalendarViewProps> = ({ monthDates }) => {
+    const weeks = splitDatesIntoWeeks(monthDates);
+
+    return (
+      <div className='flex flex-col'>
+        <DayCellsWrapper id='dayCellsWrapper'>
+          {weekdays.map((weekday, index) => (
+            <Cell
+              key={index}
+              className='text-base font-bold uppercase grow'
+              cellDate={new Date()}
+              dayCounts={monthDates.length}
+              date={date}
+              header
+            >
+              {weekday}
+            </Cell>
+          ))}
+        </DayCellsWrapper>
+
+        {weeks.map((week, index) => (
+          <WeekWrapper id='weekWrapper'>
+            <DayCellsWrapper key={`week-${index}`} id='dayCellsWrapper'>
+              {week.map((cellDate, idx) => {
+                return (
+                  <Cell
+                    key={`${index}-${idx}`}
+                    className={clsx('grow', {
+                      [isSameMonth(cellDate, date) ? '' : 'text-gray-400']:
+                        true,
+                    })}
+                    cellDate={cellDate}
+                    dayCounts={monthDates.length}
+                    date={date}
+                  >
+                    <div
+                      className={clsx('w-5 h-5 text-center', {
+                        [isSameDay(cellDate, new Date())
+                          ? 'rounded-full bg-amber-800 text-white'
+                          : '']: true,
+                      })}
+                    >
+                      {cellDate.getDate()}
+                    </div>
+                  </Cell>
+                );
+              })}
+            </DayCellsWrapper>
+
+            <EventCells
+              splitEvents={splitEvents}
+              weekIndex={index}
+              week={week}
+            />
+          </WeekWrapper>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className='mt-2 w-full border-l border-t'>
-      <div className='grid grid-cols-7 items-center justify-center text-center'>
-        {weeks.map((week, index) => (
-          <Cell key={index} className='text-base font-bold uppercase' header>
-            {week}
-          </Cell>
-        ))}
-
-        {Array.from({ length: firstDayOfMonth }).map((_, index) => (
-          <Cell
-            key={index}
-            className='bg-gray-100 text-gray-400'
-            dayCounts={
-              lastDateOfMonth + firstDayOfMonth + 7 - firstDayOfNextMonth
-            }
-            firstDayOfNextMonth={firstDayOfNextMonth}
-          >
-            <div className='w-6'>
-              {lastDateOfLastMonth - firstDayOfMonth + 1 + index}
-            </div>
-          </Cell>
-        ))}
-
-        {Array.from({ length: lastDateOfMonth }).map((_, index) => {
-          const date = index + 1;
-          const isCurrentDate =
-            currentYear === new Date().getFullYear() &&
-            currentMonth === new Date().getMonth() &&
-            date === value.getDate();
-
-          return (
-            <Cell
-              key={date}
-              dayCounts={
-                lastDateOfMonth + firstDayOfMonth + 7 - firstDayOfNextMonth
-              }
-              firstDayOfNextMonth={firstDayOfNextMonth}
-            >
-              <div
-                className={clsx('w-6', {
-                  [isCurrentDate ? 'rounded-xl bg-amber-800 text-white' : '']:
-                    true,
-                })}
-              >
-                {date}
-              </div>
-            </Cell>
-          );
-        })}
-
-        {firstDayOfNextMonth > 0 &&
-          Array.from({ length: 7 - firstDayOfNextMonth }).map((_, index) => (
-            <Cell
-              key={index}
-              className='bg-gray-100 text-gray-400'
-              dayCounts={
-                lastDateOfMonth + firstDayOfMonth + 7 - firstDayOfNextMonth
-              }
-              firstDayOfNextMonth={firstDayOfNextMonth}
-            >
-              <div className='w-6'>{index + 1}</div>
-            </Cell>
-          ))}
-      </div>
+      {CalendarView({ monthDates })}
     </div>
   );
 };

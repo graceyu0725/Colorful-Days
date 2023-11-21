@@ -3,10 +3,9 @@ import { useModalStore } from '../../store/modalStore';
 import { Event } from '../../utils/type';
 
 function SideBar() {
+  const { setIsEditModalOpen } = useModalStore();
   const { allEvents } = useEventsStore();
   getAllEvents();
-
-  const { setIsEditModalOpen } = useModalStore();
 
   const handleClick = (event: Event) => {
     setIsEditModalOpen(true, event);
@@ -14,7 +13,7 @@ function SideBar() {
 
   return (
     <>
-      <div className='border-r-3 fixed h-screen w-72 border-slate-300 p-4'>
+      <div className='border-r-3 fixed h-screen w-64 border-slate-300 p-4'>
         Events (old to new)
         <div className='flex flex-col w-fit	gap-1'>
           {allEvents.map((event) => (

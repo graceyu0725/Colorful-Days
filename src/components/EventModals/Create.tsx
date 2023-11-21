@@ -11,37 +11,33 @@ import {
   SelectItem,
   Switch,
 } from '@nextui-org/react';
+import { format } from 'date-fns';
 import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
-import { Event } from '../../utils/type';
+import { Event, initialEvent } from '../../utils/type';
 
 export default function Create() {
-  const { isCreateModalOpen, setIsCreateModalOpen } = useModalStore();
+  const { isCreateModalOpen, setIsCreateModalOpen, selectedDate, setIsEditModalOpen } =
+    useModalStore();
   const colors = [
     { color: 'blue', name: 'work' },
     { color: 'orange', name: 'study' },
     { color: 'green', name: 'travel' },
   ];
 
-  const initialInput: Event = {
-    eventId: 0,
-    title: '',
-    startAt: new Date(),
-    endAt: new Date(),
-    isAllDay: false,
-    isMemo: false,
-    tag: '0',
-    note: '',
-    createdAt: null,
-    updatedAt: null,
-    messages: [],
-  };
+  const [userInput, setUserInput] = useState(initialEvent);
 
-  const [userInput, setUserInput] = useState(initialInput);
+  useEffect(() => {
+    setUserInput((prev) => ({
+      ...prev,
+      startAt: selectedDate,
+      endAt: selectedDate,
+    }));
+  }, [selectedDate]);
 
   const updateUserInput = (label: keyof Event, value: any) => {
     setUserInput((prev) => {
@@ -109,6 +105,10 @@ export default function Create() {
   };
 
   const renderDatePicker = (type: string) => {
+    const date = selectedDate
+      ? format(selectedDate, 'MMM dd, yyyy hh:mm')
+      : new Date();
+
     if (type === 'allDay') {
       return (
         <div className='flex items-center gap-2'>
@@ -181,6 +181,10 @@ export default function Create() {
   };
 
   const handleSubmit = () => {
+    if (userInput.endAt < userInput.startAt) {
+      alert('結束時間不可早於開始時間！');
+      return;
+    }
     const currentTime = serverTimestamp();
     const eventsCollection = collection(
       db,
@@ -198,20 +202,20 @@ export default function Create() {
       eventId: eventUUID,
     };
     addEvent(eventUUID, data);
-    setUserInput(initialInput);
-    setIsCreateModalOpen(false, null);
+    setUserInput(initialEvent);
+    setIsCreateModalOpen(false, new Date());
   };
 
   const handleCancel = () => {
-    setIsCreateModalOpen(false, null);
-    setUserInput(initialInput);
+    setIsCreateModalOpen(false, new Date());
+    setUserInput(initialEvent);
   };
 
   return (
     <>
       <Modal
         isOpen={isCreateModalOpen}
-        onOpenChange={(isOpen) => setIsCreateModalOpen(isOpen, null)}
+        onOpenChange={(isOpen) => setIsCreateModalOpen(isOpen, selectedDate)}
         size='lg'
       >
         <ModalContent>
