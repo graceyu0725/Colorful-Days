@@ -11,7 +11,6 @@ import {
   SelectItem,
   Switch,
 } from '@nextui-org/react';
-import { format } from 'date-fns';
 import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
@@ -21,23 +20,22 @@ import { db } from '../../utils/firebase';
 import { Event, initialEvent } from '../../utils/type';
 
 export default function Create() {
-  const { isCreateModalOpen, setIsCreateModalOpen, selectedDate, setIsEditModalOpen } =
-    useModalStore();
-  const colors = [
-    { color: 'blue', name: 'work' },
-    { color: 'orange', name: 'study' },
-    { color: 'green', name: 'travel' },
-  ];
+  const {
+    isCreateModalOpen,
+    setIsCreateModalOpen,
+    selectedStartDate,
+    selectedEndDate,
+  } = useModalStore();
 
   const [userInput, setUserInput] = useState(initialEvent);
 
   useEffect(() => {
     setUserInput((prev) => ({
       ...prev,
-      startAt: selectedDate,
-      endAt: selectedDate,
+      startAt: selectedStartDate,
+      endAt: selectedEndDate,
     }));
-  }, [selectedDate]);
+  }, [selectedStartDate, selectedEndDate]);
 
   const updateUserInput = (label: keyof Event, value: any) => {
     setUserInput((prev) => {
@@ -105,10 +103,6 @@ export default function Create() {
   };
 
   const renderDatePicker = (type: string) => {
-    const date = selectedDate
-      ? format(selectedDate, 'MMM dd, yyyy hh:mm')
-      : new Date();
-
     if (type === 'allDay') {
       return (
         <div className='flex items-center gap-2'>
@@ -181,6 +175,10 @@ export default function Create() {
   };
 
   const handleSubmit = () => {
+    if (!userInput.title) {
+      alert('請輸入事件標題！');
+      return;
+    }
     if (userInput.endAt < userInput.startAt) {
       alert('結束時間不可早於開始時間！');
       return;
@@ -203,11 +201,11 @@ export default function Create() {
     };
     addEvent(eventUUID, data);
     setUserInput(initialEvent);
-    setIsCreateModalOpen(false, new Date());
+    setIsCreateModalOpen(false, new Date(), new Date());
   };
 
   const handleCancel = () => {
-    setIsCreateModalOpen(false, new Date());
+    setIsCreateModalOpen(false, new Date(), new Date());
     setUserInput(initialEvent);
   };
 
@@ -215,7 +213,9 @@ export default function Create() {
     <>
       <Modal
         isOpen={isCreateModalOpen}
-        onOpenChange={(isOpen) => setIsCreateModalOpen(isOpen, selectedDate)}
+        onOpenChange={(isOpen) =>
+          setIsCreateModalOpen(isOpen, selectedStartDate, selectedEndDate)
+        }
         size='lg'
       >
         <ModalContent>

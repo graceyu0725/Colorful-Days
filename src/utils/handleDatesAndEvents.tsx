@@ -126,12 +126,13 @@ export const getSplitEvents = (monthDates: Date[], allEvents: Event[]) => {
 // Render one event
 // ================================================================
 
-export const renderEvent = (event: Event, cellDate: Date) => {
+export const renderEvent = (event: any, cellDate: Date) => {
   const { setIsEditModalOpen } = useModalStore();
   const handleClick = (event: React.MouseEvent, e: Event) => {
     event.stopPropagation(); // 阻止事件冒泡
     setIsEditModalOpen(true, e);
   };
+
 
   // 如果是 memo，則不顯示在畫面上
   if (event.isMemo) {
@@ -165,7 +166,6 @@ export const renderEvent = (event: Event, cellDate: Date) => {
       );
     }
     const lastDays = differenceInCalendarDays(endDate, startDate) + 1;
-    console.log('lastDays', lastDays);
 
     // 起始＆結束為不同天，根據 事件日期長度 決定要佔的格子數
     // 若 事件日期長度 超過當週可佔據的格子數，則需要斷行
@@ -196,7 +196,6 @@ export const renderEvent = (event: Event, cellDate: Date) => {
     const lastDays = differenceInCalendarDays(endDate, startDate) + 1;
     const lastDaysThisWeek =
       lastDays - differenceInCalendarDays(cellDate, startDate);
-    console.log('lastDaysThisWeek', lastDaysThisWeek);
     if (lastDaysThisWeek <= 7) {
       return (
         <div

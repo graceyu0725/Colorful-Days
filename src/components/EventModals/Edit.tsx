@@ -35,20 +35,6 @@ export default function Edit() {
     { color: 'green', name: 'travel' },
   ];
 
-  const initialEvent = {
-    eventId: 0,
-    title: '',
-    startAt: new Date(),
-    endAt: new Date(),
-    isAllDay: false,
-    isMemo: false,
-    tag: '0',
-    note: '',
-    createdAt: null,
-    updatedAt: null,
-    messages: [],
-  };
-
   const [userInput, setUserInput] = useState<Event>(selectedEvent);
 
   useEffect(() => {

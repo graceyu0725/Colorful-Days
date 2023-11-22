@@ -8,7 +8,7 @@ function Header() {
 
   return (
     <>
-      <nav className='border-b-3 sticky top-0 flex justify-between h-14 w-full items-center border border-slate-300 px-5 bg-slate-50'>
+      <nav className='border-b-3 sticky top-0 flex justify-between h-14 w-full items-center border border-slate-300 px-5 bg-slate-50 z-10'>
         <div className='flex items-center'>
           <LucideAlignJustify className='mr-5 text-xl text-[#5a3a1b] hover:cursor-pointer' />
           <img src='/assets/logo.png' className='w-10' />
@@ -18,7 +18,7 @@ function Header() {
         </div>
         <div className='flex items-center'>
           <TdesignAdd
-            onClick={() => setIsCreateModalOpen(true, new Date())}
+            onClick={() => setIsCreateModalOpen(true, new Date(), new Date())}
             className='mr-5 text-xl text-[#5a3a1b] hover:cursor-pointer'
           />
           <User className='mr-5 text-xl text-[#5a3a1b] hover:cursor-pointer' />

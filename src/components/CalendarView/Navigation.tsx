@@ -21,7 +21,6 @@ type Props = {
 };
 
 const Navigation: React.FC<Props> = ({
-  value = new Date(),
   date,
   setDate,
   formateDate,

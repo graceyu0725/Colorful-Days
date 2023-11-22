@@ -24,9 +24,18 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
   ];
 
   const renderTime = () => {
+    const startDate = selectedEvent.startAt
+      ? selectedEvent.startAt
+      : new Date();
+    const endDate = selectedEvent.endAt ? selectedEvent.endAt : new Date();
+
+    if (selectedEvent.isMemo) {
+      return <div>Memo</div>;
+    }
+
     if (selectedEvent.isAllDay) {
-      const start = format(selectedEvent.startAt, 'yyyy E, LLL dd');
-      const end = format(selectedEvent.endAt, 'yyyy E, LLL dd');
+      const start = format(startDate, 'yyyy E, LLL dd');
+      const end = format(endDate, 'yyyy E, LLL dd');
       if (start === end) {
         return <div>{start}</div>;
       }
@@ -38,8 +47,8 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
         </>
       );
     }
-    const start = format(selectedEvent.startAt, 'E, LLL dd yyyy kk:mm');
-    const end = format(selectedEvent.endAt, 'E, LLL dd yyyy kk:mm');
+    const start = format(startDate, 'E, LLL dd yyyy kk:mm');
+    const end = format(endDate, 'E, LLL dd yyyy kk:mm');
     return (
       <>
         <div>{start}</div>
