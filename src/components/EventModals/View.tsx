@@ -47,8 +47,8 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
         </>
       );
     }
-    const start = format(startDate, 'E, LLL dd yyyy kk:mm');
-    const end = format(endDate, 'E, LLL dd yyyy kk:mm');
+    const start = format(startDate, 'E, LLL dd yyyy HH:mm');
+    const end = format(endDate, 'E, LLL dd yyyy HH:mm');
     return (
       <>
         <div>{start}</div>

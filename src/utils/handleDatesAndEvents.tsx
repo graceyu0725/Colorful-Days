@@ -1,4 +1,9 @@
-import { differenceInCalendarDays, getDay, isWithinInterval } from 'date-fns';
+import {
+  differenceInCalendarDays,
+  format,
+  getDay,
+  isWithinInterval,
+} from 'date-fns';
 import { useModalStore } from '../store/modalStore';
 import { Event } from './type';
 
@@ -133,10 +138,9 @@ export const renderEvent = (event: any, cellDate: Date) => {
     setIsEditModalOpen(true, e);
   };
 
-
   // 如果是 memo，則不顯示在畫面上
   if (event.isMemo) {
-    return <div className='grow basis-0'></div>;
+    return <div className=''></div>;
   }
 
   const startDate = event.startAt || new Date();
@@ -146,22 +150,27 @@ export const renderEvent = (event: any, cellDate: Date) => {
   if (isSameDay(startDate, cellDate)) {
     // 起始＆結束為同一天，根據 isAllDay 決定背景透明度
     if (isSameDay(startDate, endDate)) {
+      // ALL-DAY
       if (event.isAllDay) {
         return (
           <div
-            className='w-10 grow bg-red-200 basis-0 rounded indent-1.5 hover:cursor-pointer'
+            className='bg-red-200 basis-0 rounded indent-1.5 hover:cursor-pointer'
             onClick={(e) => handleClick(e, event)}
           >
             {event.title}
           </div>
         );
       }
+
+      // SAME-DAY
+      const formattedTime = format(startDate, 'h:mm a');
       return (
         <div
-          className='grow bg-red-50 basis-0 rounded indent-1.5 hover:cursor-pointer'
+          className='bg-red-50 basis-0 rounded indent-1.5 hover:cursor-pointer flex items-center justify-between'
           onClick={(e) => handleClick(e, event)}
         >
-          {event.title}
+          <div>{event.title}</div>
+          <div className='mr-1 text-xs text-gray-400'>{formattedTime}</div>
         </div>
       );
     }
@@ -173,7 +182,8 @@ export const renderEvent = (event: any, cellDate: Date) => {
       return (
         <div
           className='bg-red-200 basis-0 rounded indent-1.5 hover:cursor-pointer'
-          style={{ flexGrow: 7 - getDay(startDate) }}
+          // style={{ flexGrow: 7 - getDay(startDate) }}
+          style={{ gridColumnStart: getDay(startDate) + 1, gridColumnEnd: 8 }}
           onClick={(e) => handleClick(e, event)}
         >
           {event.title}
@@ -183,7 +193,11 @@ export const renderEvent = (event: any, cellDate: Date) => {
     return (
       <div
         className='bg-red-200 basis-0 rounded indent-1.5 hover:cursor-pointer'
-        style={{ flexGrow: lastDays }}
+        // style={{ flexGrow: lastDays }}
+        style={{
+          gridColumnStart: getDay(startDate) + 1,
+          gridColumnEnd: getDay(startDate) + 1 + lastDays,
+        }}
         onClick={(e) => handleClick(e, event)}
       >
         {event.title}
@@ -200,7 +214,8 @@ export const renderEvent = (event: any, cellDate: Date) => {
       return (
         <div
           className='bg-red-200 basis-0 rounded indent-1.5 hover:cursor-pointer'
-          style={{ flexGrow: lastDaysThisWeek }}
+          // style={{ flexGrow: lastDaysThisWeek }}
+          style={{ gridColumnStart: 1, gridColumnEnd: lastDaysThisWeek + 1 }}
           onClick={(e) => handleClick(e, event)}
         >
           {event.title}
@@ -210,7 +225,7 @@ export const renderEvent = (event: any, cellDate: Date) => {
     return (
       <div
         className='bg-red-200 basis-0 rounded indent-1.5 hover:cursor-pointer'
-        style={{ flexGrow: 7 }}
+        style={{ gridColumnStart: 1, gridColumnEnd: 8 }}
         onClick={(e) => handleClick(e, event)}
       >
         {event.title}
@@ -218,5 +233,5 @@ export const renderEvent = (event: any, cellDate: Date) => {
     );
   }
 
-  return <div className='grow-0'></div>;
+  return <div className=''></div>;
 };

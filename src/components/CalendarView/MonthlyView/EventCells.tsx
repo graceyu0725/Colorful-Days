@@ -89,7 +89,7 @@ const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
   );
 
   const EventRow: React.FC<WrapperProps> = ({ children }) => (
-    <div className='flex gap-px' id='eventRow'>
+    <div className='grid gap-px grid-cols-7' id='eventRow'>
       {children}
     </div>
   );
@@ -101,7 +101,7 @@ const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
           events[0] ? (
             renderEvent(events[0], week[index])
           ) : (
-            <div key={index} className='grow'></div>
+            <div key={index} className=''></div>
           ),
         )}
       </EventRow>
@@ -110,7 +110,7 @@ const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
           events[1] ? (
             renderEvent(events[1], week[index])
           ) : (
-            <div className='grow'></div>
+            <div className=''></div>
           ),
         )}
       </EventRow>

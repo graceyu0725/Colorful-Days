@@ -169,7 +169,7 @@ const [startCell, setStartCell] = useState([0,0])
   };
 
   return (
-    <div className='mt-2 w-full border-t'>{CalendarView({ monthDates })}</div>
+    <div className='mt-1 w-full border-t'>{CalendarView({ monthDates })}</div>
   );
 };
 
