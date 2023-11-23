@@ -1,12 +1,30 @@
 import { Card, Image } from '@nextui-org/react';
-import backgroundImage from './background.png';
-import signinImage from './signinImage.jpg';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { UserSignUp, firebase } from '../../utils/firebase';
+import signinImage from './signinImage.png';
 
 function Signup() {
+  const [userInput, setUserInput] = useState<UserSignUp>({
+    name: '',
+    email: '',
+    password: '',
+  });
+  const navigate = useNavigate();
+
+  // Update userInput when typing
+  const updateUserInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setUserInput((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   return (
     <div
-      className='flex items-center justify-center h-screen bg-cover'
-      style={{ backgroundImage: `url(${backgroundImage})` }}
+      className='flex items-center justify-center h-screen bg-cover bg-slate-200'
+      // style={{ backgroundImage: `url(${backgroundImage})` }}
     >
       <div
         style={{
@@ -21,9 +39,9 @@ function Signup() {
       ></div>
 
       <Card className='w-11/12 p-0 rounded-none flex z-10 h-5/6'>
-        <div className='flex min-h-full'>
-          <div className='flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24'>
-            <div className='mx-auto w-full max-w-sm lg:w-96'>
+        <div className='flex h-full'>
+          <div className='h-full flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24'>
+            <div className='max-h-full flex flex-col justify-center  mx-auto w-full max-w-sm lg:w-96'>
               <div className='flex items-center'>
                 <Image
                   className='h-10 mr-1'
@@ -35,25 +53,27 @@ function Signup() {
                 </div>
               </div>
 
-              <h2 className='mt-6 mb-10 text-3xl font-bold tracking-tight text-gray-900'>
+              <h2 className='mt-2 mb-10 text-3xl font-bold tracking-tight text-gray-900'>
                 Create your colorful days
               </h2>
 
               <div className='mt-6'>
-                <form action='#' method='POST' className='space-y-4'>
-                  <div className='flex flex-col gap-1'>
+                <form action='#' method='POST' className='space-y-6'>
+                  <div className='flex flex-col'>
                     <label
                       htmlFor='userName'
                       className='block font-medium text-gray-700'
                     >
-                      Username
+                      Name
                     </label>
                     <input
-                      id='username'
-                      name='username'
+                      id='name'
+                      name='name'
                       type='text'
-                      autoComplete='username'
+                      autoComplete='name'
                       required
+                      value={userInput.name}
+                      onChange={updateUserInput}
                       className='h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
                     />
                   </div>
@@ -70,6 +90,8 @@ function Signup() {
                       type='email'
                       autoComplete='email'
                       required
+                      value={userInput.email}
+                      onChange={updateUserInput}
                       className='h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
                     />
                   </div>
@@ -87,14 +109,34 @@ function Signup() {
                       type='password'
                       autoComplete='current-password'
                       required
+                      value={userInput.password}
+                      onChange={updateUserInput}
                       className='h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
                     />
                   </div>
 
+                  <div className='flex items-center text-sm'>
+                    <div className='font-medium mr-2'>
+                      Already have an account?
+                    </div>
+                    <Link
+                      to='/signin'
+                      className='font-medium text-slate-600 hover:text-slate-500 underline'
+                    >
+                      Sign in
+                    </Link>
+                  </div>
+
                   <div>
                     <button
-                      type='submit'
-                      className='mt-12 h-11 flex w-full justify-center rounded-md border border-transparent bg-slate-700 py-2 px-4 font-medium text-white shadow-sm hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2'
+                      type='button'
+                      disabled={
+                        !userInput.name ||
+                        !userInput.email ||
+                        !userInput.password
+                      }
+                      onClick={() => firebase.signUp(userInput, navigate)}
+                      className='h-11 flex w-full justify-center rounded-md border border-transparent bg-slate-700 py-2 px-4 font-medium text-white shadow-sm hover:bg-slate-600 disabled:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2'
                     >
                       Create account
                     </button>
