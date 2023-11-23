@@ -55,7 +55,11 @@ export const firebase = {
         navigate('/signin');
       })
       .catch((error) => {
-        alert('已註冊或資料格式不正確');
+        if (error.message === "Firebase: Error (auth/email-already-in-use).") {
+          alert('此 Email 已被註冊');
+        } else {
+          alert('資料格式不正確，請再試一次');
+        }
       });
   },
   signIn(userInfo: UserSignIn, navigate: NavigateFunction) {

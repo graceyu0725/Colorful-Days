@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LogosGoogleIcon from '~icons/logos/google-icon';
 import { UserSignIn, firebase } from '../../utils/firebase';
+import { googleAuth } from '../../utils/googleAuth';
 import signinImage from './signinImage.png';
 
 function Signin() {
@@ -58,7 +59,10 @@ function Signin() {
               </h2>
 
               <div className='mt-8'>
-                <div className='flex gap-4 items-center justify-center h-11 w-full rounded-md bg-slate-100 py-3 px-4 shadow-sm hover:bg-slate-200 cursor-pointer'>
+                <div
+                  className='flex gap-4 items-center justify-center h-11 w-full rounded-md bg-slate-100 py-3 px-4 shadow-sm hover:bg-slate-200 hover:cursor-pointer'
+                  onClick={() => googleAuth.signIn(navigate)}
+                >
                   <LogosGoogleIcon className='h-11' />
                   <div className='font-medium text-gray-900'>
                     Sign in with Google
