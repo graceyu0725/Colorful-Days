@@ -2,13 +2,14 @@ import { Button } from '@nextui-org/react';
 import { addMonths, format, subMonths } from 'date-fns';
 import LucideAlignJustify from '~icons/lucide/align-justify';
 import TdesignAdd from '~icons/tdesign/add';
+import { useModalStore } from '../../store/modalStore';
 import { CalendarViewCategory, useViewStore } from '../../store/viewStore';
 
 const styles = {
   container: 'w-full h-16 flex justify-between items-center px-6 border-b',
   borderButton: 'text-base border-1 hover:bg-gray-200 hover:cursor-pointer',
   addButton:
-    'p-0 min-w-unit-10 text-base border-1 hover:bg-gray-200 hover:cursor-pointer',
+    'p-1 min-w-unit-10 text-base border-1 hover:bg-gray-200 hover:cursor-pointer rounded-md',
   regularButton:
     'text-base p-2 min-w-0 w-8 h-8 rounded-full bg-white hover:bg-gray-200 hover:cursor-pointer',
   wrapper: 'flex items-center',
@@ -33,6 +34,8 @@ const Navigation: React.FC<Props> = ({
   formateDate,
   setFormateDate,
 }) => {
+  const { setIsCreateModalOpen } = useModalStore();
+
   const changeMonth = (actionType: string, number: number) => {
     if (actionType === 'sub') {
       const newDate = subMonths(date, number);
@@ -107,42 +110,45 @@ const Navigation: React.FC<Props> = ({
           {'>>'}
         </Button>
       </div>
-      <div className='border rounded-md p-1 flex gap-1'>
+
+      <div className='flex items-center gap-1'>
+        <div className='border rounded-md p-1 flex gap-1'>
+          <Button
+            className={
+              currentView === CalendarViewCategory.Monthly
+                ? styles.activeButton
+                : styles.viewButton
+            }
+            onClick={() => setCurrentView(CalendarViewCategory.Monthly)}
+          >
+            Monthly
+          </Button>
+          <Button
+            className={
+              currentView === CalendarViewCategory.Weekly
+                ? styles.activeButton
+                : styles.viewButton
+            }
+            onClick={() => setCurrentView(CalendarViewCategory.Weekly)}
+          >
+            Weekly
+          </Button>
+          {/* <Button className={styles.viewButton}>List</Button> */}
+        </div>
         <Button
-          className={
-            currentView === CalendarViewCategory.Monthly
-              ? styles.activeButton
-              : styles.viewButton
-          }
-          onClick={() => setCurrentView(CalendarViewCategory.Monthly)}
+          variant='bordered'
+          className={styles.addButton}
+          onClick={() => {
+            setDate(new Date());
+            setFormateDate(format(new Date(), 'MMMM, yyyy'));
+          }}
         >
-          Monthly
+          <TdesignAdd
+            onClick={() => setIsCreateModalOpen(true, new Date(), new Date())}
+            className='text-xl text-[#5a3a1b] hover:cursor-pointer'
+          />{' '}
         </Button>
-        <Button
-          className={
-            currentView === CalendarViewCategory.Weekly
-              ? styles.activeButton
-              : styles.viewButton
-          }
-          onClick={() => setCurrentView(CalendarViewCategory.Weekly)}
-        >
-          Weekly
-        </Button>
-        {/* <Button className={styles.viewButton}>List</Button> */}
       </div>
-      <Button
-        variant='bordered'
-        className={styles.addButton}
-        onClick={() => {
-          setDate(new Date());
-          setFormateDate(format(new Date(), 'MMMM, yyyy'));
-        }}
-      >
-        <TdesignAdd
-          onClick={() => setIsCreateModalOpen(true, new Date(), new Date())}
-          className='text-xl text-[#5a3a1b] hover:cursor-pointer'
-        />{' '}
-      </Button>
     </div>
   );
 };

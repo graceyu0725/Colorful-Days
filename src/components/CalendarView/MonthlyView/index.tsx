@@ -96,7 +96,7 @@ const MonthlyView: React.FC<Props> = ({ date }) => {
           {weekdays.map((weekday, index) => (
             <Cell
               key={index}
-              className='text-base font-bold uppercase grow'
+              className='font-bold uppercase grow'
               cellDate={new Date()}
               dayCounts={monthDates.length}
               date={date}

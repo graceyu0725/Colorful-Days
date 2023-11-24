@@ -97,7 +97,7 @@ const Cell: React.FC<Props> = ({
         'flex select-none flex-col items-start border-b text-sm w-5',
         {
           [header
-            ? 'h-10 items-center justify-center'
+            ? 'h-10 px-2 justify-center'
             : dayCounts > 35
               ? 'h-24 px-2 py-1 hover:bg-gray-200 active:bg-gray-200'
               : 'h-28 px-2 py-1 hover:bg-gray-200 active:bg-gray-200']: true,
