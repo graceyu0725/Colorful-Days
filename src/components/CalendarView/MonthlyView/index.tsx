@@ -56,9 +56,9 @@ const MonthlyView: React.FC<Props> = ({ date }) => {
   const convertDatesToFalse = (weeks: Date[][]) => {
     return weeks.map((week) => week.map(() => false));
   };
-  const initialIsMouseDown = convertDatesToFalse(weeks)
+  const initialIsMouseDown = convertDatesToFalse(weeks);
   const [isMouseDown, setIsMouseDown] = useState(initialIsMouseDown);
-const [startCell, setStartCell] = useState([0,0])
+  const [startCell, setStartCell] = useState([0, 0]);
   // const mouseDown = (row: number, col: number, cellDate: Date) => {
   //   let newArray = isMouseDown.map((innerArray) => [...innerArray]);
   //   newArray[row][col] = true;

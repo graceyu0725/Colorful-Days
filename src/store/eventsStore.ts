@@ -2,7 +2,7 @@ import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useEffect } from 'react';
 import { create } from 'zustand';
 import { db } from '../utils/firebase';
-import { Event, initialEvent } from '../utils/type';
+import { Event } from '../utils/type';
 
 // TODO: replace calendarId with a real id
 
@@ -19,7 +19,7 @@ interface eventsState {
 }
 
 export const useEventsStore = create<eventsState>((set) => ({
-  allEvents: [initialEvent],
+  allEvents: [],
   setAllEvents: (event) => set({ allEvents: event }),
 }));
 
