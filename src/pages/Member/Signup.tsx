@@ -1,16 +1,23 @@
 import { Card, Image } from '@nextui-org/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserSignUp, firebase } from '../../utils/firebase';
 import signinImage from './signinImage.png';
 
 function Signup() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem('uid')) {
+      navigate('/calendar');
+    }
+  }, []);
+
   const [userInput, setUserInput] = useState<UserSignUp>({
     name: '',
     email: '',
     password: '',
   });
-  const navigate = useNavigate();
 
   // Update userInput when typing
   const updateUserInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +89,7 @@ function Signup() {
                       htmlFor='email'
                       className='block font-medium text-gray-700'
                     >
-                      Email address
+                      Email
                     </label>
                     <input
                       id='email'
@@ -111,7 +118,7 @@ function Signup() {
                       required
                       value={userInput.password}
                       onChange={updateUserInput}
-                      className='h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
+                      className='tracking-widest h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
                     />
                   </div>
 

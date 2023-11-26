@@ -3,6 +3,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   signInWithEmailAndPassword,
+  signOut,
 } from 'firebase/auth';
 import { collection, doc, getFirestore, setDoc } from 'firebase/firestore';
 import { NavigateFunction } from 'react-router-dom';
@@ -49,34 +50,40 @@ export const firebase = {
     console.log('註冊');
     createUserWithEmailAndPassword(auth, userInfo.email, userInfo.password)
       .then((userCredential) => {
-        const user = userCredential.user;
-        addUser(userInfo, user.uid);
-        alert('註冊成功，請繼續登入');
-        navigate('/signin');
+        addUser(userInfo, userCredential.user.uid);
+        console.log('註冊user', userCredential.user);
+        localStorage.setItem('uid', userCredential.user.uid);
+
+        alert('註冊成功');
+        navigate('/calendar');
       })
       .catch((error) => {
-        if (error.message === "Firebase: Error (auth/email-already-in-use).") {
+        if (error.message === 'Firebase: Error (auth/email-already-in-use).') {
           alert('此 Email 已被註冊');
         } else {
           alert('資料格式不正確，請再試一次');
         }
+        localStorage.removeItem('uid');
       });
   },
   signIn(userInfo: UserSignIn, navigate: NavigateFunction) {
-    // setIsLoading(true);
     signInWithEmailAndPassword(auth, userInfo.email, userInfo.password)
       .then((userCredential) => {
-        const user = userCredential.user;
-        localStorage.setItem('accessToken', user.accessToken);
+        localStorage.setItem('uid', userCredential.user.uid);
         alert('登入成功');
-        // setIsLoading(false);
         navigate('/calendar');
       })
       .catch((error) => {
-        // setIsLoading(false);
         alert('帳號或密碼錯誤');
-        // const errorCode = error.code;
-        // const errorMessage = error.message;
+        localStorage.removeItem('uid');
+      });
+  },
+  logOut() {
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {})
+      .catch((error) => {
+        localStorage.removeItem('uid');
       });
   },
 };
