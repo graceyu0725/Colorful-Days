@@ -31,3 +31,19 @@ export const initialEvent = {
   updatedAt: null,
   messages: [],
 };
+
+export interface User {
+  userId: string;
+  name: string;
+  email: string;
+  avatar: string;
+  calendars: string[];
+}
+
+export const initialUser = {
+  userId: '',
+  name: '',
+  email: '',
+  avatar: '',
+  calendars: [''],
+};

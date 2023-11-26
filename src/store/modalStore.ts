@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Event, initialEvent } from '../utils/type';
+import { Event, initialEvent } from '../utils/types';
 
 interface ModalState {
   isCreateModalOpen: boolean;

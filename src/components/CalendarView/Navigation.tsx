@@ -1,5 +1,5 @@
 import { Button } from '@nextui-org/react';
-import { addMonths, format, subMonths } from 'date-fns';
+import { addDays, addMonths, subDays, subMonths } from 'date-fns';
 import LucideAlignJustify from '~icons/lucide/align-justify';
 import TdesignAdd from '~icons/tdesign/add';
 import { useModalStore } from '../../store/modalStore';
@@ -22,34 +22,42 @@ const styles = {
 
 type Props = {
   value?: Date;
-  date: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
-  formateDate: string;
-  setFormateDate: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const Navigation: React.FC<Props> = ({
-  date,
-  setDate,
-  formateDate,
-  setFormateDate,
-}) => {
+const Navigation: React.FC<Props> = () => {
   const { setIsCreateModalOpen } = useModalStore();
+  const {
+    currentView,
+    setCurrentView,
+    currentDate,
+    setCurrentDate,
+    formateDate,
+  } = useViewStore();
 
-  const changeMonth = (actionType: string, number: number) => {
-    if (actionType === 'sub') {
-      const newDate = subMonths(date, number);
-      setDate(newDate);
-      setFormateDate(format(newDate, 'MMMM, yyyy'));
-    } else {
-      const newDate = addMonths(date, number);
-      setDate(newDate);
-      setFormateDate(format(newDate, 'MMMM, yyyy'));
+  const changeMonth = (actionType: string) => {
+    switch (actionType) {
+      case 'subMore':
+        currentView === CalendarViewCategory.Monthly
+          ? setCurrentDate(subMonths(currentDate, 12))
+          : setCurrentDate(subMonths(currentDate, 1));
+        break;
+      case 'sub':
+        currentView === CalendarViewCategory.Monthly
+          ? setCurrentDate(subMonths(currentDate, 1))
+          : setCurrentDate(subDays(currentDate, 7));
+        break;
+      case 'addMore':
+        currentView === CalendarViewCategory.Monthly
+          ? setCurrentDate(addMonths(currentDate, 12))
+          : setCurrentDate(addMonths(currentDate, 1));
+        break;
+      case 'add':
+        currentView === CalendarViewCategory.Monthly
+          ? setCurrentDate(addMonths(currentDate, 1))
+          : setCurrentDate(addDays(currentDate, 7));
+        break;
     }
   };
-
-  const { currentView, setCurrentView } = useViewStore();
-  console.log(currentView);
 
   return (
     <div className={styles.container}>
@@ -64,8 +72,7 @@ const Navigation: React.FC<Props> = ({
           variant='bordered'
           className={styles.borderButton}
           onClick={() => {
-            setDate(new Date());
-            setFormateDate(format(new Date(), 'MMMM, yyyy'));
+            setCurrentDate(new Date());
           }}
         >
           Today
@@ -76,7 +83,7 @@ const Navigation: React.FC<Props> = ({
           variant='flat'
           className={styles.regularButton}
           onClick={() => {
-            changeMonth('sub', 12);
+            changeMonth('subMore');
           }}
         >
           {'<<'}
@@ -85,7 +92,7 @@ const Navigation: React.FC<Props> = ({
           variant='flat'
           className={styles.regularButton}
           onClick={() => {
-            changeMonth('sub', 1);
+            changeMonth('sub');
           }}
         >
           {'<'}
@@ -95,7 +102,7 @@ const Navigation: React.FC<Props> = ({
           variant='flat'
           className={styles.regularButton}
           onClick={() => {
-            changeMonth('add', 1);
+            changeMonth('add');
           }}
         >
           {'>'}
@@ -104,7 +111,7 @@ const Navigation: React.FC<Props> = ({
           variant='flat'
           className={styles.regularButton}
           onClick={() => {
-            changeMonth('add', 12);
+            changeMonth('addMore');
           }}
         >
           {'>>'}
@@ -138,15 +145,9 @@ const Navigation: React.FC<Props> = ({
         <Button
           variant='bordered'
           className={styles.addButton}
-          onClick={() => {
-            setDate(new Date());
-            setFormateDate(format(new Date(), 'MMMM, yyyy'));
-          }}
+          onClick={() => setIsCreateModalOpen(true, new Date(), new Date())}
         >
-          <TdesignAdd
-            onClick={() => setIsCreateModalOpen(true, new Date(), new Date())}
-            className='text-xl text-[#5a3a1b] hover:cursor-pointer'
-          />{' '}
+          <TdesignAdd className='text-xl text-[#5a3a1b] hover:cursor-pointer' />{' '}
         </Button>
       </div>
     </div>

@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import { collection, deleteDoc, doc } from 'firebase/firestore';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
-import { initialEvent } from '../../utils/type';
+import { initialEvent } from '../../utils/types';
 
 interface Props {
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;

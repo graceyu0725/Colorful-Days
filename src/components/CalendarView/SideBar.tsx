@@ -1,6 +1,6 @@
 import { getAllEvents, useEventsStore } from '../../store/eventsStore';
 import { useModalStore } from '../../store/modalStore';
-import { Event } from '../../utils/type';
+import { Event } from '../../utils/types';
 
 function SideBar() {
   const { setIsEditModalOpen } = useModalStore();

@@ -2,7 +2,7 @@ import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { useEffect } from 'react';
 import { create } from 'zustand';
 import { db } from '../utils/firebase';
-import { Event } from '../utils/type';
+import { Event } from '../utils/types';
 
 // TODO: replace calendarId with a real id
 

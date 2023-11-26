@@ -1,5 +1,5 @@
 import { renderEvent } from '../../../utils/handleDatesAndEvents';
-import { Event } from '../../../utils/type';
+import { Event } from '../../../utils/types';
 
 type Props = {
   splitEvents: Event[][][];
@@ -28,7 +28,7 @@ const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
       //   messages: [],
       // }];
 
-            let newDay = []
+      let newDay = [];
 
       currentDay.forEach((eventArray, idx) => {
         let event = eventArray.eventId;

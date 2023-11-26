@@ -9,7 +9,6 @@ interface Props extends React.PropsWithChildren {
   dayCounts: number;
   firstDayOfNextMonth?: number;
   cellDate: Date;
-  date: Date;
   isMouseDown: boolean[][];
   initialIsMouseDown: boolean[][];
   setIsMouseDown: React.Dispatch<React.SetStateAction<boolean[][]>>;
@@ -25,7 +24,6 @@ const Cell: React.FC<Props> = ({
   className,
   header,
   dayCounts,
-  date,
   cellDate,
   isMouseDown,
   setIsMouseDown,
@@ -87,7 +85,6 @@ const Cell: React.FC<Props> = ({
       onClick={() => {
         if (!header) {
           setIsCreateModalOpen(true, cellDate, cellDate);
-          console.log('cellDate:', cellDate, date);
         }
       }}
       onMouseDown={mouseDown}

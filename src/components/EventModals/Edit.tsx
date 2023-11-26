@@ -22,7 +22,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
-import { Event } from '../../utils/type';
+import { Event } from '../../utils/types';
 import { View } from './View';
 
 export default function Edit() {

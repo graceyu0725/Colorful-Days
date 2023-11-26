@@ -17,7 +17,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
-import { Event, initialEvent } from '../../utils/type';
+import { Event, initialEvent } from '../../utils/types';
 
 export default function Create() {
   const {

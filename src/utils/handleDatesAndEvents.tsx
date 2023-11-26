@@ -1,30 +1,33 @@
 import {
+  addDays,
   differenceInCalendarDays,
   format,
   getDay,
   isWithinInterval,
+  startOfWeek,
 } from 'date-fns';
 import { useModalStore } from '../store/modalStore';
-import { Event } from './type';
+import { Event } from './types';
+import { isSameDay,isSameMonth } from 'date-fns';
 
 // ================================================================
 // Common functions
 // ================================================================
 
-export const isSameDay = (date1: Date, date2: Date) => {
-  return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate()
-  );
-};
+// export const isSameDay = (date1: Date, date2: Date) => {
+//   return (
+//     date1.getFullYear() === date2.getFullYear() &&
+//     date1.getMonth() === date2.getMonth() &&
+//     date1.getDate() === date2.getDate()
+//   );
+// };
 
-export const isSameMonth = (date1: Date, date2: Date) => {
-  return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth()
-  );
-};
+// export const isSameMonth = (date1: Date, date2: Date) => {
+//   return (
+//     date1.getFullYear() === date2.getFullYear() &&
+//     date1.getMonth() === date2.getMonth()
+//   );
+// };
 
 export function splitDatesIntoWeeks(monthDates: Date[]) {
   let weeks: Array<Array<Date>> = [];
@@ -89,6 +92,15 @@ export const generateMonthDates = (year: number, month: number) => {
     }
   }
 
+  return dates;
+};
+
+export const generateWeekDates = (date: Date) => {
+  const firstDateOfWeek = startOfWeek(date);
+  const dates = [];
+  for (let i = 0; i < 7; i++) {
+    dates.push(addDays(firstDateOfWeek, i));
+  }
   return dates;
 };
 

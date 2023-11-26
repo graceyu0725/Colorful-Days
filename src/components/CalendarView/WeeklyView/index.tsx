@@ -1,7 +1,12 @@
 import clsx from 'clsx';
+import { isFirstDayOfMonth, isSameDay } from 'date-fns';
+import { useModalStore } from '../../../store/modalStore';
+import { useViewStore } from '../../../store/viewStore';
+import { generateWeekDates } from '../../../utils/handleDatesAndEvents';
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const commonTimeStyles = 'row-span-2 col-start-1 relative -top-3 pl-4 text-slate-500';
+const commonTimeStyles =
+  'row-span-2 col-start-1 relative -top-3 pl-4 text-slate-500';
 const timeStyles = [
   { time: '', style: clsx('row-start-1', commonTimeStyles) },
   { time: '1 AM', style: clsx('row-start-3', commonTimeStyles) },
@@ -31,16 +36,44 @@ const timeStyles = [
     style: clsx('row-start-47 border-b -mb-3', commonTimeStyles),
   },
 ];
-type Props = {
-  date: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
-  formateDate: string;
-  setFormateDate: React.Dispatch<React.SetStateAction<string>>;
-};
+const commonDateStyles =
+  'row-start-2 row-span-2 border-t pl-2 pt-1 text-sm hover:bg-slate-100';
+const dateStyles = [
+  clsx('col-start-2 border-r', commonDateStyles),
+  clsx('col-start-3 border-r', commonDateStyles),
+  clsx('col-start-4 border-r', commonDateStyles),
+  clsx('col-start-5 border-r', commonDateStyles),
+  clsx('col-start-6 border-r', commonDateStyles),
+  clsx('col-start-7 border-r', commonDateStyles),
+  clsx('col-start-8', commonDateStyles),
+];
 
-const WeeklyView: React.FC<Props> = ({ date }) => {
+const WeeklyView: React.FC = () => {
+  const { setIsCreateModalOpen } = useModalStore();
+  const { currentDate } = useViewStore();
+  const weekDates = generateWeekDates(currentDate);
+
+  const getStartTime = (
+    date: Date[],
+    weekdayIndex: number,
+    timeIndex: number,
+    minute: number,
+  ) => {
+    const startTime = new Date(
+      date[weekdayIndex].getFullYear(),
+      date[weekdayIndex].getMonth(),
+      date[weekdayIndex].getDate(),
+      timeIndex,
+      minute,
+    );
+    return startTime;
+  };
+
   return (
-    <div id='weekly-view-root' className='flex flex-col border-x border-t'>
+    <div
+      id='weekly-view-root'
+      className='flex flex-col border-x border-t w-full'
+    >
       <div
         id='weekly-view-header'
         className='w-full h-36 bg-gray-50 grid grid-rows-weeklyHeader grid-cols-weeklyHeader'
@@ -54,31 +87,31 @@ const WeeklyView: React.FC<Props> = ({ date }) => {
         <div className='col-start-7 pl-1 text-sm font-bold'>Fri</div>
         <div className='col-start-8 pl-1 text-sm font-bold'>Sat</div>
 
-        <div className='col-start-2 row-start-2 row-span-2 border-r border-t pl-2'>
-          19
-        </div>
-        <div className='col-start-3 row-start-2 row-span-2 border-r border-t pl-2'>
-          20
-        </div>
-        <div className='col-start-4 row-start-2 row-span-2 border-r border-t pl-2'>
-          21
-        </div>
-        <div className='col-start-5 row-start-2 row-span-2 border-r border-t pl-2'>
-          22
-        </div>
-        <div className='col-start-6 row-start-2 row-span-2 border-r border-t pl-2'>
-          23
-        </div>
-        <div className='col-start-7 row-start-2 row-span-2 border-r border-t pl-2'>
-          24
-        </div>
-        <div className='col-start-8 row-start-2 row-span-2 border-t pl-2'>
-          24
-        </div>
+        {weekDates.map((weekDate, index) => (
+          <div
+            key={index}
+            className={dateStyles[index]}
+            onClick={() => setIsCreateModalOpen(true, weekDate, weekDate)}
+          >
+            <div
+              className={
+                isSameDay(new Date(), weekDate)
+                  ? 'w-5 text-center rounded-full bg-amber-800 text-white'
+                  : ''
+              }
+            >
+              {isFirstDayOfMonth(weekDate)
+                ? `${weekDate.getMonth() + 1}/${weekDate.getDate()}`
+                : weekDate.getDate()}
+            </div>
+          </div>
+        ))}
 
-        <div className='col-start-1 row-start-3 border-b pl-4 text-sm'>All-day</div>
+        <div className='col-start-1 row-start-3 border-b pl-4 text-sm mt-2'>
+          All-day
+        </div>
         {/* 這裡用來放整日的時間  */}
-        <div className='col-start-2 row-start-3 border-b col-span-7 grid grid-cols-7 text-sm'>
+        <div className='col-start-2 row-start-3 border-b col-span-7 grid grid-cols-7 text-sm mt-2'>
           <div>Event rowwww Events</div>
         </div>
       </div>
@@ -95,9 +128,9 @@ const WeeklyView: React.FC<Props> = ({ date }) => {
           </time>
         ))}
 
-        {weekdays.map((weekday, index) => (
+        {weekdays.map((weekday, weekdayIndex) => (
           <div
-            key={index}
+            key={weekdayIndex}
             id={`column-${weekday}`}
             className='border-l column-start-2 row-start-1 row-span-full column-span-1 grid grid-rows-weeklyTimeTable z-10'
           >
@@ -106,8 +139,25 @@ const WeeklyView: React.FC<Props> = ({ date }) => {
                 <div
                   key={`row-1-${index}`}
                   className='border-b border-dashed hover:bg-slate-50'
+                  onClick={() =>
+                    setIsCreateModalOpen(
+                      true,
+                      getStartTime(weekDates, weekdayIndex, index, 0),
+                      getStartTime(weekDates, weekdayIndex, index + 1, 0),
+                    )
+                  }
                 ></div>
-                <div key={`row-2-${index}`} className='border-b hover:bg-slate-50'></div>
+                <div
+                  key={`row-2-${index}`}
+                  className='border-b hover:bg-slate-50'
+                  onClick={() =>
+                    setIsCreateModalOpen(
+                      true,
+                      getStartTime(weekDates, weekdayIndex, index, 30),
+                      getStartTime(weekDates, weekdayIndex, index + 1, 30),
+                    )
+                  }
+                ></div>
               </>
             ))}
           </div>
