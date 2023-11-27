@@ -5,11 +5,13 @@ interface ModalState {
   isCreateModalOpen: boolean;
   selectedStartDate: Date;
   selectedEndDate: Date;
+  selectedIsAllDay: boolean;
   setSelectedStartDate: (date: Date) => void;
   setIsCreateModalOpen: (
     isOpen: boolean,
     startDate: Date,
     endDate: Date,
+    isAllDay: boolean,
   ) => void;
   isEditModalOpen: boolean;
   selectedEvent: Event;
@@ -23,11 +25,13 @@ export const useModalStore = create<ModalState>((set) => ({
     set({ selectedStartDate: date });
   },
   selectedEndDate: new Date(),
-  setIsCreateModalOpen: (isOpen, startDate, endDate) =>
+  selectedIsAllDay: false,
+  setIsCreateModalOpen: (isOpen, startDate, endDate, isAllDay) =>
     set({
       isCreateModalOpen: isOpen,
       selectedStartDate: startDate,
       selectedEndDate: endDate,
+      selectedIsAllDay: isAllDay,
     }),
   isEditModalOpen: false,
   selectedEvent: initialEvent,

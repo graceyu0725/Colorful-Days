@@ -145,7 +145,9 @@ const Navigation: React.FC<Props> = () => {
         <Button
           variant='bordered'
           className={styles.addButton}
-          onClick={() => setIsCreateModalOpen(true, new Date(), new Date())}
+          onClick={() =>
+            setIsCreateModalOpen(true, new Date(), new Date(), false)
+          }
         >
           <TdesignAdd className='text-xl text-[#5a3a1b] hover:cursor-pointer' />{' '}
         </Button>

@@ -75,7 +75,7 @@ const Cell: React.FC<Props> = ({
   const mouseUp = () => {
     if (!header) {
       setIsMouseDown(initialIsMouseDown);
-      setIsCreateModalOpen(true, selectedStartDate, cellDate);
+      setIsCreateModalOpen(true, selectedStartDate, cellDate, false);
     }
   };
 
@@ -84,7 +84,7 @@ const Cell: React.FC<Props> = ({
       id='cell'
       onClick={() => {
         if (!header) {
-          setIsCreateModalOpen(true, cellDate, cellDate);
+          setIsCreateModalOpen(true, cellDate, cellDate, false);
         }
       }}
       onMouseDown={mouseDown}

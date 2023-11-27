@@ -25,6 +25,7 @@ export default function Create() {
     setIsCreateModalOpen,
     selectedStartDate,
     selectedEndDate,
+    selectedIsAllDay,
   } = useModalStore();
 
   const [userInput, setUserInput] = useState(initialEvent);
@@ -34,6 +35,7 @@ export default function Create() {
       ...prev,
       startAt: selectedStartDate,
       endAt: selectedEndDate,
+      isAllDay: selectedIsAllDay,
     }));
   }, [selectedStartDate, selectedEndDate]);
 
@@ -201,11 +203,11 @@ export default function Create() {
     };
     addEvent(eventUUID, data);
     setUserInput(initialEvent);
-    setIsCreateModalOpen(false, new Date(), new Date());
+    setIsCreateModalOpen(false, new Date(), new Date(), false);
   };
 
   const handleCancel = () => {
-    setIsCreateModalOpen(false, new Date(), new Date());
+    setIsCreateModalOpen(false, new Date(), new Date(), false);
     setUserInput(initialEvent);
   };
 
@@ -214,7 +216,12 @@ export default function Create() {
       <Modal
         isOpen={isCreateModalOpen}
         onOpenChange={(isOpen) =>
-          setIsCreateModalOpen(isOpen, selectedStartDate, selectedEndDate)
+          setIsCreateModalOpen(
+            isOpen,
+            selectedStartDate,
+            selectedEndDate,
+            selectedIsAllDay,
+          )
         }
         size='lg'
       >

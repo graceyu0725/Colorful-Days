@@ -14,7 +14,7 @@ function CalendarView() {
       <Navigation />
       <div className='flex w-full' style={{ height: 'calc(100vh - 64px)' }}>
         <SideBar />
-        <div className='px-6 py-4 flex w-full'>
+        <div className='px-6 py-4 flex grow'>
           {currentView === CalendarViewCategory.Monthly && <MonthlyView />}
           {currentView === CalendarViewCategory.Weekly && <WeeklyView />}
         </div>

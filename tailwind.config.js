@@ -10,12 +10,13 @@ export default {
   theme: {
     extend: {
       gridTemplateColumns: {
-        weeklyHeader: '80px repeat(7, 1fr) 16px',
+        weeklyHeader: '80px repeat(7, 1fr) 14px',
         weeklyTimeTable: '80px repeat(7, 1fr)',
       },
       gridTemplateRows: {
         weeklyHeader: '1fr 1fr 3fr',
         weeklyTimeTable: 'repeat(48, 48px)',
+        weeklyOneDayEvents: 'repeat(96, 24px)',
       },
     },
   },

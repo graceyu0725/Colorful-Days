@@ -3,6 +3,8 @@ import { isFirstDayOfMonth, isSameDay } from 'date-fns';
 import { useModalStore } from '../../../store/modalStore';
 import { useViewStore } from '../../../store/viewStore';
 import { generateWeekDates } from '../../../utils/handleDatesAndEvents';
+import AllDayEventCells from './AllDayEventCells';
+import OneDayEventCells from './OneDayEventCells';
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const commonTimeStyles =
@@ -45,13 +47,13 @@ const dateStyles = [
   clsx('col-start-5 border-r', commonDateStyles),
   clsx('col-start-6 border-r', commonDateStyles),
   clsx('col-start-7 border-r', commonDateStyles),
-  clsx('col-start-8', commonDateStyles),
+  clsx('col-start-8 ml-px', commonDateStyles),
 ];
 
 const WeeklyView: React.FC = () => {
-  const { setIsCreateModalOpen } = useModalStore();
   const { currentDate } = useViewStore();
   const weekDates = generateWeekDates(currentDate);
+  const { setIsCreateModalOpen } = useModalStore();
 
   const getStartTime = (
     date: Date[],
@@ -76,7 +78,7 @@ const WeeklyView: React.FC = () => {
     >
       <div
         id='weekly-view-header'
-        className='w-full h-36 bg-gray-50 grid grid-rows-weeklyHeader grid-cols-weeklyHeader'
+        className='w-full min-h-[120px] bg-gray-50 grid grid-rows-weeklyHeader grid-cols-weeklyHeader'
       >
         <div className='col-start-1'></div>
         <div className='col-start-2 pl-1 text-sm font-bold'>Sun</div>
@@ -91,7 +93,7 @@ const WeeklyView: React.FC = () => {
           <div
             key={index}
             className={dateStyles[index]}
-            onClick={() => setIsCreateModalOpen(true, weekDate, weekDate)}
+            onClick={() => setIsCreateModalOpen(true, weekDate, weekDate, true)}
           >
             <div
               className={
@@ -111,9 +113,11 @@ const WeeklyView: React.FC = () => {
           All-day
         </div>
         {/* 這裡用來放整日的時間  */}
-        <div className='col-start-2 row-start-3 border-b col-span-7 grid grid-cols-7 text-sm mt-2'>
+        <AllDayEventCells weekDates={weekDates} />
+
+        {/* <div className='col-start-2 row-start-3 border-b col-span-7 grid grid-cols-7 text-sm mt-2'>
           <div>Event rowwww Events</div>
-        </div>
+        </div> */}
       </div>
 
       {/* 一個大 Grid 包含左邊時間列及中間 Time table，Time table 也需要一個 Grid */}
@@ -129,38 +133,53 @@ const WeeklyView: React.FC = () => {
         ))}
 
         {weekdays.map((weekday, weekdayIndex) => (
-          <div
-            key={weekdayIndex}
-            id={`column-${weekday}`}
-            className='border-l column-start-2 row-start-1 row-span-full column-span-1 grid grid-rows-weeklyTimeTable z-10'
-          >
-            {timeStyles.map((timeStyle, index) => (
-              <>
-                <div
-                  key={`row-1-${index}`}
-                  className='border-b border-dashed hover:bg-slate-50'
-                  onClick={() =>
-                    setIsCreateModalOpen(
-                      true,
-                      getStartTime(weekDates, weekdayIndex, index, 0),
-                      getStartTime(weekDates, weekdayIndex, index + 1, 0),
-                    )
-                  }
-                ></div>
-                <div
-                  key={`row-2-${index}`}
-                  className='border-b hover:bg-slate-50'
-                  onClick={() =>
-                    setIsCreateModalOpen(
-                      true,
-                      getStartTime(weekDates, weekdayIndex, index, 30),
-                      getStartTime(weekDates, weekdayIndex, index + 1, 30),
-                    )
-                  }
-                ></div>
-              </>
-            ))}
-          </div>
+          <>
+            <div
+              key={weekdayIndex}
+              id={`column-${weekday}`}
+              className='relative border-l column-start-2 row-start-1 row-span-full column-span-1 grid grid-rows-weeklyTimeTable z-10'
+            >
+              {/* 用來放空白格子，點擊可新增事件 */}
+              {timeStyles.map((timeStyle, index) => (
+                <>
+                  <div
+                    key={`row-1-${index}`}
+                    className='border-b border-dashed hover:bg-slate-50'
+                    onClick={() =>
+                      setIsCreateModalOpen(
+                        true,
+                        getStartTime(weekDates, weekdayIndex, index, 0),
+                        getStartTime(weekDates, weekdayIndex, index + 1, 0),
+                        false,
+                      )
+                    }
+                  ></div>
+                  <div
+                    key={`row-2-${index}`}
+                    className='border-b hover:bg-slate-50'
+                    onClick={() =>
+                      setIsCreateModalOpen(
+                        true,
+                        getStartTime(weekDates, weekdayIndex, index, 30),
+                        getStartTime(weekDates, weekdayIndex, index + 1, 30),
+                        false,
+                      )
+                    }
+                  ></div>
+                </>
+              ))}
+
+              {/* 用來放事件格子 */}
+              {/* div內用來渲染每一天的事件 */}
+              {/* <div
+                key={weekdayIndex}
+                id={`column-${weekday}`}
+                className='absolute left-0 w-11/12 bg-red-50/50 column-start-2 row-start-1 row-span-full column-span-1 grid grid-rows-weeklyTimeTable z-10'
+              > */}
+                <OneDayEventCells weekDates={weekDates} weekdayIndex={weekdayIndex} />
+              {/* </div> */}
+            </div>
+          </>
         ))}
         {/* Time Table Grid - 7 columns */}
       </div>
