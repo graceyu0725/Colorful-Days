@@ -1,20 +1,19 @@
 import { Card, Image } from '@nextui-org/react';
-import { getAuth } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LogosGoogleIcon from '~icons/logos/google-icon';
 import { useAuthStore } from '../../store/authStore';
-import { UserSignIn, firebase } from '../../utils/firebase';
+import { firebase } from '../../utils/firebase';
 import { googleAuth } from '../../utils/googleAuth';
+import { UserSignIn } from '../../utils/types';
 import signinImage from './signinImage.png';
 
 function Signin() {
   const navigate = useNavigate();
-  const { setIsLogin, setCurrentUser } = useAuthStore();
-  const { isLogin } = useAuthStore();
+  const { currentCalendarId } = useAuthStore();
 
+  console.log('currentCalendarId', currentCalendarId);
   useEffect(() => {
-
     if (localStorage.getItem('uid')) {
       navigate('/calendar');
     }
@@ -39,17 +38,7 @@ function Signin() {
       className='flex items-center justify-center h-screen bg-cover bg-slate-200'
       // style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
-          backgroundColor: 'rgba(255, 255, 255, 0.5)',
-          zIndex: 1,
-        }}
-      ></div>
+      <div className='absolute top-0 left-0 right-0 bottom-0 bg-gray-100/50 z-10' />
 
       <Card className='w-11/12 p-0 rounded-none flex z-10 h-5/6'>
         <div className='flex h-full'>

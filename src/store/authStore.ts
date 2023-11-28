@@ -1,11 +1,20 @@
 import { create } from 'zustand';
-import { User, initialUser } from '../utils/types';
+import {
+  CalendarContent,
+  User,
+  initialCalendarContent,
+  initialUser,
+} from '../utils/types';
 
 interface authState {
   isLogin: boolean;
   setIsLogin: (isLogin: boolean) => void;
   currentUser: User;
   setCurrentUser: (currentUser: User) => void;
+  currentCalendarId: string;
+  setCurrentCalendarId: (currentCalendarId: string) => void;
+  currentCalendarContent: CalendarContent;
+  setCurrentCalendarContent: (currentCalendarContent: CalendarContent) => void;
 }
 
 export const useAuthStore = create<authState>((set) => ({
@@ -13,4 +22,9 @@ export const useAuthStore = create<authState>((set) => ({
   setIsLogin: (isLogin) => set({ isLogin }),
   currentUser: initialUser,
   setCurrentUser: (currentUser) => set({ currentUser }),
+  currentCalendarId: '',
+  setCurrentCalendarId: (currentCalendarId) => set({ currentCalendarId }),
+  currentCalendarContent: initialCalendarContent,
+  setCurrentCalendarContent: (currentCalendarContent) =>
+    set({ currentCalendarContent }),
 }));
