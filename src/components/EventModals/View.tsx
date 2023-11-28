@@ -5,11 +5,14 @@ import {
   ModalFooter,
   ModalHeader,
 } from '@nextui-org/react';
+import clsx from 'clsx';
 import { format } from 'date-fns';
 import { collection, deleteDoc, doc } from 'firebase/firestore';
+import { useAuthStore } from '../../store/authStore';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
-import { initialEvent } from '../../utils/type';
+import { themeColors } from '../../utils/theme';
+import { defaultTags, initialEvent } from '../../utils/types';
 
 interface Props {
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,11 +20,7 @@ interface Props {
 
 export const View: React.FC<Props> = ({ setIsEditing }) => {
   const { selectedEvent, setIsEditModalOpen } = useModalStore();
-  const colors = [
-    { color: 'blue', name: 'work' },
-    { color: 'orange', name: 'study' },
-    { color: 'green', name: 'travel' },
-  ];
+  const { currentCalendarId, currentCalendarContent } = useAuthStore();
 
   const renderTime = () => {
     const startDate = selectedEvent.startAt
@@ -66,13 +65,15 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     const eventsCollection = collection(
       db,
       'Calendars',
-      'nWryB1DvoYBEv1oKdc0L',
+      currentCalendarId,
       'events',
     );
     const eventRef = doc(eventsCollection, selectedEvent.eventId.toString());
     await deleteDoc(eventRef);
     setIsEditModalOpen(false, initialEvent);
   };
+
+  const calendarTags = currentCalendarContent.tags || defaultTags;
 
   return (
     <>
@@ -89,7 +90,16 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
         </div>
         <div className='flex items-center'>
           <div className='w-14 border-r-1 border-gray-500 mr-4'>Tag</div>
-          <div>{colors[parseInt(selectedEvent.tag, 10)].name}</div>
+
+          <div className='flex items-center gap-1'>
+            <div
+              className={clsx(
+                'w-3 h-3 rounded-full',
+                themeColors[Number(selectedEvent.tag)].bg,
+              )}
+            />
+            <div>{calendarTags[Number(selectedEvent.tag)].name}</div>
+          </div>
         </div>
         <div className='flex items-center'>
           <div className='w-14 border-r-1 border-gray-500 mr-4'>Note</div>

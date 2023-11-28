@@ -1,48 +1,42 @@
 import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
-import { collection, doc, setDoc } from 'firebase/firestore';
 import { NavigateFunction } from 'react-router-dom';
-import { db } from './firebase';
+import { isUserExists } from './handleUserAndCalendar';
 
 const provider = new GoogleAuthProvider();
 const auth = getAuth();
 
-const addUser = async (userInfo) => {
-  const usersCollection = collection(db, 'Users');
-  const docRef = doc(usersCollection, userInfo.email);
-  const newUser = {
-    userId: userInfo.uid,
-    name: userInfo.displayName,
-    email: userInfo.email,
-    avatar: userInfo.photoURL,
-    calendars: [],
-  };
-  await setDoc(docRef, newUser);
-};
-
 export const googleAuth = {
-  signIn(navigate: NavigateFunction) {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential.accessToken;
-        const user = result.user;
-        localStorage.setItem('accessTokenFromGoogle', user.accessToken);
-        console.log(user);
-        // Add user info to Firestore
-        addUser(user);
+  signIn: async (navigate: NavigateFunction) => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      localStorage.setItem('uid', user.uid);
 
-        navigate('/calendar');
-      })
-      .catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-      });
+      if (user.email) {
+        const userExists = await isUserExists(user.email);
+        if (userExists) {
+          alert('登入成功');
+          localStorage.setItem('uid', user.uid);
+          navigate('/calendar');
+        } else {
+          const userInfo = {
+            uid: user.uid,
+            displayName: user.displayName,
+            email: user.email,
+            photoURL: user.photoURL,
+          };
+
+          navigate('/select', {
+            state: { userInfo: userInfo, isNativeSignup: false },
+          });
+        }
+      } else {
+        localStorage.removeItem('uid');
+        console.error('登入失敗');
+      }
+    } catch (error) {
+      localStorage.removeItem('uid');
+      console.error('登入失敗');
+    }
   },
 };

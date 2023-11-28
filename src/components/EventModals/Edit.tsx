@@ -11,6 +11,7 @@ import {
   SelectItem,
   Switch,
 } from '@nextui-org/react';
+import clsx from 'clsx';
 import {
   collection,
   doc,
@@ -20,21 +21,18 @@ import {
 import { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useAuthStore } from '../../store/authStore';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
-import { Event } from '../../utils/type';
+import { themeColors } from '../../utils/theme';
+import { Event, defaultTags } from '../../utils/types';
 import { View } from './View';
 
 export default function Edit() {
   const { isEditModalOpen, setIsEditModalOpen, selectedEvent } =
     useModalStore();
+  const { currentCalendarId, currentCalendarContent } = useAuthStore();
   const [isEditing, setIsEditing] = useState(false);
-  const colors = [
-    { color: 'blue', name: 'work' },
-    { color: 'orange', name: 'study' },
-    { color: 'green', name: 'travel' },
-  ];
-
   const [userInput, setUserInput] = useState<Event>(selectedEvent);
 
   useEffect(() => {
@@ -65,6 +63,7 @@ export default function Edit() {
   // Handle rendering
   // =====================================================
 
+  const calendarTags = currentCalendarContent.tags || defaultTags;
   const renderTags = () => {
     return (
       <Select
@@ -76,39 +75,32 @@ export default function Edit() {
           setUserInput((prev) => ({ ...prev, tag: e.target.value }));
         }}
         value={userInput.tag}
-        placeholder={colors[Number(userInput.tag)].name}
+        placeholder={calendarTags[Number(userInput.tag)].name}
         renderValue={() => (
-          <>
-            <div>{colors[Number(userInput.tag)].color}</div>
-            <div>{colors[Number(userInput.tag)].name}</div>
-          </>
+          <div className='flex items-center gap-1'>
+            <div
+              className={clsx(
+                'w-3 h-3 rounded-full',
+                themeColors[Number(userInput.tag)].bg,
+              )}
+            />
+            <div>{calendarTags[Number(userInput.tag)].name}</div>
+          </div>
         )}
       >
-        <SelectItem
-          key={0}
-          value='0'
-          startContent={
-            <div className='w-4 h-4 rounded-full bg-amber-500'></div>
-          }
-        >
-          color1
-        </SelectItem>
-        <SelectItem
-          key={1}
-          value='1'
-          startContent={
-            <div className='w-4 h-4 rounded-full bg-lime-500'></div>
-          }
-        >
-          color2
-        </SelectItem>
-        <SelectItem
-          key={2}
-          value='2'
-          startContent={<div className='w-4 h-4 rounded-full bg-sky-500'></div>}
-        >
-          color3
-        </SelectItem>
+        {calendarTags.map((tag, index) => (
+          <SelectItem
+            key={tag.colorCode}
+            value={tag.colorCode}
+            startContent={
+              <div
+                className={clsx('w-4 h-4 rounded-full', themeColors[index].bg)}
+              ></div>
+            }
+          >
+            {tag.name}
+          </SelectItem>
+        ))}
       </Select>
     );
   };
@@ -179,14 +171,13 @@ export default function Edit() {
   // Handle button clicking
   // =====================================================
 
-  const eventsCollection = collection(
-    db,
-    'Calendars',
-    'nWryB1DvoYBEv1oKdc0L',
-    'events',
-  );
-
   const updateEvent = async (data: object) => {
+    const eventsCollection = collection(
+      db,
+      'Calendars',
+      currentCalendarId,
+      'events',
+    );
     const eventRef = doc(eventsCollection, selectedEvent.eventId.toString());
     await updateDoc(eventRef, data);
   };

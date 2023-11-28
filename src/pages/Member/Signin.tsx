@@ -1,17 +1,28 @@
 import { Card, Image } from '@nextui-org/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LogosGoogleIcon from '~icons/logos/google-icon';
-import { UserSignIn, firebase } from '../../utils/firebase';
+import { useAuthStore } from '../../store/authStore';
+import { firebase } from '../../utils/firebase';
 import { googleAuth } from '../../utils/googleAuth';
+import { UserSignIn } from '../../utils/types';
 import signinImage from './signinImage.png';
 
 function Signin() {
+  const navigate = useNavigate();
+  const { currentCalendarId } = useAuthStore();
+
+  console.log('currentCalendarId', currentCalendarId);
+  useEffect(() => {
+    if (localStorage.getItem('uid')) {
+      navigate('/calendar');
+    }
+  }, []);
+
   const [userInput, setUserInput] = useState<UserSignIn>({
     email: '',
     password: '',
   });
-  const navigate = useNavigate();
 
   // Update userInput when typing
   const updateUserInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,17 +38,7 @@ function Signin() {
       className='flex items-center justify-center h-screen bg-cover bg-slate-200'
       // style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          bottom: 0,
-          left: 0,
-          backgroundColor: 'rgba(255, 255, 255, 0.5)',
-          zIndex: 1,
-        }}
-      ></div>
+      <div className='absolute top-0 left-0 right-0 bottom-0 bg-gray-100/50 z-10' />
 
       <Card className='w-11/12 p-0 rounded-none flex z-10 h-5/6'>
         <div className='flex h-full'>
@@ -88,7 +89,7 @@ function Signin() {
                         htmlFor='email'
                         className='block font-medium text-gray-700'
                       >
-                        Email address
+                        Email
                       </label>
                       <input
                         id='email'
@@ -117,7 +118,7 @@ function Signin() {
                         required
                         value={userInput.password}
                         onChange={updateUserInput}
-                        className='h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
+                        className='tracking-widest h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
                       />
                     </div>
 

@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { useModalStore } from '../../../store/modalStore';
-// import { useState } from 'react';
 
 interface Props extends React.PropsWithChildren {
   className?: string;
@@ -9,7 +8,6 @@ interface Props extends React.PropsWithChildren {
   dayCounts: number;
   firstDayOfNextMonth?: number;
   cellDate: Date;
-  date: Date;
   isMouseDown: boolean[][];
   initialIsMouseDown: boolean[][];
   setIsMouseDown: React.Dispatch<React.SetStateAction<boolean[][]>>;
@@ -17,7 +15,6 @@ interface Props extends React.PropsWithChildren {
   col: number;
   startCell: number[];
   setStartCell: React.Dispatch<React.SetStateAction<number[]>>;
-  // isSelected: boolean;
 }
 
 const Cell: React.FC<Props> = ({
@@ -25,7 +22,6 @@ const Cell: React.FC<Props> = ({
   className,
   header,
   dayCounts,
-  date,
   cellDate,
   isMouseDown,
   setIsMouseDown,
@@ -34,11 +30,9 @@ const Cell: React.FC<Props> = ({
   col,
   startCell,
   setStartCell,
-  // isSelected,
 }) => {
   const { setIsCreateModalOpen, setSelectedStartDate, selectedStartDate } =
     useModalStore();
-  // const [isSelected,setIsSelected] = useState(false)
 
   const mouseDown = () => {
     if (!header) {
@@ -77,7 +71,7 @@ const Cell: React.FC<Props> = ({
   const mouseUp = () => {
     if (!header) {
       setIsMouseDown(initialIsMouseDown);
-      setIsCreateModalOpen(true, selectedStartDate, cellDate);
+      setIsCreateModalOpen(true, selectedStartDate, cellDate, false);
     }
   };
 
@@ -86,8 +80,7 @@ const Cell: React.FC<Props> = ({
       id='cell'
       onClick={() => {
         if (!header) {
-          setIsCreateModalOpen(true, cellDate, cellDate);
-          console.log('cellDate:', cellDate, date);
+          setIsCreateModalOpen(true, cellDate, cellDate, false);
         }
       }}
       onMouseDown={mouseDown}
@@ -97,14 +90,11 @@ const Cell: React.FC<Props> = ({
         'flex select-none flex-col items-start border-b text-sm w-5',
         {
           [header
-            ? 'h-10 items-center justify-center'
+            ? 'h-10 px-2 justify-center'
             : dayCounts > 35
-              ? 'h-24 px-2 py-1 hover:bg-gray-200 active:bg-gray-200'
+              ? 'h-[100px] px-2 py-1 hover:bg-gray-200 active:bg-gray-200'
               : 'h-28 px-2 py-1 hover:bg-gray-200 active:bg-gray-200']: true,
         },
-        // {
-        //   [!header && isSelected ? 'bg-gray-200 cursor-grab' : '']: true,
-        // },
         className,
       )}
     >

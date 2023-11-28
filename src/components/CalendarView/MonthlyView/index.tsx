@@ -1,11 +1,11 @@
 import clsx from 'clsx';
+import { isSameDay, isSameMonth } from 'date-fns';
 import { useState } from 'react';
 import { useEventsStore } from '../../../store/eventsStore';
+import { useViewStore } from '../../../store/viewStore';
 import {
   generateMonthDates,
   getSplitEvents,
-  isSameDay,
-  isSameMonth,
   splitDatesIntoWeeks,
 } from '../../../utils/handleDatesAndEvents';
 import Cell from './Cell';
@@ -13,16 +13,11 @@ import EventCells from './EventCells';
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-type Props = {
-  date: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
-  formateDate: string;
-  setFormateDate: React.Dispatch<React.SetStateAction<string>>;
-};
+const MonthlyView: React.FC = () => {
+  const { currentDate } = useViewStore();
 
-const MonthlyView: React.FC<Props> = ({ date }) => {
-  const currentYear = date.getFullYear();
-  const currentMonth = date.getMonth();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
   const { allEvents } = useEventsStore();
 
   // 生成當前月份的日期陣列 []
@@ -46,7 +41,7 @@ const MonthlyView: React.FC<Props> = ({ date }) => {
   );
 
   const DayCellsWrapper: React.FC<WrapperProps> = ({ children }) => (
-    <div className='flex w-full' id='dayCellsWrapper'>
+    <div className='flex w-ull' id='dayCellsWrapper'>
       {children}
     </div>
   );
@@ -56,9 +51,9 @@ const MonthlyView: React.FC<Props> = ({ date }) => {
   const convertDatesToFalse = (weeks: Date[][]) => {
     return weeks.map((week) => week.map(() => false));
   };
-  const initialIsMouseDown = convertDatesToFalse(weeks)
+  const initialIsMouseDown = convertDatesToFalse(weeks);
   const [isMouseDown, setIsMouseDown] = useState(initialIsMouseDown);
-const [startCell, setStartCell] = useState([0,0])
+  const [startCell, setStartCell] = useState([0, 0]);
   // const mouseDown = (row: number, col: number, cellDate: Date) => {
   //   let newArray = isMouseDown.map((innerArray) => [...innerArray]);
   //   newArray[row][col] = true;
@@ -96,10 +91,9 @@ const [startCell, setStartCell] = useState([0,0])
           {weekdays.map((weekday, index) => (
             <Cell
               key={index}
-              className='text-base font-bold uppercase grow'
+              className='font-bold uppercase grow'
               cellDate={new Date()}
               dayCounts={monthDates.length}
-              date={date}
               header
               isMouseDown={isMouseDown}
               setIsMouseDown={setIsMouseDown}
@@ -125,7 +119,7 @@ const [startCell, setStartCell] = useState([0,0])
                     className={clsx(
                       'grow',
                       {
-                        ['text-gray-400']: !isSameMonth(cellDate, date),
+                        ['text-gray-400']: !isSameMonth(cellDate, currentDate),
                       },
                       // {
                       //   ['bg-gray-200']: isMouseDown[index],
@@ -133,7 +127,6 @@ const [startCell, setStartCell] = useState([0,0])
                     )}
                     cellDate={cellDate}
                     dayCounts={monthDates.length}
-                    date={date}
                     isMouseDown={isMouseDown}
                     setIsMouseDown={setIsMouseDown}
                     row={index}
