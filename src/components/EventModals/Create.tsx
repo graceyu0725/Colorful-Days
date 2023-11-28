@@ -11,13 +11,16 @@ import {
   SelectItem,
   Switch,
 } from '@nextui-org/react';
+import clsx from 'clsx';
 import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useAuthStore } from '../../store/authStore';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
-import { Event, initialEvent } from '../../utils/types';
+import { themeColors } from '../../utils/theme';
+import { Event, defaultTags, initialEvent } from '../../utils/types';
 
 export default function Create() {
   const {
@@ -27,6 +30,7 @@ export default function Create() {
     selectedEndDate,
     selectedIsAllDay,
   } = useModalStore();
+  const { currentCalendarId, currentCalendarContent } = useAuthStore();
 
   const [userInput, setUserInput] = useState(initialEvent);
 
@@ -63,6 +67,8 @@ export default function Create() {
   // Handle rendering
   // =====================================================
 
+  const calendarTags = currentCalendarContent.tags || defaultTags;
+
   const renderTags = () => {
     return (
       <Select
@@ -75,31 +81,19 @@ export default function Create() {
         }}
         value={userInput.tag}
       >
-        <SelectItem
-          key={0}
-          value={0}
-          startContent={
-            <div className='w-4 h-4 rounded-full bg-amber-500'></div>
-          }
-        >
-          color1
-        </SelectItem>
-        <SelectItem
-          key={1}
-          value={1}
-          startContent={
-            <div className='w-4 h-4 rounded-full bg-lime-500'></div>
-          }
-        >
-          color2
-        </SelectItem>
-        <SelectItem
-          key={2}
-          value={2}
-          startContent={<div className='w-4 h-4 rounded-full bg-sky-500'></div>}
-        >
-          color3
-        </SelectItem>
+        {calendarTags.map((tag, index) => (
+          <SelectItem
+            key={tag.colorCode}
+            value={tag.colorCode}
+            startContent={
+              <div
+                className={clsx('w-4 h-4 rounded-full', themeColors[index].bg)}
+              ></div>
+            }
+          >
+            {tag.name}
+          </SelectItem>
+        ))}
       </Select>
     );
   };
@@ -171,7 +165,7 @@ export default function Create() {
   // =====================================================
 
   const addEvent = async (id: string, data: object) => {
-    const calendarRef = doc(db, 'Calendars', 'nWryB1DvoYBEv1oKdc0L');
+    const calendarRef = doc(db, 'Calendars', currentCalendarId);
     const eventRef = doc(calendarRef, 'events', id);
     await setDoc(eventRef, data);
   };
@@ -189,7 +183,7 @@ export default function Create() {
     const eventsCollection = collection(
       db,
       'Calendars',
-      'nWryB1DvoYBEv1oKdc0L',
+      currentCalendarId,
       'events',
     );
     const eventRef = doc(eventsCollection);
