@@ -22,9 +22,10 @@ const styles = {
 
 type Props = {
   value?: Date;
+  setIsSideBarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Navigation: React.FC<Props> = () => {
+const Navigation: React.FC<Props> = ({ setIsSideBarOpen }) => {
   const { setIsCreateModalOpen } = useModalStore();
   const {
     currentView,
@@ -62,7 +63,10 @@ const Navigation: React.FC<Props> = () => {
   return (
     <div className={styles.container}>
       <div className='flex items-center'>
-        <LucideAlignJustify className='mr-4 text-xl text-[#5a3a1b] hover:cursor-pointer' />
+        <LucideAlignJustify
+          className='mr-4 text-xl text-[#5a3a1b] hover:cursor-pointer'
+          onClick={() => setIsSideBarOpen((prev) => !prev)}
+        />
         <img src='/assets/logo.png' className='w-10' />
         <h1 className='px-1 text-lg font-bold text-[#5a3a1b] mr-4'>
           Colorful Days
