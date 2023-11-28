@@ -143,7 +143,7 @@ const WeeklyView: React.FC = () => {
               {timeStyles.map((timeStyle, index) => (
                 <>
                   <div
-                    key={`row-1-${index}`}
+                    key={`row-1-${timeStyle}-${index}`}
                     className='border-b border-dashed hover:bg-slate-50'
                     onClick={() =>
                       setIsCreateModalOpen(
@@ -176,7 +176,10 @@ const WeeklyView: React.FC = () => {
                 id={`column-${weekday}`}
                 className='absolute left-0 w-11/12 bg-red-50/50 column-start-2 row-start-1 row-span-full column-span-1 grid grid-rows-weeklyTimeTable z-10'
               > */}
-                <OneDayEventCells weekDates={weekDates} weekdayIndex={weekdayIndex} />
+              <OneDayEventCells
+                weekDates={weekDates}
+                weekdayIndex={weekdayIndex}
+              />
               {/* </div> */}
             </div>
           </>

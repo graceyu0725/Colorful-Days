@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import {
   addDays,
   differenceInCalendarDays,
+  endOfDay,
   format,
   getDay,
   isSameDay,
@@ -10,11 +11,23 @@ import {
   startOfWeek,
 } from 'date-fns';
 import { useModalStore } from '../store/modalStore';
+import { themeColors } from './theme';
 import { Event } from './types';
 
 // ================================================================
 // Common functions
 // ================================================================
+export const updateAllEvents = (
+  snapshot: any,
+  setAllEvents: (event: Event[]) => void,
+) => {
+  const newEvents = snapshot.docs.map((doc: any) => ({
+    ...doc.data(),
+    startAt: doc.data().startAt.toDate(),
+    endAt: doc.data().endAt.toDate(),
+  })) as Event[];
+  setAllEvents(newEvents);
+};
 
 export function splitDatesIntoWeeks(monthDates: Date[]) {
   let weeks: Array<Array<Date>> = [];
@@ -97,23 +110,59 @@ export const generateWeekDates = (date: Date) => {
 
 // 將所有事件按照當月日期分好（開始日或日期區間落在當格日期，就會成為當格事件）
 const mapEventsToMonthDates = (monthDates: Date[], events: Event[]) => {
-  const mappedEvents: Event[][] = new Array(monthDates.length)
-    .fill(null)
-    .map(() => []);
+  // const mappedEvents: Event[][] = new Array(monthDates.length)
+  //   .fill(null)
+  //   .map(() => []);
+
+  // monthDates.forEach((date, index) => {
+  //   events.forEach((event) => {
+  //     const startDate = event.startAt || new Date();
+  //     const endDate = event.endAt || new Date();
+  //     const isInInterval = isWithinInterval(date, {
+  //       start: startDate,
+  //       end: endDate,
+  //     });
+
+  //     if (isSameDay(startDate, date) || isInInterval) {
+  //       mappedEvents[index].push(event);
+  //     }
+  //   });
+
+  // });
+
+  const mappedEvents: Event[][] = monthDates.map(() => []);
 
   monthDates.forEach((date, index) => {
-    events.forEach((event) => {
+    const eventsOfTheDay = events.filter((event) => {
       const startDate = event.startAt || new Date();
-      const endDate = event.endAt || new Date();
-      const isInInterval = isWithinInterval(date, {
-        start: startDate,
-        end: endDate,
+      const isInInterval = isWithinInterval(startDate, {
+        start: startOfDay(date),
+        end: endOfDay(date),
       });
-
-      if (isSameDay(startDate, date) || isInInterval) {
-        mappedEvents[index].push(event);
-      }
+      return isInInterval;
     });
+
+    // 先按照開始日期排序，再按照持續時間排
+    eventsOfTheDay.sort((a, b) => {
+      if (!a.startAt || !b.startAt) {
+        return !a.startAt ? 1 : -1;
+      }
+
+      const startComparison = a.startAt.getTime() - b.startAt.getTime();
+      if (startComparison !== 0) {
+        return startComparison;
+      }
+
+      if (!a.endAt || !b.endAt) {
+        return !a.endAt ? 1 : -1;
+      }
+
+      const durationA = a.endAt.getTime() - a.startAt.getTime();
+      const durationB = b.endAt.getTime() - b.startAt.getTime();
+      return durationB - durationA;
+    });
+
+    mappedEvents[index] = eventsOfTheDay;
   });
 
   return mappedEvents;
@@ -130,7 +179,7 @@ export const getSplitEvents = (monthDates: Date[], allEvents: Event[]) => {
 // Render monthly events
 // ================================================================
 
-export const renderEvent = (event: any, cellDate: Date) => {
+export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
   const { setIsEditModalOpen } = useModalStore();
   const handleClick = (event: React.MouseEvent, e: Event) => {
     event.stopPropagation(); // 阻止事件冒泡
@@ -138,13 +187,16 @@ export const renderEvent = (event: any, cellDate: Date) => {
   };
 
   // 如果是 memo，則不顯示在畫面上
-  if (event.isMemo) return
+  if (event.isMemo || !event) return;
   // if (event.isMemo) {
   //   return <div className=''></div>;
   // }
 
   const startDate = event.startAt || new Date();
   const endDate = event.endAt || new Date();
+
+  const normalBackground = themeColors[Number(event.tag)].bg;
+  const lightBackground = themeColors[Number(event.tag)].light;
 
   // 若事件起始日 = 該格日期，在該格顯示事件標題
   if (isSameDay(startDate, cellDate)) {
@@ -154,7 +206,15 @@ export const renderEvent = (event: any, cellDate: Date) => {
       if (event.isAllDay) {
         return (
           <div
-            className='truncate bg-red-200 basis-0 rounded indent-1.5 hover:cursor-pointer'
+            className={clsx(
+              'truncate basis-0 rounded indent-1.5 hover:cursor-pointer',
+              normalBackground,
+            )}
+            style={{
+              gridColumnStart: getDay(startDate) + 1,
+              gridRowStart: eventIndex + 1,
+              pointerEvents: 'auto',
+            }}
             onClick={(e) => handleClick(e, event)}
           >
             {event.title}
@@ -166,10 +226,18 @@ export const renderEvent = (event: any, cellDate: Date) => {
       const formattedTime = format(startDate, 'h:mm a');
       return (
         <div
-          className='truncate bg-red-50 basis-0 rounded indent-1.5 hover:cursor-pointer flex items-center justify-between'
+          className={clsx(
+            'truncate basis-0 rounded indent-1.5 hover:cursor-pointer flex items-center justify-between',
+            lightBackground,
+          )}
+          style={{
+            gridColumnStart: getDay(startDate) + 1,
+            gridRowStart: eventIndex + 1,
+            pointerEvents: 'auto',
+          }}
           onClick={(e) => handleClick(e, event)}
         >
-          <div>{event.title}</div>
+          <div className='truncate'>{event.title}</div>
           <div className='truncate mr-1 text-xs text-gray-400'>
             {formattedTime}
           </div>
@@ -183,9 +251,17 @@ export const renderEvent = (event: any, cellDate: Date) => {
     if (getDay(startDate) + lastDays > 7) {
       return (
         <div
-          className='truncate bg-red-200 basis-0 rounded indent-1.5 hover:cursor-pointer'
+          className={clsx(
+            'truncate basis-0 rounded indent-1.5 hover:cursor-pointer',
+            normalBackground,
+          )}
           // style={{ flexGrow: 7 - getDay(startDate) }}
-          style={{ gridColumnStart: getDay(startDate) + 1, gridColumnEnd: 8 }}
+          style={{
+            gridColumnStart: getDay(startDate) + 1,
+            gridColumnEnd: 8,
+            gridRowStart: eventIndex + 1,
+            pointerEvents: 'auto',
+          }}
           onClick={(e) => handleClick(e, event)}
         >
           {event.title}
@@ -194,11 +270,16 @@ export const renderEvent = (event: any, cellDate: Date) => {
     }
     return (
       <div
-        className='truncate bg-red-200 basis-0 rounded indent-1.5 hover:cursor-pointer'
+        className={clsx(
+          'truncate basis-0 rounded indent-1.5 hover:cursor-pointer',
+          normalBackground,
+        )}
         // style={{ flexGrow: lastDays }}
         style={{
           gridColumnStart: getDay(startDate) + 1,
           gridColumnEnd: getDay(startDate) + 1 + lastDays,
+          gridRowStart: eventIndex + 1,
+          pointerEvents: 'auto',
         }}
         onClick={(e) => handleClick(e, event)}
       >
@@ -215,9 +296,17 @@ export const renderEvent = (event: any, cellDate: Date) => {
     if (lastDaysThisWeek <= 7) {
       return (
         <div
-          className='truncate bg-red-200 basis-0 rounded indent-1.5 hover:cursor-pointer'
+          className={clsx(
+            'truncate basis-0 rounded indent-1.5 hover:cursor-pointer',
+            normalBackground,
+          )}
           // style={{ flexGrow: lastDaysThisWeek }}
-          style={{ gridColumnStart: 1, gridColumnEnd: lastDaysThisWeek + 1 }}
+          style={{
+            gridColumnStart: 1,
+            gridColumnEnd: lastDaysThisWeek + 1,
+            gridRowStart: eventIndex + 1,
+            pointerEvents: 'auto',
+          }}
           onClick={(e) => handleClick(e, event)}
         >
           {event.title}
@@ -226,8 +315,16 @@ export const renderEvent = (event: any, cellDate: Date) => {
     }
     return (
       <div
-        className='truncate bg-red-200 basis-0 rounded indent-1.5 hover:cursor-pointer'
-        style={{ gridColumnStart: 1, gridColumnEnd: 8 }}
+        className={clsx(
+          'truncate basis-0 rounded indent-1.5 hover:cursor-pointer',
+          normalBackground,
+        )}
+        style={{
+          gridColumnStart: 1,
+          gridColumnEnd: 8,
+          gridRowStart: eventIndex + 1,
+          pointerEvents: 'auto',
+        }}
         onClick={(e) => handleClick(e, event)}
       >
         {event.title}
@@ -235,7 +332,9 @@ export const renderEvent = (event: any, cellDate: Date) => {
     );
   }
 
-  return <div className=''></div>;
+  if (event.title) {
+    // return <div className=''>{event.title}</div>;
+  }
 };
 
 // ================================================================
@@ -265,14 +364,27 @@ export const renderWeeklyAllDayEvent = (
   };
 
   return events.map((event, eventIndex) => {
-    // 當日沒有事件
-    // if (!event || event.isMemo) {
-    //   return <div className={eventCellStyles[index]}></div>;
-    // }
-    if (!event || event.isMemo) return;
+    if (!event || event.isMemo || eventIndex > 2) return;
 
     const startDate = event.startAt || new Date();
     const endDate = event.endAt || new Date();
+
+    if (eventIndex === 2) {
+      return (
+        <div
+          className='truncate border-2 border-slate-200 text-xs text-center w-10 rounded hover:cursor-pointer'
+          style={{
+            gridColumnStart: getDay(startDate) + 1,
+            pointerEvents: 'auto',
+          }}
+          onClick={() => console.log(getDay(startDate) + 1)}
+        >
+          more
+        </div>
+      );
+    }
+
+    const normalBackground = themeColors[Number(event.tag)].bg;
 
     // 事件起始日 = 該格日期
     if (isSameDay(startDate, weekDates[index])) {
@@ -284,11 +396,13 @@ export const renderWeeklyAllDayEvent = (
           return (
             <div
               className={clsx(eventCellStyles[index], {
-                ['bg-red-200 rounded']: event.title,
+                ['rounded']: event.title,
+                [normalBackground]: event.title,
               })}
               style={{
                 gridColumnStart: getDay(startDate) + 1,
                 gridColumnEnd: 8,
+                gridRowStart: eventIndex + 1,
                 pointerEvents: 'auto',
               }}
               onClick={(e) => handleClick(e, event)}
@@ -301,11 +415,13 @@ export const renderWeeklyAllDayEvent = (
         return (
           <div
             className={clsx(eventCellStyles[index], {
-              ['bg-red-200 rounded']: event?.title,
+              ['rounded']: event.title,
+              [normalBackground]: event.title,
             })}
             style={{
               gridColumnStart: getDay(startDate) + 1,
               gridColumnEnd: getDay(startDate) + 1 + lastDays,
+              gridRowStart: eventIndex + 1,
               pointerEvents: 'auto',
             }}
             onClick={(e) => handleClick(e, event)}
@@ -317,10 +433,12 @@ export const renderWeeklyAllDayEvent = (
       return (
         <div
           className={clsx(eventCellStyles[index], {
-            ['bg-red-200 rounded']: event.title,
+            ['rounded']: event.title,
+            [normalBackground]: event.title,
           })}
           style={{
             pointerEvents: 'auto',
+            gridRowStart: eventIndex + 1,
           }}
           onClick={(e) => handleClick(e, event)}
         >
@@ -338,11 +456,13 @@ export const renderWeeklyAllDayEvent = (
         return (
           <div
             className={clsx(eventCellStyles[index], {
-              ['bg-red-200 rounded']: event.title,
+              ['rounded']: event.title,
+              [normalBackground]: event.title,
             })}
             style={{
               gridColumnStart: 1,
               gridColumnEnd: lastDayThisWeek + 1,
+              gridRowStart: eventIndex + 1,
               pointerEvents: 'auto',
             }}
             onClick={(e) => handleClick(e, event)}
@@ -354,11 +474,13 @@ export const renderWeeklyAllDayEvent = (
       return (
         <div
           className={clsx(eventCellStyles[index], {
-            ['bg-red-200 rounded']: event.title,
+            ['rounded']: event.title,
+            [normalBackground]: event.title,
           })}
           style={{
             gridColumnStart: 1,
             gridColumnEnd: 8,
+            gridRowStart: eventIndex + 1,
             pointerEvents: 'auto',
           }}
           onClick={(e) => handleClick(e, event)}
@@ -379,7 +501,7 @@ export const renderWeeklyOneDayEvent = (
   setIsEditModalOpen: (isOpen: boolean, event: Event) => void,
 ) => {
   // 沒有事件
-  if (!event || event.isMemo) return;
+  if (!event.title || event.isMemo) return;
 
   const handleClick = (event: React.MouseEvent, e: Event) => {
     event.stopPropagation(); // 阻止事件冒泡
@@ -388,6 +510,8 @@ export const renderWeeklyOneDayEvent = (
 
   const startDate = event.startAt || new Date();
   const endDate = event.endAt || new Date();
+  const borderColor = themeColors[Number(event.tag)].border;
+  const lightBackground = themeColors[Number(event.tag)].light;
 
   // 起始日 = 該格日期下
   // 若起始日 = 結束日，按事件時間 render， 若起始日 ！= 結束日，起始日當天 render 所有格子
@@ -406,7 +530,11 @@ export const renderWeeklyOneDayEvent = (
     if (isSameDay(startDate, endDate)) {
       return (
         <div
-          className='bg-blue-100/50 border-l-2 border-blue-600 pl-1 truncate hover:cursor-pointer'
+          className={clsx(
+            'border-l-2 pl-1 truncate hover:cursor-pointer',
+            borderColor,
+            lightBackground,
+          )}
           style={{
             gridRowStart: startRowIndex,
             gridRowEnd: startRowIndex + rowSpanNumber,
@@ -420,7 +548,11 @@ export const renderWeeklyOneDayEvent = (
     }
     return (
       <div
-        className='bg-blue-100/50 border-l-2 border-blue-600 pl-1 truncate hover:cursor-pointer'
+        className={clsx(
+          'border-l-2 pl-1 truncate hover:cursor-pointer',
+          borderColor,
+          lightBackground,
+        )}
         style={{
           gridRowStart: startRowIndex,
           gridRowEnd: 97,
@@ -444,7 +576,11 @@ export const renderWeeklyOneDayEvent = (
     );
     return (
       <div
-        className='bg-blue-100/50 border-l-2 border-blue-600 pl-1 truncate hover:cursor-pointer'
+        className={clsx(
+          'border-l-2 pl-1 truncate hover:cursor-pointer',
+          borderColor,
+          lightBackground,
+        )}
         style={{
           gridRowStart: 1,
           gridRowEnd: 1 + rowSpanNumber,
@@ -459,7 +595,11 @@ export const renderWeeklyOneDayEvent = (
 
   return (
     <div
-      className='bg-blue-100/50 border-l-2 border-blue-600 pl-1 truncate hover:cursor-pointer'
+      className={clsx(
+        'border-l-2 pl-1 truncate hover:cursor-pointer',
+        borderColor,
+        lightBackground,
+      )}
       style={{
         gridRowStart: 1,
         gridRowEnd: 97,

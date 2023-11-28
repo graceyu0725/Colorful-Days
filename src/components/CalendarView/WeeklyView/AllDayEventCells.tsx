@@ -3,7 +3,6 @@ import {
   getSplitEvents,
   renderWeeklyAllDayEvent,
 } from '../../../utils/handleDatesAndEvents';
-import { useModalStore } from '../../../store/modalStore';
 
 type Props = {
   weekDates: Date[];
@@ -11,7 +10,6 @@ type Props = {
 
 const AllDayEventCells: React.FC<Props> = ({ weekDates }) => {
   const { allEvents } = useEventsStore();
-  const { setIsEditModalOpen } = useModalStore();
 
   const spiltEvents = getSplitEvents(weekDates, allEvents);
   const filteredAllDayEvents = spiltEvents[0].map((spiltEvent) =>
@@ -36,7 +34,8 @@ const AllDayEventCells: React.FC<Props> = ({ weekDates }) => {
 
   const EventRow: React.FC<WrapperProps> = ({ children }) => (
     <div
-      className='grid gap-px col-span-7 grid-cols-7 row-span-1 auto-rows-auto'
+      className='grid gap-px col-span-7 grid-cols-7 row-span-1 auto-rows-[20px] w-full'
+      // style={{ maxWidth: 'calc(100% - 12px)' }}
       id='eventRow'
     >
       {children}

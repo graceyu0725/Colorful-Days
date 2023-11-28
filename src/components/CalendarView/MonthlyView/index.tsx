@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { isSameDay, isSameMonth } from 'date-fns';
 import { useState } from 'react';
 import { useEventsStore } from '../../../store/eventsStore';
 import { useViewStore } from '../../../store/viewStore';
@@ -9,7 +10,6 @@ import {
 } from '../../../utils/handleDatesAndEvents';
 import Cell from './Cell';
 import EventCells from './EventCells';
-import { isSameDay,isSameMonth } from 'date-fns';
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -41,7 +41,7 @@ const MonthlyView: React.FC = () => {
   );
 
   const DayCellsWrapper: React.FC<WrapperProps> = ({ children }) => (
-    <div className='flex w-full' id='dayCellsWrapper'>
+    <div className='flex w-ull' id='dayCellsWrapper'>
       {children}
     </div>
   );

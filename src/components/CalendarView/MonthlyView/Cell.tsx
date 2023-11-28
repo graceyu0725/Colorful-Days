@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { useModalStore } from '../../../store/modalStore';
-// import { useState } from 'react';
 
 interface Props extends React.PropsWithChildren {
   className?: string;
@@ -16,7 +15,6 @@ interface Props extends React.PropsWithChildren {
   col: number;
   startCell: number[];
   setStartCell: React.Dispatch<React.SetStateAction<number[]>>;
-  // isSelected: boolean;
 }
 
 const Cell: React.FC<Props> = ({
@@ -32,11 +30,9 @@ const Cell: React.FC<Props> = ({
   col,
   startCell,
   setStartCell,
-  // isSelected,
 }) => {
   const { setIsCreateModalOpen, setSelectedStartDate, selectedStartDate } =
     useModalStore();
-  // const [isSelected,setIsSelected] = useState(false)
 
   const mouseDown = () => {
     if (!header) {
@@ -96,12 +92,9 @@ const Cell: React.FC<Props> = ({
           [header
             ? 'h-10 px-2 justify-center'
             : dayCounts > 35
-              ? 'h-24 px-2 py-1 hover:bg-gray-200 active:bg-gray-200'
+              ? 'h-[100px] px-2 py-1 hover:bg-gray-200 active:bg-gray-200'
               : 'h-28 px-2 py-1 hover:bg-gray-200 active:bg-gray-200']: true,
         },
-        // {
-        //   [!header && isSelected ? 'bg-gray-200 cursor-grab' : '']: true,
-        // },
         className,
       )}
     >
