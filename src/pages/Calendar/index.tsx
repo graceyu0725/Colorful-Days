@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import CalendarView from '../../components/CalendarView';
 import CreateEventModal from '../../components/EventModals/Create';
 import EditEventModal from '../../components/EventModals/Edit';
+import MoreEventModal from '../../components/EventModals/More';
 import Header from '../../components/Header';
 import { useAuthStore } from '../../store/authStore';
 import { useEventsStore } from '../../store/eventsStore';
@@ -67,7 +68,6 @@ function Calendar() {
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log('useEffect設定');
         localStorage.setItem('uid', user.uid);
         setIsLogin(true);
         updateCurrentUser(
@@ -76,6 +76,7 @@ function Calendar() {
           setCurrentCalendarId,
           setCurrentCalendarContent,
         );
+        // TODO: 取得該使用者下有的calendarId & name
       } else {
         localStorage.removeItem('uid');
         navigate('/signin');
@@ -90,6 +91,7 @@ function Calendar() {
           <CalendarView />
           <CreateEventModal />
           <EditEventModal />
+          <MoreEventModal />
           <Header />
         </>
       ) : (

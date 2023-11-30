@@ -131,13 +131,15 @@ const mapEventsToMonthDates = (monthDates: Date[], events: Event[]) => {
   // });
 
   const mappedEvents: Event[][] = monthDates.map(() => []);
+  const eventIndices = new Map();
 
   monthDates.forEach((date, index) => {
     const eventsOfTheDay = events.filter((event) => {
       const startDate = event.startAt || new Date();
-      const isInInterval = isWithinInterval(startDate, {
-        start: startOfDay(date),
-        end: endOfDay(date),
+      const endDate = event.endAt || new Date();
+      const isInInterval = isWithinInterval(date, {
+        start: startOfDay(startDate),
+        end: endOfDay(endDate),
       });
       return isInInterval;
     });
@@ -162,7 +164,35 @@ const mapEventsToMonthDates = (monthDates: Date[], events: Event[]) => {
       return durationB - durationA;
     });
 
-    mappedEvents[index] = eventsOfTheDay;
+    mappedEvents[index] = mappedEvents[index] || [];
+
+    eventsOfTheDay.forEach((event) => {
+      if (!event.eventId) return;
+
+      if (eventIndices.has(event.eventId)) {
+        // If the event already appeared, use the same index
+        const eventIndex = eventIndices.get(event.eventId);
+
+        if (!mappedEvents[index][eventIndex]) {
+          mappedEvents[index][eventIndex] = event;
+        } else {
+          // 若該位置已被佔用，加到 array 尾
+          mappedEvents[index].push(event);
+          eventIndices.set(event.eventId, mappedEvents[index].length - 1);
+        }
+      } else {
+        const emptyIndex = mappedEvents[index].findIndex((e) => !e);
+        if (emptyIndex !== -1) {
+          mappedEvents[index][emptyIndex] = event;
+        } else {
+          mappedEvents[index].push(event);
+        }
+        eventIndices.set(
+          event.eventId,
+          emptyIndex >= 0 ? emptyIndex : mappedEvents[index].length - 1,
+        );
+      }
+    });
   });
 
   return mappedEvents;
@@ -290,6 +320,7 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
 
   // 若為當週第一天，且事件起始日 != 該格日期，需判斷該格是否有需要接續的事件
   if (getDay(cellDate) === 0) {
+    console.log('遇到跨週事件');
     const lastDays = differenceInCalendarDays(endDate, startDate) + 1;
     const lastDaysThisWeek =
       lastDays - differenceInCalendarDays(cellDate, startDate);
@@ -374,10 +405,11 @@ export const renderWeeklyAllDayEvent = (
         <div
           className='truncate border-2 border-slate-200 text-xs text-center w-10 rounded hover:cursor-pointer'
           style={{
-            gridColumnStart: getDay(startDate) + 1,
+            gridRowStart: 3,
+            gridColumnStart: index + 1,
             pointerEvents: 'auto',
           }}
-          onClick={() => console.log(getDay(startDate) + 1)}
+          onClick={() => console.log('more', events)}
         >
           more
         </div>

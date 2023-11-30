@@ -38,8 +38,8 @@ const SideBar: React.FC<Props> = ({ isSideBarOpen }) => {
           },
         )}
       >
-        <Schedule todaysEvents={todaysEvents}></Schedule>
-        <TagFilter calendarTags={calendarTags}></TagFilter>
+        <Schedule todaysEvents={todaysEvents} />
+        <TagFilter calendarTags={calendarTags} />
       </div>
     </>
   );

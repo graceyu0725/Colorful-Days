@@ -1,4 +1,5 @@
 import { getDay } from 'date-fns';
+import { useModalStore } from '../../../store/modalStore';
 import { renderEvent } from '../../../utils/handleDatesAndEvents';
 import { Event } from '../../../utils/types';
 
@@ -9,6 +10,8 @@ type Props = {
 };
 
 const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
+  const { isMoreModalOpen, setIsMoreModalOpen, eventsToShow } = useModalStore();
+
   // function adjustEvents(origin: Event[][]) {
   //   let firstAppearanceIndexes: { [eventId: string]: number } = {};
   //   let expectation = [];
@@ -103,7 +106,7 @@ const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
                   gridColumnStart: getDay(week[eventsIndex]) + 1,
                   pointerEvents: 'auto',
                 }}
-                onClick={() => console.log(getDay(week[eventsIndex]) + 1)}
+                onClick={() => setIsMoreModalOpen(true, events)}
               >
                 more
               </div>

@@ -1,8 +1,11 @@
 import clsx from 'clsx';
-import { isFirstDayOfMonth, isSameDay } from 'date-fns';
+import { isFirstDayOfMonth, isSameDay, startOfToday } from 'date-fns';
+import { useEffect, useState } from 'react';
+import { useAuthStore } from '../../../store/authStore';
 import { useModalStore } from '../../../store/modalStore';
 import { useViewStore } from '../../../store/viewStore';
 import { generateWeekDates } from '../../../utils/handleDatesAndEvents';
+import { themeColors } from '../../../utils/theme';
 import AllDayEventCells from './AllDayEventCells';
 import OneDayEventCells from './OneDayEventCells';
 
@@ -39,7 +42,7 @@ const timeStyles = [
   },
 ];
 const commonDateStyles =
-  'row-start-2 row-span-2 border-t pl-2 pt-1 text-sm hover:bg-slate-100';
+  'row-start-2 row-span-2 border-t pl-2 pt-1 -mr-px text-sm hover:bg-slate-100';
 const dateStyles = [
   clsx('col-start-2 border-r', commonDateStyles),
   clsx('col-start-3 border-r', commonDateStyles),
@@ -54,6 +57,9 @@ const WeeklyView: React.FC = () => {
   const { currentDate } = useViewStore();
   const weekDates = generateWeekDates(currentDate);
   const { setIsCreateModalOpen } = useModalStore();
+  const { currentCalendarContent } = useAuthStore();
+
+  const themeColorIndex = Number(currentCalendarContent.themeColor) || 0;
 
   const getStartTime = (
     date: Date[],
@@ -70,6 +76,22 @@ const WeeklyView: React.FC = () => {
     );
     return startTime;
   };
+
+  const [topPosition, setTopPosition] = useState(0);
+  useEffect(() => {
+    const updatePosition = () => {
+      const today = startOfToday();
+      const now = new Date();
+      const minutesPassed = (now.getTime() - today.getTime()) / 60000;
+      const pixelsPerMinute = 1.6;
+      setTopPosition(minutesPassed * pixelsPerMinute);
+    };
+
+    const intervalId = setInterval(updatePosition, 60000);
+    updatePosition();
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <div
@@ -123,8 +145,17 @@ const WeeklyView: React.FC = () => {
       {/* 一個大 Grid 包含左邊時間列及中間 Time table，Time table 也需要一個 Grid */}
       <div
         id='weekly-view-time-table'
-        className='relative w-full grid grid-cols-weeklyTimeTable grid-rows-weeklyTimeTable overflow-auto'
+        className='relative w-full grid grid-cols-weeklyHeader grid-rows-weeklyTimeTable overflow-auto'
       >
+        {/* 時間線 */}
+        <div
+          className={clsx(
+            'absolute w-full border-t top-1 right-0 z-20',
+            themeColors[themeColorIndex].border,
+          )}
+          style={{ width: 'calc(100% - 80px)', top: `${topPosition}px` }}
+        ></div>
+
         {/* 左邊時間列 */}
         {timeStyles.map((timeStyle, index) => (
           <time key={index} className={timeStyle.style}>
