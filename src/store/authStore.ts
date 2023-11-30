@@ -15,6 +15,7 @@ interface authState {
   setCurrentCalendarId: (currentCalendarId: string) => void;
   currentCalendarContent: CalendarContent;
   setCurrentCalendarContent: (currentCalendarContent: CalendarContent) => void;
+  resetUser: () => void;
 }
 
 export const useAuthStore = create<authState>((set) => ({
@@ -27,4 +28,11 @@ export const useAuthStore = create<authState>((set) => ({
   currentCalendarContent: initialCalendarContent,
   setCurrentCalendarContent: (currentCalendarContent) =>
     set({ currentCalendarContent }),
+  resetUser: () =>
+    set({
+      isLogin: false,
+      currentUser: initialUser,
+      currentCalendarId: '',
+      currentCalendarContent: initialCalendarContent,
+    }),
 }));

@@ -3,8 +3,13 @@ import clsx from 'clsx';
 import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../store/authStore';
+import { useEventsStore } from '../../store/eventsStore';
 import { firebase } from '../../utils/firebase';
-import { addUserForGoogle } from '../../utils/handleUserAndCalendar';
+import {
+  addUserForGoogle,
+  createNewCalendar,
+} from '../../utils/handleUserAndCalendar';
 import { themeColors } from '../../utils/theme';
 import { CalendarInfo } from '../../utils/types';
 
@@ -15,9 +20,12 @@ export default function SelectTheme() {
   if (!state) return <Navigate to='/signup' replace />;
 
   const [calendarInfo, setCalendarInfo] = useState<CalendarInfo>({
-    name: '',
+    name: "Pikachu's calendar",
     themeColor: '',
   });
+  const { currentUser, setCurrentCalendarId, setCurrentCalendarContent } =
+    useAuthStore();
+  const { resetAllEvents } = useEventsStore();
 
   // Update userInput when typing
   const updateCalendarInfo = (
@@ -53,6 +61,26 @@ export default function SelectTheme() {
   ]);
   const [backGroundColor, setBackGroundColor] = useState('bg-slate-200');
   const [borderColor, setBorderColor] = useState('border-slate-200');
+
+  const handleSubmit = () => {
+    if (state.isCreateCalendar) {
+      createNewCalendar(
+        currentUser.email,
+        currentUser.name,
+        currentUser.userId,
+        calendarInfo.name,
+        calendarInfo.themeColor,
+        setCurrentCalendarId,
+        setCurrentCalendarContent,
+        resetAllEvents,
+      );
+      navigate('/calendar');
+    } else {
+      state.isNativeSignup
+        ? firebase.signUp(state.userInfo, navigate, calendarInfo)
+        : addUserForGoogle(state.userInfo, navigate, calendarInfo);
+    }
+  };
 
   return (
     <>
@@ -107,11 +135,7 @@ export default function SelectTheme() {
             color='default'
             className='w-32'
             disabled={!calendarInfo.name || !calendarInfo.themeColor}
-            onClick={() =>
-              state.isNativeSignup
-                ? firebase.signUp(state.userInfo, navigate, calendarInfo)
-                : addUserForGoogle(state.userInfo, navigate, calendarInfo)
-            }
+            onClick={handleSubmit}
           >
             送出
           </Button>

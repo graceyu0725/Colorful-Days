@@ -9,6 +9,7 @@ import {
 } from 'firebase/firestore';
 import { NavigateFunction } from 'react-router-dom';
 // import { updateCalendarContent } from '../store/authStore';
+import { arrayUnion, updateDoc } from 'firebase/firestore';
 import { DocumentData, DocumentReference } from 'firebase/firestore/lite';
 import {
   CalendarContent,
@@ -43,6 +44,7 @@ export const addCalendar = async (
     name: calendarName,
     themeColor: selectedThemeColor,
     tags: defaultTags,
+    calendarId: calendarDocRef.id,
   };
 
   await setDoc(calendarDocRef, newCalendar);
@@ -140,6 +142,7 @@ const getCalendarContent = async (calendarId: string) => {
         name: docSnap.data()?.name,
         tags: docSnap.data()?.tags,
         themeColor: docSnap.data()?.themeColor,
+        calendarId: docSnap.data()?.calendarId,
       };
     } else {
       console.error('No such document!');
@@ -195,4 +198,61 @@ export const updateCurrentUser = async (
       setCurrentCalendarContent,
     );
   });
+};
+
+// For UserCalendars
+// 根據 Calendar Id 取得 Calendar Name
+const getCalendarDetail = async (calendarId: string) => {
+  const calendarsCollection = collection(db, 'Calendars');
+  const docRef = doc(calendarsCollection, calendarId);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return docSnap.data();
+  } else {
+    console.error('No such document!');
+  }
+};
+
+export const getAllCalendarDetail = async (userCalendars: string[]) => {
+  const promises = userCalendars.map((calendarId) =>
+    getCalendarDetail(calendarId),
+  );
+  const userCalendarsDetail = await Promise.all(promises);
+  return userCalendarsDetail.filter(
+    (detail): detail is CalendarContent => detail !== undefined,
+  ) as CalendarContent[];
+};
+
+export const createNewCalendar = async (
+  userEmail: string,
+  userName: string,
+  userId: string,
+  calendarName: string,
+  calendarThemeColor: string,
+  setCurrentCalendarId: (currentCalendarId: string) => void,
+  setCurrentCalendarContent: (currentCalendarContent: CalendarContent) => void,
+  resetAllEvents: () => void,
+) => {
+  const calendarsCollection = collection(db, 'Calendars');
+  const calendarDocRef = doc(calendarsCollection);
+  addCalendar(
+    userEmail,
+    userName,
+    userId,
+    calendarName,
+    calendarThemeColor,
+    calendarDocRef,
+  );
+  const userRef = doc(db, 'Users', userEmail);
+  await updateDoc(userRef, {
+    calendars: arrayUnion(calendarDocRef.id),
+  });
+  resetAllEvents();
+
+  updateCalendarContent(
+    calendarDocRef.id,
+    setCurrentCalendarId,
+    setCurrentCalendarContent,
+  );
+  console.log('新增日曆成功');
 };

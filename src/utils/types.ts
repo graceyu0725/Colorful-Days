@@ -99,6 +99,7 @@ export interface CalendarContent {
   name: string;
   tags: CalendarTag[];
   themeColor: string;
+  calendarId: string;
 }
 
 export const initialCalendarContent = {
@@ -117,6 +118,7 @@ export const initialCalendarContent = {
     },
   ],
   themeColor: '',
+  calendarId: '',
 };
 
 export interface UserSignUp {
