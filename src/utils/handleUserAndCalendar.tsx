@@ -32,15 +32,13 @@ export const addEventToCalendar = async (
 };
 
 export const addCalendar = async (
-  userEmail: string,
-  userName: string,
   userId: string,
   calendarName: string,
   selectedThemeColor: string,
   calendarDocRef: DocumentReference<DocumentData, { [x: string]: any }>,
 ) => {
   const newCalendar = {
-    members: [{ email: userEmail, name: userName, id: userId }],
+    members: [userId],
     name: calendarName,
     themeColor: selectedThemeColor,
     tags: defaultTags,
@@ -63,14 +61,7 @@ export const addUserForNative = async (
   const calendarsCollection = collection(db, 'Calendars');
   const calendarDocRef = doc(calendarsCollection);
 
-  addCalendar(
-    userInfo.email,
-    userInfo.name,
-    uid,
-    calendarInfo.name,
-    calendarInfo.themeColor,
-    calendarDocRef,
-  );
+  addCalendar(uid, calendarInfo.name, calendarInfo.themeColor, calendarDocRef);
 
   const newUser = {
     userId: uid,
@@ -95,8 +86,6 @@ export const addUserForGoogle = async (
     const calendarDocRef = doc(calendarsCollection);
 
     addCalendar(
-      userInfo.email,
-      userInfo.displayName || '',
       userInfo.uid,
       calendarInfo.name,
       calendarInfo.themeColor,
@@ -152,13 +141,13 @@ const getCalendarContent = async (calendarId: string) => {
   }
 };
 
-const updateCalendarContent = async (
+export const updateCalendarContent = async (
   calendarId: string,
   setCurrentCalendarId: (currentCalendarId: string) => void,
   setCurrentCalendarContent: (currentCalendarContent: CalendarContent) => void,
 ) => {
-  const calendarContent = await getCalendarContent(calendarId);
   console.log('3. 更新日曆內容');
+  const calendarContent = await getCalendarContent(calendarId);
   // const { setCurrentCalendarId, setCurrentCalendarContent } = useAuthStore();
   if (calendarContent) {
     console.log('5. 設定日曆內容');
@@ -182,25 +171,30 @@ export const updateCurrentUser = async (
 
   const querySnapshot = await getDocs(q);
 
-  querySnapshot.forEach((doc) => {
+  if (!querySnapshot.empty) {
+    const userDoc = querySnapshot.docs[0];
+    const userData = userDoc.data();
     setCurrentUser({
-      userId: doc.data().userId,
-      name: doc.data().name,
-      email: doc.data().email,
-      avatar: doc.data().avatar,
-      calendars: doc.data().calendars,
+      userId: userData.userId,
+      name: userData.name,
+      email: userData.email,
+      avatar: userData.avatar,
+      calendars: userData.calendars,
     });
 
-    // setCurrentCalendarId(doc.data().calendars[0]);
-    updateCalendarContent(
-      doc.data().calendars[0],
-      setCurrentCalendarId,
-      setCurrentCalendarContent,
-    );
-  });
+    if (userData.calendars && userData.calendars.length > 0) {
+      updateCalendarContent(
+        userData.calendars[0],
+        setCurrentCalendarId,
+        setCurrentCalendarContent,
+      );
+    }
+  } else {
+    console.error('No such user!');
+  }
 };
 
-// For UserCalendars
+// For Side Navigation - Calendars
 // 根據 Calendar Id 取得 Calendar Name
 const getCalendarDetail = async (calendarId: string) => {
   const calendarsCollection = collection(db, 'Calendars');
@@ -218,14 +212,11 @@ export const getAllCalendarDetail = async (userCalendars: string[]) => {
     getCalendarDetail(calendarId),
   );
   const userCalendarsDetail = await Promise.all(promises);
-  return userCalendarsDetail.filter(
-    (detail): detail is CalendarContent => detail !== undefined,
-  ) as CalendarContent[];
+  return userCalendarsDetail as CalendarContent[];
 };
 
 export const createNewCalendar = async (
   userEmail: string,
-  userName: string,
   userId: string,
   calendarName: string,
   calendarThemeColor: string,
@@ -235,14 +226,7 @@ export const createNewCalendar = async (
 ) => {
   const calendarsCollection = collection(db, 'Calendars');
   const calendarDocRef = doc(calendarsCollection);
-  addCalendar(
-    userEmail,
-    userName,
-    userId,
-    calendarName,
-    calendarThemeColor,
-    calendarDocRef,
-  );
+  addCalendar(userId, calendarName, calendarThemeColor, calendarDocRef);
   const userRef = doc(db, 'Users', userEmail);
   await updateDoc(userRef, {
     calendars: arrayUnion(calendarDocRef.id),
@@ -255,4 +239,63 @@ export const createNewCalendar = async (
     setCurrentCalendarContent,
   );
   console.log('新增日曆成功');
+};
+
+// For Side Navigation - Members
+// 根據 Member Id 取得 Member Info
+const getMemberDetailById = async (memberId: string) => {
+  const q = query(collection(db, 'Users'), where('userId', '==', memberId));
+  const querySnapshot = await getDocs(q);
+
+  if (!querySnapshot.empty) {
+    return querySnapshot.docs[0].data();
+  } else {
+    console.error('No such document!');
+  }
+};
+
+export const getAllMemberDetail = async (memberIds: string[]) => {
+  const promises = memberIds.map((memberId) => getMemberDetailById(memberId));
+  const userCalendarsDetail = await Promise.all(promises);
+  return userCalendarsDetail as User[];
+};
+
+// 根據輸入的 email 搜尋該會員資料
+export const getMemberSearchResults = async (memberEmail: string) => {
+  const usersCollection = collection(db, 'Users');
+  const docRef = doc(usersCollection, memberEmail);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    return docSnap.data() as User;
+  } else {
+    return 'nonexistent';
+  }
+};
+
+// Invite 後更新 Calendar's members & User's calendars
+export const addMemberToCalendar = async (
+  calendarId: string,
+  memberId: string,
+  memberEmail: string,
+) => {
+  try {
+
+  // 根據 CalendarId，將 userId push 進 Calendar.members Array
+  const calendarsCollection = collection(db, 'Calendars');
+  const calendarDocRef = doc(calendarsCollection, calendarId);
+  await updateDoc(calendarDocRef, {
+    members: arrayUnion(memberId),
+  });
+
+  // 根據 UserId，將 CalendarId push 進 User.calendars Array
+  const usersCollection = collection(db, 'Users');
+  const userDocRef = doc(usersCollection, memberEmail);
+  await updateDoc(userDocRef, {
+    calendars: arrayUnion(calendarId),
+  });
+  return true;
+} catch (error) {
+  console.error('Error adding member to calendar:', error);
+  return false;
+}
 };

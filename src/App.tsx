@@ -5,11 +5,13 @@ import SelectTheme from './pages/Member/SelectTheme';
 import Signin from './pages/Member/Signin';
 import Signup from './pages/Member/Signup';
 // import Test from './pages/Test';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
     <BrowserRouter>
       <NextUIProvider>
+        <Toaster position='top-right' />
         <Routes>
           <Route path='/' element={<Calendar />} />
           <Route path='/signin' element={<Signin />} />

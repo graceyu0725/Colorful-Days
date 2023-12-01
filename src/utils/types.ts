@@ -48,11 +48,11 @@ export const initialUser = {
   calendars: [''],
 };
 
-interface CalendarMember {
-  email: string;
-  name: string;
-  id: string;
-}
+// interface CalendarMember {
+//   email: string;
+//   name: string;
+//   id: string;
+// }
 
 export interface CalendarTag {
   colorCode: string;
@@ -95,7 +95,7 @@ export const defaultTags = [
 ];
 
 export interface CalendarContent {
-  members: CalendarMember[];
+  members: string[];
   name: string;
   tags: CalendarTag[];
   themeColor: string;
@@ -103,13 +103,7 @@ export interface CalendarContent {
 }
 
 export const initialCalendarContent = {
-  members: [
-    {
-      email: '',
-      name: '',
-      id: '',
-    },
-  ],
+  members: [''],
   name: '',
   tags: [
     {
