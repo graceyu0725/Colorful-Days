@@ -1,6 +1,8 @@
-import { Button } from '@nextui-org/react';
+import { Button, ButtonGroup, Tooltip } from '@nextui-org/react';
 import { addDays, addMonths, subDays, subMonths } from 'date-fns';
+import CodiconFilter from '~icons/codicon/filter';
 import LucideAlignJustify from '~icons/lucide/align-justify';
+// import MaterialSymbolsStickyNote2OutlineRounded from '~icons/material-symbols/sticky-note-2-outline-rounded';
 import TdesignAdd from '~icons/tdesign/add';
 import { useModalStore } from '../../store/modalStore';
 import { CalendarViewCategory, useViewStore } from '../../store/viewStore';
@@ -11,7 +13,7 @@ const styles = {
   addButton:
     'p-1 min-w-unit-10 text-base border-1 hover:bg-gray-200 hover:cursor-pointer rounded-md',
   regularButton:
-    'text-base p-2 min-w-0 w-8 h-8 rounded-full bg-white hover:bg-gray-200 hover:cursor-pointer',
+    ' text-base p-2 min-w-0 w-8 h-8 rounded-full bg-white hover:bg-gray-200 hover:cursor-pointer',
   wrapper: 'flex items-center',
   title: 'font-bold mx-2 text-xl w-44 text-center',
   viewButton:
@@ -23,9 +25,13 @@ const styles = {
 type Props = {
   value?: Date;
   setIsSideBarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsSideNavigationOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const Navigation: React.FC<Props> = ({ setIsSideBarOpen }) => {
+const Navigation: React.FC<Props> = ({
+  setIsSideBarOpen,
+  setIsSideNavigationOpen,
+}) => {
   const { setIsCreateModalOpen } = useModalStore();
   const {
     currentView,
@@ -65,62 +71,70 @@ const Navigation: React.FC<Props> = ({ setIsSideBarOpen }) => {
       <div className='flex items-center'>
         <LucideAlignJustify
           className='mr-4 text-xl text-[#5a3a1b] hover:cursor-pointer'
-          onClick={() => setIsSideBarOpen((prev) => !prev)}
+          onClick={() => setIsSideNavigationOpen((prev) => !prev)}
         />
-        <img src='/assets/logo.png' className='w-10' />
-        <h1 className='px-1 text-lg font-bold text-[#5a3a1b] mr-4'>
-          Colorful Days
-        </h1>
 
-        <Button
-          variant='bordered'
-          className={styles.borderButton}
-          onClick={() => {
-            setCurrentDate(new Date());
-          }}
-        >
-          Today
-        </Button>
+        <div className='flex items-center justify-center'>
+          <img src='/assets/logo.png' className='w-10 ml-6' />
+          <h1 className='px-1 text-lg font-bold text-[#5a3a1b] mr-4'>
+            Colorful Days
+          </h1>
+
+          <Button
+            variant='bordered'
+            className={styles.borderButton}
+            onClick={() => {
+              setCurrentDate(new Date());
+            }}
+          >
+            Today
+          </Button>
+
+          <ButtonGroup className='min-w-0 ml-2' variant='bordered'>
+            <Button
+              className='border-1 border-r-0 min-w-0 w-8 p-0 hover:bg-slate-300'
+              onClick={() => {
+                changeMonth('sub');
+              }}
+            >
+              {'<'}
+            </Button>
+            <Button
+              className='border-1 border-l-0 min-w-0 w-8 p-0 hover:bg-slate-300'
+              onClick={() => {
+                changeMonth('add');
+              }}
+            >
+              {'>'}
+            </Button>
+          </ButtonGroup>
+
+          <span className={styles.title}>{formateDate}</span>
+        </div>
       </div>
-      <div className={styles.wrapper}>
+
+      {/* <div className='border rounded-md p-1 flex gap-1'>
         <Button
-          variant='flat'
-          className={styles.regularButton}
-          onClick={() => {
-            changeMonth('subMore');
-          }}
+          className={
+            currentView === CalendarViewCategory.Monthly
+              ? styles.activeButton
+              : styles.viewButton
+          }
+          onClick={() => setCurrentView(CalendarViewCategory.Monthly)}
         >
-          {'<<'}
+          Monthly
         </Button>
         <Button
-          variant='flat'
-          className={styles.regularButton}
-          onClick={() => {
-            changeMonth('sub');
-          }}
+          className={
+            currentView === CalendarViewCategory.Weekly
+              ? styles.activeButton
+              : styles.viewButton
+          }
+          onClick={() => setCurrentView(CalendarViewCategory.Weekly)}
         >
-          {'<'}
+          Weekly
         </Button>
-        <span className={styles.title}>{formateDate}</span>
-        <Button
-          variant='flat'
-          className={styles.regularButton}
-          onClick={() => {
-            changeMonth('add');
-          }}
-        >
-          {'>'}
-        </Button>
-        <Button
-          variant='flat'
-          className={styles.regularButton}
-          onClick={() => {
-            changeMonth('addMore');
-          }}
-        >
-          {'>>'}
-        </Button>
-      </div>
+      </div> */}
 
       <div className='flex items-center gap-1'>
         <div className='border rounded-md p-1 flex gap-1'>
@@ -144,17 +158,41 @@ const Navigation: React.FC<Props> = ({ setIsSideBarOpen }) => {
           >
             Weekly
           </Button>
-          {/* <Button className={styles.viewButton}>List</Button> */}
         </div>
-        <Button
-          variant='bordered'
-          className={styles.addButton}
-          onClick={() =>
-            setIsCreateModalOpen(true, new Date(), new Date(), false)
-          }
-        >
-          <TdesignAdd className='text-xl text-[#5a3a1b] hover:cursor-pointer' />{' '}
-        </Button>
+
+        <Tooltip showArrow={true} placement='bottom' content='Create an event'>
+          <Button
+            variant='bordered'
+            className={styles.addButton}
+            onClick={() =>
+              setIsCreateModalOpen(true, new Date(), new Date(), false)
+            }
+          >
+            <TdesignAdd className='text-xl text-[#5a3a1b] hover:cursor-pointer' />
+          </Button>
+        </Tooltip>
+
+        {/* <Tooltip showArrow={true} placement='bottom' content='Memo'>
+          <Button
+            variant='bordered'
+            className={styles.addButton}
+            onClick={() =>
+              setIsCreateModalOpen(true, new Date(), new Date(), false)
+            }
+          >
+            <MaterialSymbolsStickyNote2OutlineRounded className='text-xl text-[#5a3a1b] hover:cursor-pointer' />
+          </Button>
+        </Tooltip> */}
+
+        <Tooltip showArrow={true} placement='bottom' content='Filter'>
+          <Button
+            variant='bordered'
+            className={styles.addButton}
+            onClick={() => setIsSideBarOpen((prev) => !prev)}
+          >
+            <CodiconFilter className='text-xl text-[#5a3a1b] hover:cursor-pointer' />{' '}
+          </Button>
+        </Tooltip>
       </div>
     </div>
   );

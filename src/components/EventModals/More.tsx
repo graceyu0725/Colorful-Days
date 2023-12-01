@@ -18,7 +18,6 @@ export default function More() {
     eventsToShow,
   } = useModalStore();
   const eventsToRender = eventsToShow.filter((event) => event !== null);
-  console.log('eventsToRender', eventsToRender);
 
   return (
     // <div className='absolute w-screen h-screen bg-slate-100 top-0 left-0'>

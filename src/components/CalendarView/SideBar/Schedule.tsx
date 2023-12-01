@@ -14,7 +14,7 @@ const Schedule: React.FC<Props> = ({ todaysEvents }) => {
   };
 
   return (
-    <div className='h-1/2 px-2 mt-2 mb-1'>
+    <div className='h-1/2 px-2 mt-4 mb-1'>
       <Card className='w-full h-full rounded-lg shadow border'>
         <CardHeader>Today's Events</CardHeader>
         <Divider></Divider>

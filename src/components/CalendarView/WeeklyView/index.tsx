@@ -96,7 +96,7 @@ const WeeklyView: React.FC = () => {
   return (
     <div
       id='weekly-view-root'
-      className='flex flex-col border-x border-t w-full'
+      className='flex flex-col border-x border-t w-full mt-1'
     >
       <div
         id='weekly-view-header'

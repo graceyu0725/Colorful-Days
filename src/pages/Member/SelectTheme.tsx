@@ -66,7 +66,6 @@ export default function SelectTheme() {
     if (state.isCreateCalendar) {
       createNewCalendar(
         currentUser.email,
-        currentUser.name,
         currentUser.userId,
         calendarInfo.name,
         calendarInfo.themeColor,

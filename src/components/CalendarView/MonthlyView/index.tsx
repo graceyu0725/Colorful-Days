@@ -110,8 +110,8 @@ const MonthlyView: React.FC = () => {
         </DayCellsWrapper>
 
         {weeks.map((week, index) => (
-          <WeekWrapper id='weekWrapper'>
-            <DayCellsWrapper key={`week-${index}`} id='dayCellsWrapper'>
+          <WeekWrapper id='weekWrapper' key={`week-${index}`}>
+            <DayCellsWrapper id='dayCellsWrapper'>
               {week.map((cellDate, idx) => {
                 return (
                   <Cell
