@@ -2,7 +2,6 @@ import { Card, Image } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LogosGoogleIcon from '~icons/logos/google-icon';
-import { useAuthStore } from '../../store/authStore';
 import { firebase } from '../../utils/firebase';
 import { googleAuth } from '../../utils/googleAuth';
 import { UserSignIn } from '../../utils/types';
@@ -10,9 +9,7 @@ import signinImage from './signinImage.png';
 
 function Signin() {
   const navigate = useNavigate();
-  const { currentCalendarId } = useAuthStore();
 
-  console.log('currentCalendarId', currentCalendarId);
   useEffect(() => {
     if (localStorage.getItem('uid')) {
       navigate('/calendar');
@@ -40,7 +37,7 @@ function Signin() {
     >
       <div className='absolute top-0 left-0 right-0 bottom-0 bg-gray-100/50 z-10' />
 
-      <Card className='w-11/12 p-0 rounded-none flex z-10 h-5/6'>
+      <Card className='w-11/12 p-0 rounded-lg flex z-10 h-5/6'>
         <div className='flex h-full'>
           <div className='h-full flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24'>
             <div className='max-h-full flex flex-col justify-center  mx-auto w-full max-w-sm lg:w-96'>

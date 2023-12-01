@@ -14,9 +14,9 @@ function Signup() {
   }, []);
 
   const [userInput, setUserInput] = useState<UserSignUp>({
-    name: '',
-    email: '',
-    password: '',
+    name: 'Pikachu',
+    email: 'pikachu@gmail.com',
+    password: '123456',
   });
 
   // Update userInput when typing
@@ -36,7 +36,7 @@ function Signup() {
       >
         <div className='absolute top-0 left-0 right-0 bottom-0 bg-gray-100/50 z-10' />
 
-        <Card className='w-11/12 p-0 rounded-none flex z-10 h-5/6'>
+        <Card className='w-11/12 p-0 rounded-lg flex z-10 h-5/6'>
           <div className='flex h-full'>
             <div className='h-full flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24'>
               <div className='max-h-full flex flex-col justify-center  mx-auto w-full max-w-sm lg:w-96'>
@@ -138,6 +138,7 @@ function Signup() {
                             state: {
                               userInfo: userInput,
                               isNativeSignup: true,
+                              isCreateCalendar: false,
                             },
                           })
                         }

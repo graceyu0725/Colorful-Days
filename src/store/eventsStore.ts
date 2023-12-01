@@ -8,6 +8,7 @@ interface eventsState {
   setCalendarAllEvents: (event: Event[]) => void;
   allEvents: Event[];
   setAllEvents: (event: Event[]) => void;
+  resetAllEvents: () => void;
 }
 
 export const useEventsStore = create<eventsState>((set) => ({
@@ -32,4 +33,5 @@ export const useEventsStore = create<eventsState>((set) => ({
   },
   allEvents: [],
   setAllEvents: (event) => set({ allEvents: event }),
+  resetAllEvents: () => set({ calendarAllEvents: [], allEvents: [] }),
 }));

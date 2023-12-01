@@ -12,10 +12,28 @@ const AllDayEventCells: React.FC<Props> = ({ weekDates }) => {
   const { allEvents } = useEventsStore();
 
   const spiltEvents = getSplitEvents(weekDates, allEvents);
-  const filteredAllDayEvents = spiltEvents[0].map((spiltEvent) =>
-    spiltEvent.filter((event) => event.isAllDay === true),
-  );
-  console.log('filteredAllDayEvents', filteredAllDayEvents);
+
+  const filterAllDayEventsF = (weekEvents) => {
+    // return events.map(event =>
+    //   event === null || event.isAllDay ? event : null
+    // );
+    return weekEvents.map(
+      (dayEvents) =>
+        dayEvents.map((event) =>
+          event === null || event.isAllDay ? event : null,
+        ),
+      //  console.log("回圈中",event)
+    );
+  };
+
+  // const filteredAllDayEvents = spiltEvents[0].map((spiltEvent) =>
+  //   spiltEvent.filter((event) => event.isAllDay === true || event === undefined),
+  // );
+
+  const filteredAllDayEvents = filterAllDayEventsF(spiltEvents[0]);
+
+  console.log('weekly1', spiltEvents[0]);
+  console.log('weekly2', filteredAllDayEvents);
 
   interface WrapperProps {
     children: React.ReactNode;

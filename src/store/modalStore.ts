@@ -16,6 +16,9 @@ interface ModalState {
   isEditModalOpen: boolean;
   selectedEvent: Event;
   setIsEditModalOpen: (isOpen: boolean, event: Event) => void;
+  eventsToShow: Event[];
+  isMoreModalOpen: boolean;
+  setIsMoreModalOpen: (isOpen: boolean, events: Event[]) => void;
 }
 
 export const useModalStore = create<ModalState>((set) => ({
@@ -37,4 +40,8 @@ export const useModalStore = create<ModalState>((set) => ({
   selectedEvent: initialEvent,
   setIsEditModalOpen: (isOpen, event) =>
     set({ isEditModalOpen: isOpen, selectedEvent: event }),
+  eventsToShow: [initialEvent],
+  isMoreModalOpen: false,
+  setIsMoreModalOpen: (isOpen, events) =>
+    set({ isMoreModalOpen: isOpen, eventsToShow: events }),
 }));

@@ -27,7 +27,11 @@ export const googleAuth = {
           };
 
           navigate('/select', {
-            state: { userInfo: userInfo, isNativeSignup: false },
+            state: {
+              userInfo: userInfo,
+              isNativeSignup: false,
+              isCreateCalendar: false,
+            },
           });
         }
       } else {
