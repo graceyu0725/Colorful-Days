@@ -99,7 +99,7 @@ const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
               event ? (
                 renderEvent(event, week[eventsIndex], eventIndex)
               ) : null
-            ) : eventIndex === 2 ? (
+            ) : eventIndex === 2 && !event.isMemo ? (
               <div
                 className='truncate border-2 border-slate-200 text-xs text-center w-10 rounded hover:cursor-pointer'
                 style={{

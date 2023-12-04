@@ -20,12 +20,31 @@ import { Event } from './types';
 export const updateAllEvents = (
   snapshot: any,
   setAllEvents: (event: Event[]) => void,
+  selectedEvent?: Event,
+  setSelectedEvent?: (event: Event) => void,
 ) => {
-  const newEvents = snapshot.docs.map((doc: any) => ({
-    ...doc.data(),
-    startAt: doc.data().startAt.toDate(),
-    endAt: doc.data().endAt.toDate(),
-  })) as Event[];
+  console.log('updateAllEvents');
+  const newEvents = snapshot.docs.map((doc: any) => {
+    const eventData = {
+      ...doc.data(),
+      startAt: doc.data().startAt.toDate(),
+      endAt: doc.data().endAt.toDate(),
+    };
+
+    console.log('doc.data().eventId', doc.data().eventId);
+    console.log('selectedEvent.eventId', selectedEvent?.eventId);
+
+    if (
+      selectedEvent &&
+      setSelectedEvent &&
+      doc.data().eventId === selectedEvent.eventId
+    ) {
+      setSelectedEvent(eventData);
+      console.log('變化，', eventData);
+    }
+    return eventData;
+  }) as Event[];
+
   setAllEvents(newEvents);
 };
 
@@ -141,7 +160,7 @@ const mapEventsToMonthDates = (monthDates: Date[], events: Event[]) => {
         start: startOfDay(startDate),
         end: endOfDay(endDate),
       });
-      return isInInterval;
+      return isInInterval && !event.isMemo;
     });
 
     // 先按照開始日期排序，再按照持續時間排
@@ -268,7 +287,7 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
           onClick={(e) => handleClick(e, event)}
         >
           <div className='truncate'>{event.title}</div>
-          <div className='truncate mr-1 text-xs text-gray-400'>
+          <div className='truncate mr-1 text-xs text-slate-500'>
             {formattedTime}
           </div>
         </div>

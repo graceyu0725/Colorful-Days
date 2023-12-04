@@ -9,11 +9,12 @@ import {
 } from 'firebase/firestore';
 import { NavigateFunction } from 'react-router-dom';
 // import { updateCalendarContent } from '../store/authStore';
-import { arrayUnion, updateDoc } from 'firebase/firestore';
+import { arrayUnion, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { DocumentData, DocumentReference } from 'firebase/firestore/lite';
 import {
   CalendarContent,
   CalendarInfo,
+  Event,
   GoogleUserInfo,
   User,
   UserSignUp,
@@ -279,23 +280,75 @@ export const addMemberToCalendar = async (
   memberEmail: string,
 ) => {
   try {
+    // 根據 CalendarId，將 userId push 進 Calendar.members Array
+    const calendarsCollection = collection(db, 'Calendars');
+    const calendarDocRef = doc(calendarsCollection, calendarId);
+    await updateDoc(calendarDocRef, {
+      members: arrayUnion(memberId),
+    });
 
-  // 根據 CalendarId，將 userId push 進 Calendar.members Array
-  const calendarsCollection = collection(db, 'Calendars');
-  const calendarDocRef = doc(calendarsCollection, calendarId);
-  await updateDoc(calendarDocRef, {
-    members: arrayUnion(memberId),
-  });
+    // 根據 UserId，將 CalendarId push 進 User.calendars Array
+    const usersCollection = collection(db, 'Users');
+    const userDocRef = doc(usersCollection, memberEmail);
+    await updateDoc(userDocRef, {
+      calendars: arrayUnion(calendarId),
+    });
+    return true;
+  } catch (error) {
+    console.error('Error adding member to calendar:', error);
+    return false;
+  }
+};
 
-  // 根據 UserId，將 CalendarId push 進 User.calendars Array
-  const usersCollection = collection(db, 'Users');
-  const userDocRef = doc(usersCollection, memberEmail);
-  await updateDoc(userDocRef, {
-    calendars: arrayUnion(calendarId),
+// For Side Navigation - Memo
+export const addNewMemo = async (
+  tag: string,
+  memoTitle: string,
+  currentCalendarId: string,
+) => {
+  const currentTime = serverTimestamp();
+  const eventsCollection = collection(
+    db,
+    'Calendars',
+    currentCalendarId,
+    'events',
+  );
+  const eventUUID = doc(eventsCollection).id;
+  const calendarRef = doc(db, 'Calendars', currentCalendarId);
+  const newEventRef = doc(calendarRef, 'events', eventUUID);
+
+  const data = {
+    title: memoTitle,
+    tag: tag,
+    startAt: new Date(),
+    endAt: new Date(),
+    createdAt: currentTime,
+    updatedAt: currentTime,
+    isAllDay: false,
+    isMemo: true,
+    note: '',
+    messages: [],
+    eventId: eventUUID,
+  };
+
+  await setDoc(newEventRef, data);
+};
+
+// For ViewEventModal - comments
+export const addNewComment = async (
+  calendarId: string,
+  eventId: string,
+  userInfo: User,
+  comment: string,
+) => {
+  if (!comment) return;
+  const eventDoc = doc(db, 'Calendars', calendarId, 'events', eventId);
+  const newComment = {
+    arthur: userInfo,
+    content: comment,
+    createdAt: new Date(),
+  };
+  await updateDoc(eventDoc, {
+    messages: arrayUnion(newComment),
   });
-  return true;
-} catch (error) {
-  console.error('Error adding member to calendar:', error);
-  return false;
-}
 };

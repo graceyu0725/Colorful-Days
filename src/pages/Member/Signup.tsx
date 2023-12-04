@@ -138,7 +138,6 @@ function Signup() {
                             state: {
                               userInfo: userInput,
                               isNativeSignup: true,
-                              isCreateCalendar: false,
                             },
                           })
                         }

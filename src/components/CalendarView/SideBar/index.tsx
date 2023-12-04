@@ -19,10 +19,12 @@ const SideBar: React.FC<Props> = ({ isSideBarOpen }) => {
       const startDate = startOfDay(event.startAt);
       const endDate = endOfDay(event.endAt);
 
-      return isWithinInterval(startOfToday(), {
-        start: startDate,
-        end: endDate,
-      });
+      return (
+        isWithinInterval(startOfToday(), {
+          start: startDate,
+          end: endDate,
+        }) && !event.isMemo
+      );
     }
   });
 

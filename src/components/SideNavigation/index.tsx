@@ -14,8 +14,9 @@ import {
   getAllMemberDetail,
 } from '../../utils/handleUserAndCalendar';
 import { themeColors } from '../../utils/theme';
-import { CalendarContent, User } from '../../utils/types';
+import { CalendarContent, Event, User } from '../../utils/types';
 import Members from './SidePanels/Members';
+import Memo from './SidePanels/Memo';
 import UserCalendars from './SidePanels/UserCalendars';
 import AvatarImage from './avatar.png';
 
@@ -26,7 +27,7 @@ type Props = {
 const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
   const { currentUser, currentCalendarContent, currentCalendarId, resetUser } =
     useAuthStore();
-  const { resetAllEvents } = useEventsStore();
+  const { allEvents, calendarAllEvents, resetAllEvents } = useEventsStore();
 
   // Handle functions of icons
   const themeColorIndex: number =
@@ -54,24 +55,52 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
   const [currentPanel, setCurrentPanel] = useState<PanelType>(PanelType.None);
   const [calendarDetails, setCalendarDetails] = useState<CalendarContent[]>([]);
   const [memberDetails, setMemberDetails] = useState<User[]>([]);
+  const [memoEvents, setMemoEvents] = useState<Event[]>([]);
 
   const fetchDetails = async () => {
+    const filteredMemoEvents = calendarAllEvents.filter(event => event.isMemo)
+    setMemoEvents(filteredMemoEvents)
+
     const detailsOfCalendar = await getAllCalendarDetail(userCalendars);
+    setCalendarDetails(detailsOfCalendar);
+
     const detailsOfMember = await getAllMemberDetail(
       currentCalendarContent.members,
     );
-    setCalendarDetails(detailsOfCalendar);
     setMemberDetails(detailsOfMember);
-    console.log('更新calendar', detailsOfCalendar);
-    console.log('detailsOfMember', detailsOfMember);
   };
 
   // 取得會員下所有日曆以及現日曆下所有成員
   useEffect(() => {
-    if (currentCalendarId && userCalendars) {
+    if (currentCalendarId && userCalendars && calendarAllEvents) {
       fetchDetails();
     }
-  }, [userCalendars, currentCalendarContent]);
+  }, [userCalendars, currentCalendarContent, calendarAllEvents]);
+
+  // const TooltippedIcon = ({ icon, tooltipContent, onClick }) => (
+  //   <Tooltip showArrow={true} placement='right' content={tooltipContent}>
+  //     <button className='outline-none' onClick={onClick}>
+  //       {icon}
+  //     </button>
+  //   </Tooltip>
+  // );
+
+  const PANEL_COMPONENTS = {
+    [PanelType.Profile]: <></>,
+    [PanelType.Memo]: <Memo currentCalendarContent={currentCalendarContent} memoEvents={memoEvents}/>,
+    [PanelType.Calendars]: (
+      <UserCalendars
+        currentCalendarId={currentCalendarId}
+        calendarDetails={calendarDetails}
+      />
+    ),
+    [PanelType.Members]: (
+      <Members
+        memberDetails={memberDetails}
+        setMemberDetails={setMemberDetails}
+      />
+    ),
+  };
 
   return (
     <div
@@ -90,6 +119,31 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
         )}
       >
         <div className='flex items-center flex-col gap-4 overflow-hidden'>
+          {/* {currentUser.avatar ? (
+            <TooltippedIcon
+              icon={
+                <Avatar
+                  className={clsx('w-10 h-10 p-0 border-2', borderColor)}
+                  src={currentUser.avatar}
+                />
+              }
+              tooltipContent={currentUser.email}
+            />
+          ) : (
+            <TooltippedIcon
+              icon={
+                <img
+                  className={clsx(
+                    'w-9 h-9 p-0 border-2 rounded-full ',
+                    borderColor,
+                  )}
+                  src={AvatarImage}
+                />
+              }
+              tooltipContent={currentUser.email}
+            />
+          )} */}
+
           <Tooltip
             showArrow={true}
             placement='right'
@@ -116,7 +170,18 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
 
           <Tooltip showArrow={true} placement='right' content='Memo'>
             <button className='outline-none'>
-              <MaterialSymbolsStickyNote2OutlineRounded className='mt-1 text-2xl text-slate-700 hover:cursor-pointer' />
+              <MaterialSymbolsStickyNote2OutlineRounded
+                className='mt-1 text-2xl text-slate-700 hover:cursor-pointer'
+                onClick={() =>
+                  setCurrentPanel((prev) =>
+                    prev
+                      ? prev === PanelType.Memo
+                        ? PanelType.None
+                        : PanelType.Memo
+                      : PanelType.Memo,
+                  )
+                }
+              />
             </button>
           </Tooltip>
 
@@ -173,18 +238,7 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
           'w-56 border-r': currentPanel,
         })}
       >
-        {currentPanel === PanelType.Calendars && (
-          <UserCalendars
-            currentCalendarId={currentCalendarId}
-            calendarDetails={calendarDetails}
-          />
-        )}
-        {currentPanel === PanelType.Members && (
-          <Members
-            memberDetails={memberDetails}
-            setMemberDetails={setMemberDetails}
-          />
-        )}
+        {currentPanel && PANEL_COMPONENTS[currentPanel]}
       </div>
     </div>
   );

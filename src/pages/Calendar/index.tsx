@@ -12,8 +12,10 @@ import CalendarView from '../../components/CalendarView';
 import CreateEventModal from '../../components/EventModals/Create';
 import EditEventModal from '../../components/EventModals/Edit';
 import MoreEventModal from '../../components/EventModals/More';
+import AddCalendarModal from '../../components/CalendarModals/AddCalendar';
 import { useAuthStore } from '../../store/authStore';
 import { useEventsStore } from '../../store/eventsStore';
+import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
 import { updateAllEvents } from '../../utils/handleDatesAndEvents';
 import { updateCurrentUser } from '../../utils/handleUserAndCalendar';
@@ -29,6 +31,8 @@ function Calendar() {
     setCurrentCalendarContent,
   } = useAuthStore();
   const { setCalendarAllEvents } = useEventsStore();
+  const { selectedEvent, setSelectedEvent, setIsEditModalOpen } =
+    useModalStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,7 +63,13 @@ function Calendar() {
             updateAllEvents(snapshot, setCalendarAllEvents);
           }
           if (change.type === 'modified') {
-            updateAllEvents(snapshot, setCalendarAllEvents);
+            updateAllEvents(
+              snapshot,
+              setCalendarAllEvents,
+              selectedEvent,
+              setSelectedEvent,
+            );
+            console.log('selectedEvent', selectedEvent);
           }
           if (change.type === 'removed') {
             updateAllEvents(snapshot, setCalendarAllEvents);
@@ -95,11 +105,11 @@ function Calendar() {
       unsubscribeEvents();
       unsubscribeCalendar();
     };
-  }, [currentCalendarId]);
+  }, [currentCalendarId, selectedEvent]);
 
   useEffect(() => {
     if (!currentUser || !currentUser.email) {
-      console.log('没有 currentUser 或 currentUser.email');
+      console.log('沒有 currentUser 或 currentUser.email');
       return;
     }
 
@@ -129,8 +139,6 @@ function Calendar() {
     };
   }, [currentUser.email]);
 
-  console.log('CurrentCalendarContent', currentCalendarContent);
-
   useEffect(() => {
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
@@ -159,6 +167,7 @@ function Calendar() {
           <CreateEventModal />
           <EditEventModal />
           <MoreEventModal />
+          <AddCalendarModal />
         </>
       ) : (
         <div>Loading...</div>

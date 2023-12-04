@@ -19,10 +19,7 @@ type Props = {
   setMemberDetails: React.Dispatch<React.SetStateAction<User[]>>;
 };
 
-const UserCalendars: React.FC<Props> = ({
-  memberDetails,
-  setMemberDetails,
-}) => {
+const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
   const navigate = useNavigate();
   const { currentCalendarId, currentCalendarContent } = useAuthStore();
   const [searchInput, setSearchInput] = useState('');
@@ -64,7 +61,6 @@ const UserCalendars: React.FC<Props> = ({
       setSearchInput('');
       setSearchResult(null);
       setIsMemberExist(false);
-      // setMemberDetails((prev) => [...prev, result]);
       toast.success('Member added successfully!');
     } else {
       alert('Failed to add member.');
@@ -75,7 +71,7 @@ const UserCalendars: React.FC<Props> = ({
     avatarUrl: string | undefined;
   }
   const UserAvatar: React.FC<UserAvatarProps> = ({ avatarUrl }) => (
-    <img className='w-10 h-10 mr-2' src={avatarUrl || AvatarImage}></img>
+    <img className='w-10 h-10 mr-2 rounded-full' src={avatarUrl || AvatarImage}></img>
   );
 
   interface InviteButtonProps {
@@ -121,42 +117,8 @@ const UserCalendars: React.FC<Props> = ({
     );
   };
 
-  // const renderSearchResult = (result: User, index: number, type: string) => {
-  //   return (
-  //     <>
-  //       <div key={index} className='flex items-center'>
-  //         {result.avatar ? (
-  //           <img className='w-10 h-10 mr-2' src={result.avatar}></img>
-  //         ) : (
-  //           <img className='w-10 h-10 mr-2' src={AvatarImage}></img>
-  //         )}
-  //         <div className='flex flex-col truncate'>
-  //           <div className='truncate'>{result.name}</div>
-  //           <div className='truncate text-xs text-gray-400'>{result.email}</div>
-  //         </div>
-  //       </div>
-  //       {type === 'invite' && !isMemberExist && (
-  //         <button className='mt-2 h-6 w-full px-2 rounded bg-slate-200 flex gap-1 items-center justify-center'>
-  //           <MaterialSymbolsLightPersonAddRounded className='w-5 h-5' />
-  //           <div className='text-xs truncate'>Invite {result.name}</div>
-  //         </button>
-  //       )}
-  //       {type === 'invite' && isMemberExist && (
-  //         <button
-  //           disabled={true}
-  //           className='mt-2 h-6 w-full px-2 rounded bg-slate-200 flex gap-1 items-center justify-center'
-  //         >
-  //           <div className='text-xs truncate'>
-  //             {result.name} is already a member
-  //           </div>
-  //         </button>
-  //       )}
-  //     </>
-  //   );
-  // };
-
   return (
-    <div className='py-3 px-4 flex flex-col gap-3'>
+    <div className='py-3 px-4 flex flex-col gap-3 overflow-y-auto'>
       <div className='text-center'>Members</div>
 
       <div className='flex-col items-center justify-center gap-2'>
@@ -200,22 +162,8 @@ const UserCalendars: React.FC<Props> = ({
         <Divider />
         <div className='flex flex-col gap-2 mt-2'>
           {memberDetails.length === 0 && <EosIconsLoading />}
-          {memberDetails.map(
-            (memberDetail, index) =>
-              renderSearchResult(memberDetail, index, 'list'),
-            // <div key={index} className='flex items-center'>
-            //   {memberDetail.avatar ? (
-            //     <img className='w-10 h-10 mr-2' src={memberDetail.avatar}></img>
-            //   ) : (
-            //     <img className='w-10 h-10 mr-2' src={AvatarImage}></img>
-            //   )}
-            //   <div className='flex flex-col'>
-            //     <div className='truncate'>{memberDetail.name}</div>
-            //     <div className='truncate text-xs text-gray-400'>
-            //       {memberDetail.email}
-            //     </div>
-            //   </div>
-            // </div>
+          {memberDetails.map((memberDetail, index) =>
+            renderSearchResult(memberDetail, index, 'list'),
           )}
         </div>
       </div>
