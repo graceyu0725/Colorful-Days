@@ -1,5 +1,7 @@
 import {
+  arrayRemove,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -146,6 +148,7 @@ export const updateCalendarContent = async (
   calendarId: string,
   setCurrentCalendarId: (currentCalendarId: string) => void,
   setCurrentCalendarContent: (currentCalendarContent: CalendarContent) => void,
+  setCalendarAllEvents?: (event: Event[]) => void,
 ) => {
   console.log('3. 更新日曆內容');
   const calendarContent = await getCalendarContent(calendarId);
@@ -154,6 +157,24 @@ export const updateCalendarContent = async (
     console.log('5. 設定日曆內容');
     setCurrentCalendarId(calendarId);
     setCurrentCalendarContent(calendarContent);
+  }
+
+  if (setCalendarAllEvents) {
+    const eventsCollection = collection(db, 'Calendars', calendarId, 'events');
+    getDocs(eventsCollection)
+      .then((querySnapshot) => {
+        const events = querySnapshot.docs
+          .filter((doc) => doc.data().title)
+          .map((doc) => ({
+            ...doc.data(),
+            startAt: doc.data().startAt.toDate(),
+            endAt: doc.data().endAt.toDate(),
+          })) as Event[];
+        setCalendarAllEvents(events);
+      })
+      .catch((error) => {
+        console.error('Error getting documents: ', error);
+      });
   }
 };
 
@@ -242,6 +263,49 @@ export const createNewCalendar = async (
   console.log('新增日曆成功');
 };
 
+// 根據 calendarId & memberIds 刪除 calendar
+export const deleteCalendar = async (calendarDetail: CalendarContent) => {
+  try {
+    const eventsCollectionRef = collection(
+      db,
+      'Calendars',
+      calendarDetail.calendarId,
+      'events',
+    );
+    const querySnapshot = await getDocs(eventsCollectionRef);
+    const deleteEventsPromises = querySnapshot.docs.map((docSnapshot) =>
+      deleteDoc(docSnapshot.ref),
+    );
+    await Promise.all(deleteEventsPromises);
+    console.log("All documents in 'events' have been successfully deleted.");
+
+    const calendarDocRef = doc(db, 'Calendars', calendarDetail.calendarId);
+    await deleteDoc(calendarDocRef);
+    console.log('The calendar document has been successfully deleted.');
+
+    const usersCollectionRef = collection(db, 'Users');
+
+    for (const userId of calendarDetail.members) {
+      const q = query(usersCollectionRef, where('userId', '==', userId));
+      const userQuerySnapshot = await getDocs(q);
+      userQuerySnapshot.forEach(async (docSnapshot) => {
+        const currentCalendars = docSnapshot.data().calendars;
+        if (
+          currentCalendars &&
+          currentCalendars.includes(calendarDetail.calendarId)
+        ) {
+          await updateDoc(docSnapshot.ref, {
+            calendars: arrayRemove(calendarDetail.calendarId),
+          });
+          console.log(`calendarId removed from user ${userId}`);
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error getting documents: ', error);
+  }
+};
+
 // For Side Navigation - Members
 // 根據 Member Id 取得 Member Info
 const getMemberDetailById = async (memberId: string) => {
@@ -297,6 +361,35 @@ export const addMemberToCalendar = async (
   } catch (error) {
     console.error('Error adding member to calendar:', error);
     return false;
+  }
+};
+
+// Remove member
+export const removeMember = async (calendarId: string, userId: string) => {
+  try {
+    // 從 該calendar底下的members陣列，移除userId
+    const calendarDocRef = doc(db, 'Calendars', calendarId);
+    await updateDoc(calendarDocRef, {
+      members: arrayRemove(userId),
+    });
+    console.log(`Removed userId ${userId} from calendar ${calendarId}`);
+
+    // 再從該userId的user的calendars陣列，移除calendarId
+    const usersCollectionRef = collection(db, 'Users');
+    const q = query(usersCollectionRef, where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const userDocRef = querySnapshot.docs[0].ref;
+      await updateDoc(userDocRef, {
+        calendars: arrayRemove(calendarId),
+      });
+      console.log(`Removed calendarId ${calendarId} from user ${userId}`);
+    } else {
+      console.log(`No user found with userId ${userId}`);
+    }
+  } catch (error) {
+    console.error('Error getting documents: ', error);
   }
 };
 

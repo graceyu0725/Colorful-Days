@@ -1,4 +1,11 @@
-import { Avatar, Tooltip } from '@nextui-org/react';
+import {
+  Avatar,
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+} from '@nextui-org/react';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 import MaterialSymbolsExitToAppRounded from '~icons/material-symbols/exit-to-app-rounded';
@@ -17,6 +24,7 @@ import { themeColors } from '../../utils/theme';
 import { CalendarContent, Event, User } from '../../utils/types';
 import Members from './SidePanels/Members';
 import Memo from './SidePanels/Memo';
+import Settings from './SidePanels/Settings';
 import UserCalendars from './SidePanels/UserCalendars';
 import AvatarImage from './avatar.png';
 
@@ -49,6 +57,7 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
     Memo = 'Memo',
     Calendars = 'Calendars',
     Members = 'Members',
+    Settings = 'Settings',
   }
 
   // Handle data of props
@@ -58,8 +67,11 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
   const [memoEvents, setMemoEvents] = useState<Event[]>([]);
 
   const fetchDetails = async () => {
-    const filteredMemoEvents = calendarAllEvents.filter(event => event.isMemo)
-    setMemoEvents(filteredMemoEvents)
+    console.log("userCalendars",userCalendars)
+    const filteredMemoEvents = calendarAllEvents.filter(
+      (event) => event.isMemo,
+    );
+    setMemoEvents(filteredMemoEvents);
 
     const detailsOfCalendar = await getAllCalendarDetail(userCalendars);
     setCalendarDetails(detailsOfCalendar);
@@ -75,7 +87,12 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
     if (currentCalendarId && userCalendars && calendarAllEvents) {
       fetchDetails();
     }
-  }, [userCalendars, currentCalendarContent, calendarAllEvents]);
+  }, [
+    userCalendars,
+    currentCalendarContent,
+    currentCalendarId,
+    calendarAllEvents,
+  ]);
 
   // const TooltippedIcon = ({ icon, tooltipContent, onClick }) => (
   //   <Tooltip showArrow={true} placement='right' content={tooltipContent}>
@@ -87,7 +104,12 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
 
   const PANEL_COMPONENTS = {
     [PanelType.Profile]: <></>,
-    [PanelType.Memo]: <Memo currentCalendarContent={currentCalendarContent} memoEvents={memoEvents}/>,
+    [PanelType.Memo]: (
+      <Memo
+        currentCalendarContent={currentCalendarContent}
+        memoEvents={memoEvents}
+      />
+    ),
     [PanelType.Calendars]: (
       <UserCalendars
         currentCalendarId={currentCalendarId}
@@ -98,6 +120,12 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
       <Members
         memberDetails={memberDetails}
         setMemberDetails={setMemberDetails}
+      />
+    ),
+    [PanelType.Settings]: (
+      <Settings
+        currentCalendarContent={currentCalendarContent}
+        currentCalendarId={currentCalendarId}
       />
     ),
   };
@@ -118,33 +146,38 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
           // , backgroundColor
         )}
       >
-        <div className='flex items-center flex-col gap-4 overflow-hidden'>
-          {/* {currentUser.avatar ? (
-            <TooltippedIcon
-              icon={
-                <Avatar
-                  className={clsx('w-10 h-10 p-0 border-2', borderColor)}
-                  src={currentUser.avatar}
-                />
-              }
-              tooltipContent={currentUser.email}
-            />
-          ) : (
-            <TooltippedIcon
-              icon={
-                <img
-                  className={clsx(
-                    'w-9 h-9 p-0 border-2 rounded-full ',
-                    borderColor,
-                  )}
-                  src={AvatarImage}
-                />
-              }
-              tooltipContent={currentUser.email}
-            />
-          )} */}
+        <div className='flex items-center flex-col gap-4 overflow-hidden h-full'>
+          <Popover placement='bottom-start'>
+            <PopoverTrigger>
+              <button className='outline-none mt-1'>
+                {currentUser.avatar ? (
+                  <Avatar
+                    className={clsx('w-10 h-10 p-0 border-2', borderColor)}
+                    src={currentUser.avatar}
+                  />
+                ) : (
+                  <img
+                    className={clsx(
+                      'w-9 h-9 p-0 border-2 rounded-full',
+                      borderColor,
+                    )}
+                    src={AvatarImage}
+                  />
+                )}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className='p-0'>
+              <Button
+                startContent={<MaterialSymbolsExitToAppRounded />}
+                className='bg-white'
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+            </PopoverContent>
+          </Popover>
 
-          <Tooltip
+          {/* <Tooltip
             showArrow={true}
             placement='right'
             content={currentUser.email}
@@ -162,11 +195,11 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
                     borderColor,
                   )}
                   src={AvatarImage}
-                ></img>
+                />
                 // <UserIcon className='w-9 text-2xl text-slate-700' />
               )}
             </button>
-          </Tooltip>
+          </Tooltip> */}
 
           <Tooltip showArrow={true} placement='right' content='Memo'>
             <button className='outline-none'>
@@ -221,15 +254,29 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
 
           <Tooltip showArrow={true} placement='right' content='Settings'>
             <button className='outline-none'>
-              <MingcuteSettings2Line className='text-2xl text-slate-700 hover:cursor-pointer' />
+              <MingcuteSettings2Line
+                className='text-2xl text-slate-700 hover:cursor-pointer'
+                onClick={() =>
+                  setCurrentPanel((prev) =>
+                    prev
+                      ? prev === PanelType.Settings
+                        ? PanelType.None
+                        : PanelType.Settings
+                      : PanelType.Settings,
+                  )
+                }
+              />
             </button>
           </Tooltip>
 
-          <Tooltip showArrow={true} placement='right' content='Logout'>
-            <button className='outline-none' onClick={handleLogout}>
-              <MaterialSymbolsExitToAppRounded className='text-2xl text-slate-700 hover:cursor-pointer' />
-            </button>
-          </Tooltip>
+          {/* <Tooltip showArrow={true} placement='right' content='Logout'>
+              <button
+                className='outline-none justify-end'
+                onClick={handleLogout}
+              >
+                <MaterialSymbolsExitToAppRounded className='text-2xl text-slate-700 hover:cursor-pointer' />
+              </button>
+            </Tooltip> */}
         </div>
       </div>
 

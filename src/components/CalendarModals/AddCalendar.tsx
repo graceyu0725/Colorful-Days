@@ -63,6 +63,10 @@ export default function AddCalendar() {
       resetAllEvents,
     );
     setIsAddCalendarModalOpen(false);
+    setCalendarInfo({
+      name: '',
+      themeColor: '',
+    });
   };
 
   return (

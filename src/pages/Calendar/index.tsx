@@ -8,17 +8,20 @@ import {
 } from 'firebase/firestore';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AddCalendarModal from '../../components/CalendarModals/AddCalendar';
 import CalendarView from '../../components/CalendarView';
 import CreateEventModal from '../../components/EventModals/Create';
 import EditEventModal from '../../components/EventModals/Edit';
 import MoreEventModal from '../../components/EventModals/More';
-import AddCalendarModal from '../../components/CalendarModals/AddCalendar';
 import { useAuthStore } from '../../store/authStore';
 import { useEventsStore } from '../../store/eventsStore';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
 import { updateAllEvents } from '../../utils/handleDatesAndEvents';
-import { updateCurrentUser } from '../../utils/handleUserAndCalendar';
+import {
+  updateCalendarContent,
+  updateCurrentUser,
+} from '../../utils/handleUserAndCalendar';
 
 function Calendar() {
   const {
@@ -58,6 +61,8 @@ function Calendar() {
     const unsubscribeEvents = onSnapshot(
       orderedEventsCollection,
       (snapshot) => {
+        console.log('Calendar data 行事曆 snapshot:', snapshot);
+
         snapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
             updateAllEvents(snapshot, setCalendarAllEvents);
@@ -81,7 +86,6 @@ function Calendar() {
     const calendarDocRef = doc(db, 'Calendars', currentCalendarId);
     const unsubscribeCalendar = onSnapshot(calendarDocRef, (docSnapshot) => {
       if (docSnapshot.exists()) {
-        console.log('Calendar data 行事曆 snapshot:', docSnapshot.data());
         setCurrentCalendarContent({
           members: docSnapshot.data().members,
           name: docSnapshot.data().name,
@@ -124,6 +128,7 @@ function Calendar() {
           calendars: docSnapshot.data().calendars,
         };
         setCurrentUser(updatedUser);
+
       }
       // updateCurrentUser(
       //   docSnapshot.data()?.userId,

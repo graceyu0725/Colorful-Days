@@ -31,20 +31,17 @@ export const updateAllEvents = (
       endAt: doc.data().endAt.toDate(),
     };
 
-    console.log('doc.data().eventId', doc.data().eventId);
-    console.log('selectedEvent.eventId', selectedEvent?.eventId);
-
     if (
       selectedEvent &&
       setSelectedEvent &&
       doc.data().eventId === selectedEvent.eventId
     ) {
       setSelectedEvent(eventData);
-      console.log('變化，', eventData);
     }
     return eventData;
   }) as Event[];
 
+  console.log('newEvents', newEvents);
   setAllEvents(newEvents);
 };
 

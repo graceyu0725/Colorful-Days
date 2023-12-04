@@ -1,15 +1,22 @@
-import { Divider } from '@nextui-org/react';
+import {
+  Button,
+  Divider,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@nextui-org/react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 import EosIconsLoading from '~icons/eos-icons/loading';
 import IcRoundSearchOff from '~icons/ic/round-search-off';
 import MaterialSymbolsLightPersonAddRounded from '~icons/material-symbols-light/person-add-rounded';
+import MaterialSymbolsPersonRemoveRounded from '~icons/material-symbols/person-remove-rounded';
 import MaterialSymbolsSubdirectoryArrowLeftRounded from '~icons/material-symbols/subdirectory-arrow-left-rounded';
 import { useAuthStore } from '../../../store/authStore';
 import {
   addMemberToCalendar,
   getMemberSearchResults,
+  removeMember,
 } from '../../../utils/handleUserAndCalendar';
 import { User } from '../../../utils/types';
 import AvatarImage from '../avatar.png';
@@ -20,8 +27,8 @@ type Props = {
 };
 
 const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
-  const navigate = useNavigate();
-  const { currentCalendarId, currentCalendarContent } = useAuthStore();
+  const { currentUser, currentCalendarId, currentCalendarContent } =
+    useAuthStore();
   const [searchInput, setSearchInput] = useState('');
   const [searchResult, setSearchResult] = useState<User | string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -67,11 +74,18 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
     }
   };
 
+  const handleRemoveMember = async (calendarId: string, userId: string) => {
+    removeMember(calendarId, userId);
+  };
+
   interface UserAvatarProps {
     avatarUrl: string | undefined;
   }
   const UserAvatar: React.FC<UserAvatarProps> = ({ avatarUrl }) => (
-    <img className='w-10 h-10 mr-2 rounded-full' src={avatarUrl || AvatarImage}></img>
+    <img
+      className='w-10 h-10 mr-2 rounded-full'
+      src={avatarUrl || AvatarImage}
+    />
   );
 
   interface InviteButtonProps {
@@ -106,7 +120,30 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
         <div className='flex items-center'>
           <UserAvatar avatarUrl={result.avatar} />
           <div className='flex flex-col truncate'>
-            <div className='truncate'>{result.name}</div>
+            <div className='flex items-center justify-between'>
+              <div className='truncate w-36'>{result.name}</div>
+              {type !== 'invite' && result.userId !== currentUser.userId && (
+                <Popover placement='bottom'>
+                  <PopoverTrigger>
+                    <button>
+                      <MaterialSymbolsPersonRemoveRounded className='w-4 h-4 p-0 text-slate-500' />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className='p-0 rounded-lg'>
+                    <Button
+                      color='danger'
+                      variant='bordered'
+                      className='p-0 border-0'
+                      onClick={() => {
+                        handleRemoveMember(currentCalendarId, result.userId);
+                      }}
+                    >
+                      remove
+                    </Button>
+                  </PopoverContent>
+                </Popover>
+              )}
+            </div>
             <div className='truncate text-xs text-gray-400'>{result.email}</div>
           </div>
         </div>
