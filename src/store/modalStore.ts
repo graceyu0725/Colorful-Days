@@ -15,10 +15,13 @@ interface ModalState {
   ) => void;
   isEditModalOpen: boolean;
   selectedEvent: Event;
+  setSelectedEvent: (event: Event) => void;
   setIsEditModalOpen: (isOpen: boolean, event: Event) => void;
   eventsToShow: Event[];
   isMoreModalOpen: boolean;
   setIsMoreModalOpen: (isOpen: boolean, events: Event[]) => void;
+  isAddCalendarModalOpen: boolean;
+  setIsAddCalendarModalOpen: (isOpen: boolean) => void;
 }
 
 export const useModalStore = create<ModalState>((set) => ({
@@ -38,10 +41,16 @@ export const useModalStore = create<ModalState>((set) => ({
     }),
   isEditModalOpen: false,
   selectedEvent: initialEvent,
-  setIsEditModalOpen: (isOpen, event) =>
+  setSelectedEvent: (event) => set({ selectedEvent: event }),
+  setIsEditModalOpen: (isOpen, event) => {
     set({ isEditModalOpen: isOpen, selectedEvent: event }),
+      console.log('modalevent', event);
+  },
   eventsToShow: [initialEvent],
   isMoreModalOpen: false,
   setIsMoreModalOpen: (isOpen, events) =>
     set({ isMoreModalOpen: isOpen, eventsToShow: events }),
+  isAddCalendarModalOpen: false,
+  setIsAddCalendarModalOpen: (isOpen) =>
+    set({ isAddCalendarModalOpen: isOpen }),
 }));

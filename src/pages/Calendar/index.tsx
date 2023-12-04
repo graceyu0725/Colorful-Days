@@ -8,15 +8,20 @@ import {
 } from 'firebase/firestore';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AddCalendarModal from '../../components/CalendarModals/AddCalendar';
 import CalendarView from '../../components/CalendarView';
 import CreateEventModal from '../../components/EventModals/Create';
 import EditEventModal from '../../components/EventModals/Edit';
 import MoreEventModal from '../../components/EventModals/More';
 import { useAuthStore } from '../../store/authStore';
 import { useEventsStore } from '../../store/eventsStore';
+import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
 import { updateAllEvents } from '../../utils/handleDatesAndEvents';
-import { updateCurrentUser } from '../../utils/handleUserAndCalendar';
+import {
+  updateCalendarContent,
+  updateCurrentUser,
+} from '../../utils/handleUserAndCalendar';
 
 function Calendar() {
   const {
@@ -29,6 +34,8 @@ function Calendar() {
     setCurrentCalendarContent,
   } = useAuthStore();
   const { setCalendarAllEvents } = useEventsStore();
+  const { selectedEvent, setSelectedEvent, setIsEditModalOpen } =
+    useModalStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,12 +61,20 @@ function Calendar() {
     const unsubscribeEvents = onSnapshot(
       orderedEventsCollection,
       (snapshot) => {
+        console.log('Calendar data 行事曆 snapshot:', snapshot);
+
         snapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
             updateAllEvents(snapshot, setCalendarAllEvents);
           }
           if (change.type === 'modified') {
-            updateAllEvents(snapshot, setCalendarAllEvents);
+            updateAllEvents(
+              snapshot,
+              setCalendarAllEvents,
+              selectedEvent,
+              setSelectedEvent,
+            );
+            console.log('selectedEvent', selectedEvent);
           }
           if (change.type === 'removed') {
             updateAllEvents(snapshot, setCalendarAllEvents);
@@ -71,7 +86,6 @@ function Calendar() {
     const calendarDocRef = doc(db, 'Calendars', currentCalendarId);
     const unsubscribeCalendar = onSnapshot(calendarDocRef, (docSnapshot) => {
       if (docSnapshot.exists()) {
-        console.log('Calendar data 行事曆 snapshot:', docSnapshot.data());
         setCurrentCalendarContent({
           members: docSnapshot.data().members,
           name: docSnapshot.data().name,
@@ -95,11 +109,11 @@ function Calendar() {
       unsubscribeEvents();
       unsubscribeCalendar();
     };
-  }, [currentCalendarId]);
+  }, [currentCalendarId, selectedEvent]);
 
   useEffect(() => {
     if (!currentUser || !currentUser.email) {
-      console.log('没有 currentUser 或 currentUser.email');
+      console.log('沒有 currentUser 或 currentUser.email');
       return;
     }
 
@@ -114,6 +128,7 @@ function Calendar() {
           calendars: docSnapshot.data().calendars,
         };
         setCurrentUser(updatedUser);
+
       }
       // updateCurrentUser(
       //   docSnapshot.data()?.userId,
@@ -128,8 +143,6 @@ function Calendar() {
       unsubscribeByEmail();
     };
   }, [currentUser.email]);
-
-  console.log('CurrentCalendarContent', currentCalendarContent);
 
   useEffect(() => {
     const auth = getAuth();
@@ -159,6 +172,7 @@ function Calendar() {
           <CreateEventModal />
           <EditEventModal />
           <MoreEventModal />
+          <AddCalendarModal />
         </>
       ) : (
         <div>Loading...</div>

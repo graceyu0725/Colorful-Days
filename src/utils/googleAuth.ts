@@ -30,7 +30,6 @@ export const googleAuth = {
             state: {
               userInfo: userInfo,
               isNativeSignup: false,
-              isCreateCalendar: false,
             },
           });
         }

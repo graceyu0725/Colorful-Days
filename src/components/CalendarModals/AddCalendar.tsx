@@ -1,25 +1,24 @@
-import { Button, Card } from '@nextui-org/react';
+import { Button, Modal, ModalContent } from '@nextui-org/react';
 import clsx from 'clsx';
 import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { firebase } from '../../utils/firebase';
-import { addUserForGoogle } from '../../utils/handleUserAndCalendar';
+import { useAuthStore } from '../../store/authStore';
+import { useEventsStore } from '../../store/eventsStore';
+import { useModalStore } from '../../store/modalStore';
+import { createNewCalendar } from '../../utils/handleUserAndCalendar';
 import { themeColors } from '../../utils/theme';
 import { CalendarInfo } from '../../utils/types';
 
-export default function SelectTheme() {
-  const { state } = useLocation();
-  const navigate = useNavigate();
-
-  if (!state) return <Navigate to='/signup' replace />;
-
+export default function AddCalendar() {
+  const { currentUser, setCurrentCalendarId, setCurrentCalendarContent } =
+    useAuthStore();
+  const { resetAllEvents } = useEventsStore();
+  const { isAddCalendarModalOpen, setIsAddCalendarModalOpen } = useModalStore();
   const [calendarInfo, setCalendarInfo] = useState<CalendarInfo>({
     name: "Pikachu's calendar",
     themeColor: '',
   });
 
-  // Update userInput when typing
   const updateCalendarInfo = (
     event:
       | React.ChangeEvent<HTMLInputElement>
@@ -41,6 +40,7 @@ export default function SelectTheme() {
     }));
   };
 
+  const [borderColor, setBorderColor] = useState('border-slate-200');
   const [isSelected, setIsSelected] = useState([
     false,
     false,
@@ -51,25 +51,38 @@ export default function SelectTheme() {
     false,
     false,
   ]);
-  const [backGroundColor, setBackGroundColor] = useState('bg-slate-200');
-  const [borderColor, setBorderColor] = useState('border-slate-200');
 
   const handleSubmit = () => {
-    state.isNativeSignup
-      ? firebase.signUp(state.userInfo, navigate, calendarInfo)
-      : addUserForGoogle(state.userInfo, navigate, calendarInfo);
+    createNewCalendar(
+      currentUser.email,
+      currentUser.userId,
+      calendarInfo.name,
+      calendarInfo.themeColor,
+      setCurrentCalendarId,
+      setCurrentCalendarContent,
+      resetAllEvents,
+    );
+    setIsAddCalendarModalOpen(false);
+    setCalendarInfo({
+      name: '',
+      themeColor: '',
+    });
   };
 
   return (
     <>
-      <div
-        className={clsx(
-          'flex items-center justify-center h-screen bg-cover bg-slate-200',
-          backGroundColor,
-        )}
+      <Modal
+        isOpen={isAddCalendarModalOpen}
+        onOpenChange={(isOpen) => setIsAddCalendarModalOpen(isOpen)}
+        size='4xl'
       >
-        <Card className='w-11/12 p-0 rounded-none flex flex-col items-center justify-center gap-10 z-10 h-5/6'>
-          <div className='flex flex-col items-center gap-5'>
+        <ModalContent
+          className={clsx(
+            'flex flex-col justify-center items-center p-8 overflow-y-auto gap-10 border-[20px]',
+            borderColor,
+          )}
+        >
+          <div className='flex flex-col items-center gap-5 w-full'>
             <div className='text-2xl font-bold'>Name Your Calendar</div>
             <input
               name='name'
@@ -102,23 +115,25 @@ export default function SelectTheme() {
                       prevState.map((_, idx) => (idx === index ? true : false)),
                     );
                     updateCalendarInfo(e);
-                    setBackGroundColor(themeColors[index].bg);
                     setBorderColor(themeColors[index].border);
                   }}
                 />
               ))}
             </div>
           </div>
-          <Button
-            color='default'
-            className='w-32'
-            disabled={!calendarInfo.name || !calendarInfo.themeColor}
-            onClick={handleSubmit}
-          >
-            送出
-          </Button>
-        </Card>
-      </div>
+
+          <div>
+            <Button
+              color='default'
+              className='w-32'
+              disabled={!calendarInfo.name || !calendarInfo.themeColor}
+              onClick={handleSubmit}
+            >
+              送出
+            </Button>
+          </div>
+        </ModalContent>
+      </Modal>
     </>
   );
 }
