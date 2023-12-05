@@ -24,7 +24,7 @@ const TagFilter: React.FC<Props> = ({ calendarTags }) => {
     <div className='h-1/2 px-2 mb-4 mt-1'>
       <Card className='w-full h-full rounded-lg shadow border'>
         <CardHeader className='flex justify-between'>
-          <p>Tags Filter</p>
+          <p>Tags</p>
           <div className='flex gap-2'>
             <MaterialSymbolsSelectCheckBox
               className='hover:cursor-pointer'
@@ -56,8 +56,8 @@ const TagFilter: React.FC<Props> = ({ calendarTags }) => {
                         'rounded-full w-3 h-3',
                         themeColors[index].bg,
                       )}
-                    ></div>
-                    <p>{tag.name}</p>
+                    />
+                    <div className='text-sm truncate'>{tag.name}</div>
                   </div>
                 </Checkbox>
               ))}

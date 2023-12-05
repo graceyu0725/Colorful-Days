@@ -18,10 +18,7 @@ import { useEventsStore } from '../../store/eventsStore';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
 import { updateAllEvents } from '../../utils/handleDatesAndEvents';
-import {
-  updateCalendarContent,
-  updateCurrentUser,
-} from '../../utils/handleUserAndCalendar';
+import { updateCurrentUser } from '../../utils/handleUserAndCalendar';
 
 function Calendar() {
   const {
@@ -30,21 +27,16 @@ function Calendar() {
     setCurrentUser,
     currentCalendarId,
     setCurrentCalendarId,
-    currentCalendarContent,
     setCurrentCalendarContent,
   } = useAuthStore();
   const { setCalendarAllEvents } = useEventsStore();
-  const { selectedEvent, setSelectedEvent, setIsEditModalOpen } =
-    useModalStore();
+  const { selectedEvent, setSelectedEvent } = useModalStore();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!currentCalendarId) {
-      console.log('沒有calendarId');
       return;
     }
-    console.log('現在的calendarId', currentCalendarId);
-    // const calendarId = currentUser.calendars[0]
 
     const eventsCollection = collection(
       db,
@@ -61,8 +53,6 @@ function Calendar() {
     const unsubscribeEvents = onSnapshot(
       orderedEventsCollection,
       (snapshot) => {
-        console.log('Calendar data 行事曆 snapshot:', snapshot);
-
         snapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
             updateAllEvents(snapshot, setCalendarAllEvents);
@@ -74,7 +64,6 @@ function Calendar() {
               selectedEvent,
               setSelectedEvent,
             );
-            console.log('selectedEvent', selectedEvent);
           }
           if (change.type === 'removed') {
             updateAllEvents(snapshot, setCalendarAllEvents);
@@ -93,12 +82,6 @@ function Calendar() {
           themeColor: docSnapshot.data().themeColor,
           calendarId: docSnapshot.data().calendarId,
         });
-        // docSnapshot.data())
-        // updateCalendarContent(
-        //   docSnapshot.data().calendarId,
-        //   setCurrentCalendarId,
-        //   setCurrentCalendarContent,
-        // );
       } else {
         console.log('Calendar not found');
       }
@@ -128,7 +111,6 @@ function Calendar() {
           calendars: docSnapshot.data().calendars,
         };
         setCurrentUser(updatedUser);
-
       }
       // updateCurrentUser(
       //   docSnapshot.data()?.userId,

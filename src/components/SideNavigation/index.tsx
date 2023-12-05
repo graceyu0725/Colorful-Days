@@ -10,7 +10,6 @@ import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 import MaterialSymbolsExitToAppRounded from '~icons/material-symbols/exit-to-app-rounded';
 import MaterialSymbolsStickyNote2OutlineRounded from '~icons/material-symbols/sticky-note-2-outline-rounded';
-import MingcuteSettings2Line from '~icons/mingcute/settings-2-line';
 import OcticonPeople16 from '~icons/octicon/people-16';
 import UilSchedule from '~icons/uil/schedule';
 import { useAuthStore } from '../../store/authStore';
@@ -24,7 +23,6 @@ import { themeColors } from '../../utils/theme';
 import { CalendarContent, Event, User } from '../../utils/types';
 import Members from './SidePanels/Members';
 import Memo from './SidePanels/Memo';
-import Settings from './SidePanels/Settings';
 import UserCalendars from './SidePanels/UserCalendars';
 import AvatarImage from './avatar.png';
 
@@ -35,12 +33,12 @@ type Props = {
 const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
   const { currentUser, currentCalendarContent, currentCalendarId, resetUser } =
     useAuthStore();
-  const { allEvents, calendarAllEvents, resetAllEvents } = useEventsStore();
+  const { calendarAllEvents, resetAllEvents } = useEventsStore();
 
   // Handle functions of icons
   const themeColorIndex: number =
     Number(currentCalendarContent.themeColor) || 0;
-  const backgroundColor = themeColors[themeColorIndex]?.light || 'bg-slate-100';
+  // const backgroundColor = themeColors[themeColorIndex]?.light || 'bg-slate-100';
   const borderColor =
     themeColors[themeColorIndex]?.border || 'border-slate-100';
   const userCalendars = currentUser.calendars || [''];
@@ -57,7 +55,6 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
     Memo = 'Memo',
     Calendars = 'Calendars',
     Members = 'Members',
-    Settings = 'Settings',
   }
 
   // Handle data of props
@@ -67,7 +64,7 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
   const [memoEvents, setMemoEvents] = useState<Event[]>([]);
 
   const fetchDetails = async () => {
-    console.log("userCalendars",userCalendars)
+    console.log('userCalendars', userCalendars);
     const filteredMemoEvents = calendarAllEvents.filter(
       (event) => event.isMemo,
     );
@@ -94,14 +91,6 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
     calendarAllEvents,
   ]);
 
-  // const TooltippedIcon = ({ icon, tooltipContent, onClick }) => (
-  //   <Tooltip showArrow={true} placement='right' content={tooltipContent}>
-  //     <button className='outline-none' onClick={onClick}>
-  //       {icon}
-  //     </button>
-  //   </Tooltip>
-  // );
-
   const PANEL_COMPONENTS = {
     [PanelType.Profile]: <></>,
     [PanelType.Memo]: (
@@ -120,12 +109,6 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
       <Members
         memberDetails={memberDetails}
         setMemberDetails={setMemberDetails}
-      />
-    ),
-    [PanelType.Settings]: (
-      <Settings
-        currentCalendarContent={currentCalendarContent}
-        currentCalendarId={currentCalendarId}
       />
     ),
   };
@@ -177,30 +160,6 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
             </PopoverContent>
           </Popover>
 
-          {/* <Tooltip
-            showArrow={true}
-            placement='right'
-            content={currentUser.email}
-          >
-            <button className='outline-none'>
-              {currentUser.avatar ? (
-                <Avatar
-                  className={clsx('w-10 h-10 p-0 border-2', borderColor)}
-                  src={currentUser.avatar}
-                />
-              ) : (
-                <img
-                  className={clsx(
-                    'w-9 h-9 p-0 border-2 rounded-full ',
-                    borderColor,
-                  )}
-                  src={AvatarImage}
-                />
-                // <UserIcon className='w-9 text-2xl text-slate-700' />
-              )}
-            </button>
-          </Tooltip> */}
-
           <Tooltip showArrow={true} placement='right' content='Memo'>
             <button className='outline-none'>
               <MaterialSymbolsStickyNote2OutlineRounded
@@ -251,32 +210,6 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
               />
             </button>
           </Tooltip>
-
-          <Tooltip showArrow={true} placement='right' content='Settings'>
-            <button className='outline-none'>
-              <MingcuteSettings2Line
-                className='text-2xl text-slate-700 hover:cursor-pointer'
-                onClick={() =>
-                  setCurrentPanel((prev) =>
-                    prev
-                      ? prev === PanelType.Settings
-                        ? PanelType.None
-                        : PanelType.Settings
-                      : PanelType.Settings,
-                  )
-                }
-              />
-            </button>
-          </Tooltip>
-
-          {/* <Tooltip showArrow={true} placement='right' content='Logout'>
-              <button
-                className='outline-none justify-end'
-                onClick={handleLogout}
-              >
-                <MaterialSymbolsExitToAppRounded className='text-2xl text-slate-700 hover:cursor-pointer' />
-              </button>
-            </Tooltip> */}
         </div>
       </div>
 

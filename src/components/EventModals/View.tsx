@@ -6,7 +6,13 @@ import {
   ModalHeader,
 } from '@nextui-org/react';
 import clsx from 'clsx';
-import { format } from 'date-fns';
+import {
+  differenceInDays,
+  differenceInHours,
+  differenceInMinutes,
+  differenceInSeconds,
+  format,
+} from 'date-fns';
 import { Timestamp, collection, deleteDoc, doc } from 'firebase/firestore';
 import { useState } from 'react';
 import MaterialSymbolsSubdirectoryArrowLeftRounded from '~icons/material-symbols/subdirectory-arrow-left-rounded';
@@ -23,8 +29,7 @@ interface Props {
 }
 
 export const View: React.FC<Props> = ({ setIsEditing }) => {
-  const { selectedEvent, setIsEditModalOpen, setSelectedEvent } =
-    useModalStore();
+  const { selectedEvent, setIsEditModalOpen } = useModalStore();
   const { currentUser, currentCalendarId, currentCalendarContent } =
     useAuthStore();
 
@@ -88,29 +93,35 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
       selectedEvent.eventId.toString(),
       currentUser,
       commentInput,
-      setSelectedEvent,
     );
     setCommentInput('');
   };
 
-  const formatTime = (time: Timestamp) => {
-    const originTime = new Date(time.seconds * 1000);
-    let formattedTime = '';
-    try {
-      if (time) {
-        formattedTime = format(originTime, 'EEE, LLL dd yyyy HH:mm');
-      }
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      formattedTime = format(new Date(), 'EEE, LLL dd yyyy HH:mm');
-    }
-    return formattedTime;
+  const formatTime = (time: Timestamp | null) => {
+    const originTime = time?.toDate() || new Date();
+    const now = new Date();
+
+    const secondsDiff = differenceInSeconds(now, originTime);
+    const minutesDiff = differenceInMinutes(now, originTime);
+    const hoursDiff = differenceInHours(now, originTime);
+    const daysDiff = differenceInDays(now, originTime);
+
+    if (secondsDiff < 30) return 'just now';
+    if (secondsDiff < 90) return '1 min ago';
+    if (minutesDiff < 45) return `${minutesDiff} mins ago`;
+    if (minutesDiff < 90) return '1 hr ago';
+    if (hoursDiff < 24) return `${hoursDiff} hrs ago`;
+    if (hoursDiff < 42) return '1 day ago';
+    if (daysDiff < 30) return `${daysDiff} days ago`;
+    if (daysDiff < 45) return '1 month ago';
+    if (daysDiff >= 45) return format(originTime, 'LLL dd, yyyy');
   };
 
   const renderComments = () => {
     if (selectedEvent.isMemo) return;
+
     return (
-      <div className='h-40 flex flex-col gap-2 overflow-y-auto'>
+      <div className='h-40 flex flex-col gap-2 overflow-y-auto px-1'>
         {selectedEvent.messages.map((message, index) => (
           <div
             key={index}
@@ -123,32 +134,51 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
                 'justify-end': currentUser.userId === message.arthur.userId,
               })}
             >
-              {currentUser.userId !== message.arthur.userId && (
-                <img
-                  src={message.arthur.avatar || avatarImage}
-                  className='w-9 h-9 rounded-full'
-                />
-              )}
-
-              <div className='flex-col'>
-                <div className='text-sm max-w-[240px] break-words	'>
-                  {message.content}
-                </div>
-                <div className='flex items-center'>
-                  <div className='text-xs text-slate-500 truncate max-w-[92px]'>
-                    {message.arthur.name}・
+              {currentUser.userId === message.arthur.userId ? (
+                <>
+                  <div className='flex items-end gap-2'>
+                    <div className='text-xs w-24 text-slate-500 text-right'>
+                      {formatTime(message.createdAt)}
+                    </div>
+                    <div className='flex flex-col items-end'>
+                      <div className='px-px text-xs text-slate-500 truncate max-w-[92px] text-right'>
+                        {message.arthur.name}
+                      </div>
+                      <div
+                        className={clsx(
+                          'text-sm max-w-[200px] min-h-[28px] px-2 leading-7 break-words bg-slate-100 rounded-lg',
+                          themeColors[Number(selectedEvent.tag)].light,
+                        )}
+                      >
+                        {message.content}
+                      </div>
+                    </div>
                   </div>
-                  <div className='text-xs text-slate-500'>
-                    {formatTime(message.createdAt)}
+                  <img
+                    src={message.arthur.avatar || avatarImage}
+                    className='w-11 h-11 rounded-full'
+                  />
+                </>
+              ) : (
+                <>
+                  <img
+                    src={message.arthur.avatar || avatarImage}
+                    className='w-11 h-11 rounded-full'
+                  />
+                  <div className='flex flex-col'>
+                    <div className='px-px text-xs text-slate-500 truncate max-w-[92px]'>
+                      {message.arthur.name}
+                    </div>
+                    <div className='flex items-end gap-2'>
+                      <div className='text-sm max-w-[200px] min-h-[28px] px-2 leading-7 break-words bg-slate-100 rounded-lg'>
+                        {message.content}
+                      </div>
+                      <div className='text-xs w-24 text-slate-500'>
+                        {formatTime(message.createdAt)}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              {currentUser.userId === message.arthur.userId && (
-                <img
-                  src={message.arthur.avatar || avatarImage}
-                  className='w-9 h-9 rounded-full'
-                />
+                </>
               )}
             </div>
           </div>

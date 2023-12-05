@@ -402,7 +402,7 @@ const eventCellStyles = [
 export const renderWeeklyAllDayEvent = (
   weekDates: Date[],
   index: number,
-  events: Event[],
+  events: (Event | null)[],
 ) => {
   const { setIsEditModalOpen } = useModalStore();
   const handleClick = (event: React.MouseEvent, e: Event) => {

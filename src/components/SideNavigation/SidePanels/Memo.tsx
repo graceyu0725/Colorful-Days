@@ -11,9 +11,9 @@ import { useState } from 'react';
 import EosIconsLoading from '~icons/eos-icons/loading';
 import MaterialSymbolsSubdirectoryArrowLeftRounded from '~icons/material-symbols/subdirectory-arrow-left-rounded';
 import { useModalStore } from '../../../store/modalStore';
+import { addNewMemo } from '../../../utils/handleUserAndCalendar';
 import { themeColors } from '../../../utils/theme';
 import { CalendarContent, Event } from '../../../utils/types';
-import {addNewMemo} from "../../../utils/handleUserAndCalendar"
 
 type Props = {
   memoEvents: Event[];
@@ -27,14 +27,14 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMemoInput(e.target.value);
   };
 
   const handleAddMemo = () => {
-    setIsLoading(true)
-    addNewMemo(selectedTag,memoInput,currentCalendarContent.calendarId)
-    setIsLoading(false)
+    setIsLoading(true);
+    addNewMemo(selectedTag, memoInput, currentCalendarContent.calendarId);
+    setIsLoading(false);
   };
 
   return (

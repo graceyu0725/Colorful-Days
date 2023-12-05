@@ -34,7 +34,7 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isMemberExist, setIsMemberExist] = useState(false);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
     setSearchResult(null);
     setIsMemberExist(false);

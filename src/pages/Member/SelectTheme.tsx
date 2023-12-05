@@ -54,10 +54,14 @@ export default function SelectTheme() {
   const [backGroundColor, setBackGroundColor] = useState('bg-slate-200');
   const [borderColor, setBorderColor] = useState('border-slate-200');
 
-  const handleSubmit = () => {
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    setIsButtonLoading(true);
     state.isNativeSignup
-      ? firebase.signUp(state.userInfo, navigate, calendarInfo)
-      : addUserForGoogle(state.userInfo, navigate, calendarInfo);
+      ? await firebase.signUp(state.userInfo, navigate, calendarInfo)
+      : await addUserForGoogle(state.userInfo, navigate, calendarInfo);
+    setIsButtonLoading(false);
   };
 
   return (
@@ -110,6 +114,7 @@ export default function SelectTheme() {
             </div>
           </div>
           <Button
+            isLoading={isButtonLoading}
             color='default'
             className='w-32'
             disabled={!calendarInfo.name || !calendarInfo.themeColor}

@@ -6,6 +6,7 @@ import {
   signOut,
 } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import toast from 'react-hot-toast';
 import { NavigateFunction } from 'react-router-dom';
 import { CalendarInfo, UserSignIn, UserSignUp } from '../utils/types';
 import { addUserForNative } from './handleUserAndCalendar';
@@ -24,41 +25,46 @@ export const db = getFirestore(app);
 export const auth = getAuth(app);
 
 export const firebase = {
-  signUp(
+  async signUp(
     userInfo: UserSignUp,
     navigate: NavigateFunction,
     calendarInfo: CalendarInfo,
   ) {
-    createUserWithEmailAndPassword(auth, userInfo.email, userInfo.password)
-      .then((userCredential) => {
-        addUserForNative(userInfo, userCredential.user.uid, calendarInfo);
-        localStorage.setItem('uid', userCredential.user.uid);
-        alert('註冊成功');
-        navigate('/calendar');
-      })
-      .catch((error) => {
-        if (error.message === 'Firebase: Error (auth/email-already-in-use).') {
-          alert('此 Email 已被註冊');
-          navigate('/signup');
-        } else {
-          alert('資料格式不正確，請再試一次');
-          navigate('/signup');
-        }
-        localStorage.removeItem('uid');
-      });
+    try {
+      const data = await createUserWithEmailAndPassword(
+        auth,
+        userInfo.email,
+        userInfo.password,
+      );
+
+      addUserForNative(userInfo, data.user.uid, calendarInfo);
+      localStorage.setItem('uid', data.user.uid);
+      navigate('/calendar');
+    } catch (e: any) {
+      if (e.message === 'Firebase: Error (auth/email-already-in-use).') {
+        toast.error('此 Email 已被註冊');
+        navigate('/signup');
+      } else {
+        toast.error('資料格式不正確，請再試一次');
+        navigate('/signup');
+      }
+      localStorage.removeItem('uid');
+    }
   },
-  signIn(userInfo: UserSignIn, navigate: NavigateFunction) {
-    signInWithEmailAndPassword(auth, userInfo.email, userInfo.password)
-      .then((userCredential) => {
-        localStorage.setItem('uid', userCredential.user.uid);
-        alert('登入成功');
-        navigate('/calendar');
-      })
-      .catch((error) => {
-        alert('帳號或密碼錯誤');
-        localStorage.removeItem('uid');
-        console.error(error);
-      });
+  async signIn(userInfo: UserSignIn, navigate: NavigateFunction) {
+    try {
+      const data = await signInWithEmailAndPassword(
+        auth,
+        userInfo.email,
+        userInfo.password,
+      );
+      localStorage.setItem('uid', data.user.uid);
+      navigate('/calendar');
+    } catch (e) {
+      toast.error('帳號或密碼錯誤');
+      localStorage.removeItem('uid');
+      console.error(e);
+    }
   },
   logOut() {
     const auth = getAuth();

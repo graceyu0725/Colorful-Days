@@ -43,12 +43,12 @@ const UserCalendars: React.FC<Props> = ({
   ) => {
     await deleteCalendar(calendarDetail);
     console.log('previousCalendarId', typeof previousCalendarId);
-    updateCalendarContent(
-      previousCalendarId,
-      setCurrentCalendarId,
-      setCurrentCalendarContent,
-      setCalendarAllEvents,
-    );
+    // updateCalendarContent(
+    //   previousCalendarId,
+    //   setCurrentCalendarId,
+    //   setCurrentCalendarContent,
+    //   setCalendarAllEvents,
+    // );
     updateCurrentUser(
       currentUser.userId,
       setCurrentUser,

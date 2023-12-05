@@ -15,7 +15,7 @@ export default function AddCalendar() {
   const { resetAllEvents } = useEventsStore();
   const { isAddCalendarModalOpen, setIsAddCalendarModalOpen } = useModalStore();
   const [calendarInfo, setCalendarInfo] = useState<CalendarInfo>({
-    name: "Pikachu's calendar",
+    name: '',
     themeColor: '',
   });
 
