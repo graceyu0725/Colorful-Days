@@ -41,7 +41,6 @@ export const updateAllEvents = (
     return eventData;
   }) as Event[];
 
-  console.log('newEvents', newEvents);
   setAllEvents(newEvents);
 };
 

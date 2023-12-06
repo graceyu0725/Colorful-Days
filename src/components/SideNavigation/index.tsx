@@ -64,7 +64,6 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
   const [memoEvents, setMemoEvents] = useState<Event[]>([]);
 
   const fetchDetails = async () => {
-    console.log('userCalendars', userCalendars);
     const filteredMemoEvents = calendarAllEvents.filter(
       (event) => event.isMemo,
     );
@@ -161,9 +160,13 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
           </Popover>
 
           <Tooltip showArrow={true} placement='right' content='Memo'>
-            <button className='outline-none'>
+            <button
+              className={clsx('outline-none w-full', {
+                'border-r-4 pl-1': currentPanel === PanelType.Memo,
+              })}
+            >
               <MaterialSymbolsStickyNote2OutlineRounded
-                className='mt-1 text-2xl text-slate-700 hover:cursor-pointer'
+                className='text-2xl text-slate-700 hover:cursor-pointer m-auto'
                 onClick={() =>
                   setCurrentPanel((prev) =>
                     prev
@@ -179,7 +182,9 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
 
           <Tooltip showArrow={true} placement='right' content='Calendars'>
             <button
-              className='outline-none'
+              className={clsx('outline-none w-full', {
+                'border-r-4 pl-1': currentPanel === PanelType.Calendars,
+              })}
               onClick={() =>
                 setCurrentPanel((prev) =>
                   prev
@@ -190,14 +195,18 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
                 )
               }
             >
-              <UilSchedule className='mt-1 text-2xl text-slate-700 hover:cursor-pointer' />
+              <UilSchedule className='text-2xl text-slate-700 hover:cursor-pointer m-auto' />
             </button>
           </Tooltip>
 
           <Tooltip showArrow={true} placement='right' content='Members'>
-            <button className='outline-none'>
+            <button
+              className={clsx('outline-none w-full', {
+                'border-r-4 pl-1': currentPanel === PanelType.Members,
+              })}
+            >
               <OcticonPeople16
-                className='text-2xl text-slate-700 hover:cursor-pointer'
+                className='text-2xl text-slate-700 hover:cursor-pointer m-auto'
                 onClick={() =>
                   setCurrentPanel((prev) =>
                     prev

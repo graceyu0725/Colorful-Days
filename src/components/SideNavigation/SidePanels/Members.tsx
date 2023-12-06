@@ -48,7 +48,6 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
     if (result && typeof result !== 'string') {
       setSearchResult(result);
       if (currentCalendarContent.members.includes(result.userId)) {
-        console.log('user已存在');
         setIsMemberExist(true);
       }
     } else if (result && typeof result == 'string') {

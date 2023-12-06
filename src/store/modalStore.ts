@@ -42,10 +42,8 @@ export const useModalStore = create<ModalState>((set) => ({
   isEditModalOpen: false,
   selectedEvent: initialEvent,
   setSelectedEvent: (event) => set({ selectedEvent: event }),
-  setIsEditModalOpen: (isOpen, event) => {
+  setIsEditModalOpen: (isOpen, event) =>
     set({ isEditModalOpen: isOpen, selectedEvent: event }),
-      console.log('modalevent', event);
-  },
   eventsToShow: [initialEvent],
   isMoreModalOpen: false,
   setIsMoreModalOpen: (isOpen, events) =>

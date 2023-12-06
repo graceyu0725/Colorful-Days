@@ -68,7 +68,7 @@ export const defaultTags = [
   },
   {
     colorCode: '1',
-    name: 'Personal',
+    name: 'Appointments',
   },
   {
     colorCode: '2',

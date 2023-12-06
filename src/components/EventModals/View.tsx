@@ -107,7 +107,7 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     const daysDiff = differenceInDays(now, originTime);
 
     if (secondsDiff < 30) return 'just now';
-    if (secondsDiff < 90) return '1 min ago';
+    if (secondsDiff < 61) return '1 min ago';
     if (minutesDiff < 45) return `${minutesDiff} mins ago`;
     if (minutesDiff < 90) return '1 hr ago';
     if (hoursDiff < 24) return `${hoursDiff} hrs ago`;

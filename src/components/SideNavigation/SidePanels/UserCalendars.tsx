@@ -37,12 +37,8 @@ const UserCalendars: React.FC<Props> = ({
   const { setIsAddCalendarModalOpen } = useModalStore();
   const { setCalendarAllEvents } = useEventsStore();
 
-  const handleDeleteCalendar = async (
-    calendarDetail: CalendarContent,
-    previousCalendarId: string,
-  ) => {
+  const handleDeleteCalendar = async (calendarDetail: CalendarContent) => {
     await deleteCalendar(calendarDetail);
-    console.log('previousCalendarId', typeof previousCalendarId);
     // updateCalendarContent(
     //   previousCalendarId,
     //   setCurrentCalendarId,
@@ -108,14 +104,7 @@ const UserCalendars: React.FC<Props> = ({
                       color='danger'
                       variant='bordered'
                       className='p-0 border-0'
-                      onClick={() => {
-                        const newIndex =
-                          index === 0 ? calendarDetails.length - 1 : index - 1;
-                        handleDeleteCalendar(
-                          calendarDetail,
-                          calendarDetails[newIndex].calendarId,
-                        );
-                      }}
+                      onClick={() => handleDeleteCalendar(calendarDetail)}
                     >
                       delete
                     </Button>

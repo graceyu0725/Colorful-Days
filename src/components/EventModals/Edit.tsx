@@ -182,13 +182,13 @@ export default function Edit() {
     await updateDoc(eventRef, data);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const currentTime = serverTimestamp();
     const data = {
       ...userInput,
       updatedAt: currentTime,
     };
-    updateEvent(data);
+    await updateEvent(data);
     setIsEditModalOpen(false, userInput);
     setIsEditing(false);
   };

@@ -8,7 +8,7 @@ import {
 } from '@nextui-org/react';
 import clsx from 'clsx';
 import { useState } from 'react';
-import EosIconsLoading from '~icons/eos-icons/loading';
+// import EosIconsLoading from '~icons/eos-icons/loading';
 import MaterialSymbolsSubdirectoryArrowLeftRounded from '~icons/material-symbols/subdirectory-arrow-left-rounded';
 import { useModalStore } from '../../../store/modalStore';
 import { addNewMemo } from '../../../utils/handleUserAndCalendar';
@@ -24,17 +24,18 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
   const { setIsEditModalOpen } = useModalStore();
   const [selectedTag, setSelectedTag] = useState('0');
   const [memoInput, setMemoInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMemoInput(e.target.value);
   };
 
-  const handleAddMemo = () => {
-    setIsLoading(true);
-    addNewMemo(selectedTag, memoInput, currentCalendarContent.calendarId);
-    setIsLoading(false);
+  const handleAddMemo = async () => {
+    // setIsLoading(true);
+    await addNewMemo(selectedTag, memoInput, currentCalendarContent.calendarId);
+    setMemoInput('');
+    // setIsLoading(false);
   };
 
   return (
@@ -98,7 +99,7 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
             />
           </div>
 
-          {isLoading && <EosIconsLoading />}
+          {/* {isLoading && <EosIconsLoading />} */}
         </div>
 
         <div className='mt-10'>Memo ({memoEvents.length})</div>

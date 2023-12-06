@@ -11,7 +11,7 @@ import OneDayEventCells from './OneDayEventCells';
 
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const commonTimeStyles =
-  'row-span-2 col-start-1 relative -top-3 pl-4 text-slate-500';
+  'row-span-2 col-start-1 relative -top-3 pl-4 text-slate-500 text-sm';
 const timeStyles = [
   { time: '', style: clsx('row-start-1', commonTimeStyles) },
   { time: '1 AM', style: clsx('row-start-3', commonTimeStyles) },
@@ -145,7 +145,7 @@ const WeeklyView: React.FC = () => {
       {/* 一個大 Grid 包含左邊時間列及中間 Time table，Time table 也需要一個 Grid */}
       <div
         id='weekly-view-time-table'
-        className='relative w-full grid grid-cols-weeklyHeader grid-rows-weeklyTimeTable overflow-auto'
+        className='relative w-full grid grid-cols-weeklyTimeTable grid-rows-weeklyTimeTable overflow-scroll pr-[14px]'
       >
         {/* 時間線 */}
         <div

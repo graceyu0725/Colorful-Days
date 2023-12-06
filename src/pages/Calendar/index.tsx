@@ -88,23 +88,19 @@ function Calendar() {
     });
 
     return () => {
-      console.log(`取消訂閱: ${currentCalendarId}`);
       unsubscribeEvents();
       unsubscribeCalendar();
     };
-  }, [currentCalendarId, selectedEvent]);
+  }, [currentCalendarId]);
 
   useEffect(() => {
     if (!currentUser || !currentUser.email) {
-      console.log('沒有 currentUser 或 currentUser.email');
       return;
     }
 
     const usersCollectionRef = collection(db, 'Users');
     const docRef = doc(usersCollectionRef, currentUser.email);
     const unsubscribeByEmail = onSnapshot(docRef, (docSnapshot) => {
-      console.log('Matching users:', docSnapshot.data());
-      console.log('currentUser:', currentUser);
       if (docSnapshot.exists()) {
         const updatedUser = {
           ...currentUser,
@@ -112,16 +108,15 @@ function Calendar() {
         };
         setCurrentUser(updatedUser);
       }
-      // updateCurrentUser(
-      //   docSnapshot.data()?.userId,
-      //   setCurrentUser,
-      //   setCurrentCalendarId,
-      //   setCurrentCalendarContent,
-      // );
+      updateCurrentUser(
+        docSnapshot.data()?.userId,
+        setCurrentUser,
+        setCurrentCalendarId,
+        setCurrentCalendarContent,
+      );
     });
 
     return () => {
-      console.log('取消訂閱 user');
       unsubscribeByEmail();
     };
   }, [currentUser.email]);
@@ -145,6 +140,46 @@ function Calendar() {
       }
     });
   }, []);
+
+  useEffect(() => {
+    if (!selectedEvent || !selectedEvent.eventId) {
+      return;
+    }
+
+    const eventDocRef = doc(
+      db,
+      'Calendars',
+      currentCalendarId,
+      'events',
+      selectedEvent.eventId.toString(),
+    );
+    const unsubscribeFromEvent = onSnapshot(eventDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const updatedEvent = {
+          startAt: docSnapshot.data().startAt.toDate(),
+          endAt: docSnapshot.data().endAt.toDate(),
+          eventId: docSnapshot.data().eventId,
+          title: docSnapshot.data().title,
+          isAllDay: docSnapshot.data().isAllDay,
+          isMemo: docSnapshot.data().isMemo,
+          tag: docSnapshot.data().tag,
+          note: docSnapshot.data().note,
+          createdAt: docSnapshot.data().createdAt
+            ? docSnapshot.data().createdAt.toDate()
+            : null,
+          updatedAt: docSnapshot.data().updatedAt
+            ? docSnapshot.data().updatedAt.toDate()
+            : null,
+          messages: docSnapshot.data().messages,
+        };
+        setSelectedEvent(updatedEvent);
+      }
+    });
+
+    return () => {
+      unsubscribeFromEvent();
+    };
+  }, [selectedEvent?.eventId]);
 
   return (
     <div className='flex w-screen'>

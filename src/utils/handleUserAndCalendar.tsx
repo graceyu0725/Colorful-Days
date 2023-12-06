@@ -102,7 +102,7 @@ export const addUserForGoogle = async (
       calendars: [calendarDocRef.id],
     };
     await setDoc(docRef, newUser);
-    alert('註冊成功');
+    // alert('註冊成功');
     // updateCurrentUser(userInfo.uid,setCurrentUser);
     navigate('/calendar');
   }
@@ -260,7 +260,6 @@ export const createNewCalendar = async (
     setCurrentCalendarId,
     setCurrentCalendarContent,
   );
-  console.log('新增日曆成功');
 };
 
 // 根據 calendarId & memberIds 刪除 calendar
@@ -277,11 +276,9 @@ export const deleteCalendar = async (calendarDetail: CalendarContent) => {
       deleteDoc(docSnapshot.ref),
     );
     await Promise.all(deleteEventsPromises);
-    console.log("All documents in 'events' have been successfully deleted.");
 
     const calendarDocRef = doc(db, 'Calendars', calendarDetail.calendarId);
     await deleteDoc(calendarDocRef);
-    console.log('The calendar document has been successfully deleted.');
 
     const usersCollectionRef = collection(db, 'Users');
 
@@ -297,7 +294,6 @@ export const deleteCalendar = async (calendarDetail: CalendarContent) => {
           await updateDoc(docSnapshot.ref, {
             calendars: arrayRemove(calendarDetail.calendarId),
           });
-          console.log(`calendarId removed from user ${userId}`);
         }
       });
     }
@@ -372,7 +368,6 @@ export const removeMember = async (calendarId: string, userId: string) => {
     await updateDoc(calendarDocRef, {
       members: arrayRemove(userId),
     });
-    console.log(`Removed userId ${userId} from calendar ${calendarId}`);
 
     // 再從該userId的user的calendars陣列，移除calendarId
     const usersCollectionRef = collection(db, 'Users');
