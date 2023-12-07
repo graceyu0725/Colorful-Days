@@ -160,11 +160,18 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
             </PopoverContent>
           </Popover>
 
-          <Tooltip showArrow={true} placement='right' content='Memo'>
+          <Tooltip showArrow={true} placement='right' content='Memos'>
             <button
-              className={clsx('outline-none w-full', {
-                'border-r-4 pl-1': currentPanel === PanelType.Memo,
-              })}
+              className={clsx(
+                'outline-none w-full',
+                {
+                  'border-r-4 pl-1': currentPanel === PanelType.Memo,
+                },
+                {
+                  [currentThemeColor.lightBorder]:
+                    currentPanel === PanelType.Memo,
+                },
+              )}
             >
               <MaterialSymbolsStickyNote2OutlineRounded
                 className='text-2xl text-slate-700 hover:cursor-pointer m-auto'
@@ -183,9 +190,16 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
 
           <Tooltip showArrow={true} placement='right' content='Calendars'>
             <button
-              className={clsx('outline-none w-full', {
-                'border-r-4 pl-1': currentPanel === PanelType.Calendars,
-              })}
+              className={clsx(
+                'outline-none w-full',
+                {
+                  'border-r-4 pl-1': currentPanel === PanelType.Calendars,
+                },
+                {
+                  [currentThemeColor.lightBorder]:
+                    currentPanel === PanelType.Calendars,
+                },
+              )}
               onClick={() =>
                 setCurrentPanel((prev) =>
                   prev
@@ -202,9 +216,16 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
 
           <Tooltip showArrow={true} placement='right' content='Members'>
             <button
-              className={clsx('outline-none w-full', {
-                'border-r-4 pl-1': currentPanel === PanelType.Members,
-              })}
+              className={clsx(
+                'outline-none w-full',
+                {
+                  'border-r-4 pl-1': currentPanel === PanelType.Members,
+                },
+                {
+                  [currentThemeColor.lightBorder]:
+                    currentPanel === PanelType.Members,
+                },
+              )}
             >
               <OcticonPeople16
                 className='text-2xl text-slate-700 hover:cursor-pointer m-auto'

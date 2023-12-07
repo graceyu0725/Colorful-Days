@@ -36,12 +36,12 @@ const SideBar: React.FC<Props> = ({ isSideBarOpen }) => {
         className={clsx(
           'w-0 overflow-hidden border-slate-300 transition-all flex flex-col',
           {
-            'w-60 border-l px-4': isSideBarOpen,
+            'w-60 border-l px-3 py-4': isSideBarOpen,
           },
         )}
       >
-        <Schedule todaysEvents={todaysEvents} />
         <TagFilter calendarTags={calendarTags} />
+        <Schedule todaysEvents={todaysEvents} />
       </div>
     </>
   );

@@ -14,6 +14,8 @@ interface themeColor {
   lightBorder: string;
   border: string;
   text: string;
+  hover: string;
+  outline: string;
 }
 
 interface authState {

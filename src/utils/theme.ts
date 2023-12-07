@@ -6,6 +6,8 @@ export const themeColors = [
     lightBorder: 'border-theme-1-100',
     border: 'border-theme-1-300',
     text: 'text-theme-1-300',
+    hover: 'hover:bg-theme-1-50 hover:text-theme-1-300',
+    outline: 'outline-theme-1-300',
   },
   {
     lightBackground: 'bg-theme-2-100',
@@ -14,6 +16,8 @@ export const themeColors = [
     lightBorder: 'border-theme-2-100',
     border: 'border-theme-2-300',
     text: 'text-theme-2-300',
+    hover: 'hover:bg-theme-2-50 hover:text-theme-2-300',
+    outline: 'outline-theme-2-300',
   },
   {
     lightBackground: 'bg-theme-3-100',
@@ -22,6 +26,8 @@ export const themeColors = [
     lightBorder: 'border-theme-3-100',
     border: 'border-theme-3-300',
     text: 'text-theme-3-300',
+    hover: 'hover:bg-theme-3-50 hover:text-theme-3-300',
+    outline: 'outline-theme-3-300',
   },
   {
     lightBackground: 'bg-theme-4-100',
@@ -30,6 +36,8 @@ export const themeColors = [
     lightBorder: 'border-theme-4-100',
     border: 'border-theme-4-300',
     text: 'text-theme-4-300',
+    hover: 'hover:bg-theme-4-50 hover:text-theme-4-300',
+    outline: 'outline-theme-4-300',
   },
   {
     lightBackground: 'bg-theme-5-100',
@@ -38,6 +46,8 @@ export const themeColors = [
     lightBorder: 'border-theme-5-100',
     border: 'border-theme-5-300',
     text: 'text-theme-5-300',
+    hover: 'hover:bg-theme-5-50 hover:text-theme-5-300',
+    outline: 'outline-theme-5-300',
   },
   {
     lightBackground: 'bg-theme-6-100',
@@ -46,6 +56,8 @@ export const themeColors = [
     lightBorder: 'border-theme-6-100',
     border: 'border-theme-6-300',
     text: 'text-theme-6-300',
+    hover: 'hover:bg-theme-6-50 hover:text-theme-6-300',
+    outline: 'outline-theme-6-300',
   },
   {
     lightBackground: 'bg-theme-7-100',
@@ -54,6 +66,8 @@ export const themeColors = [
     lightBorder: 'border-theme-7-100',
     border: 'border-theme-7-300',
     text: 'text-theme-7-300',
+    hover: 'hover:bg-theme-7-50 hover:text-theme-7-300',
+    outline: 'outline-theme-7-300',
   },
   {
     lightBackground: 'bg-theme-8-100',
@@ -62,5 +76,7 @@ export const themeColors = [
     lightBorder: 'border-theme-8-100',
     border: 'border-theme-8-300',
     text: 'text-theme-8-300',
+    hover: 'hover:bg-theme-8-50 hover:text-theme-8-300',
+    outline: 'outline-theme-8-300',
   },
 ];

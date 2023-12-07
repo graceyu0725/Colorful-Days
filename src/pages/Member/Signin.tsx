@@ -73,18 +73,18 @@ function Signin() {
 
   return (
     <div
-      className='flex items-center justify-center h-screen bg-cover bg-slate-200'
+      className='flex items-center justify-center h-screen bg-cover bg-theme-1-200'
       // style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-      <div className='absolute top-0 left-0 right-0 bottom-0 bg-gray-100/50 z-10' />
+      <div className='absolute top-0 left-0 right-0 bottom-0 bg-gray-100/10 z-10' />
 
       <Card className='w-11/12 p-0 rounded-lg flex z-10 h-5/6'>
         <div className='flex h-full'>
           <div className='h-full flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24'>
-            <div className='max-h-full flex flex-col justify-center  mx-auto w-full max-w-sm lg:w-96'>
+            <div className='max-h-full flex flex-col justify-center mx-auto w-full max-w-sm lg:w-96'>
               <div className='flex items-end'>
                 <Image
-                  className='h-10 mr-1'
+                  className='h-10 mr-2'
                   src='assets/logo.png'
                   alt='Colorful Days'
                 />
@@ -112,7 +112,7 @@ function Signin() {
                     stroke-dashoffset='2' // 定義虛線開始的偏移量
                   />
                 </motion.svg> */}
-                <div className='font-custom text-3xl font-bold text-[#5a3a1b]'>
+                <div className='font-custom text-3xl font-bold text-theme-1-300'>
                   Colorful Days
                 </div>
 
@@ -130,7 +130,7 @@ function Signin() {
                 </svg> */}
               </div>
 
-              <h2 className='mt-2 mb-4 text-3xl font-bold tracking-tight text-gray-900'>
+              <h2 className='mt-2 mb-4 text-3xl font-bold tracking-tight'>
                 Sign in to your account
               </h2>
 
@@ -148,9 +148,7 @@ function Signin() {
                   ) : (
                     <LogosGoogleIcon className='h-11' />
                   )}
-                  <div className='font-medium text-gray-900'>
-                    Sign in with Google
-                  </div>
+                  <div className='font-medium'>Sign in with Google</div>
                 </div>
 
                 <div className='relative mt-6'>
@@ -182,7 +180,7 @@ function Signin() {
                         required
                         value={userInput.email}
                         onChange={updateUserInput}
-                        className='leading-[44px] h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
+                        className='leading-[44px] h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
                       />
                     </div>
 
@@ -201,7 +199,7 @@ function Signin() {
                         required
                         value={userInput.password}
                         onChange={updateUserInput}
-                        className='tracking-widest h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
+                        className='tracking-widest h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
                       />
                     </div>
 
@@ -211,7 +209,7 @@ function Signin() {
                       </div>
                       <Link
                         to='/signup'
-                        className='font-medium text-slate-600 hover:text-slate-500 underline'
+                        className='font-medium text-slate-600 hover:text-theme-1-300 underline'
                       >
                         Create account
                       </Link>
@@ -223,7 +221,7 @@ function Signin() {
                         type='button'
                         disabled={!userInput.email || !userInput.password}
                         onClick={handleSignin}
-                        className='text-base h-11 flex w-full justify-center rounded-md border border-transparent disabled:bg-slate-500 bg-slate-700 py-2 px-4 font-medium text-white shadow-sm hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2'
+                        className='h-11 w-full text-base rounded-lg bg-theme-1-300 text-white'
                       >
                         Sign in
                       </Button>

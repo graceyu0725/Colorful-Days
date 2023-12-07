@@ -1,4 +1,4 @@
-import { Card, Image } from '@nextui-org/react';
+import { Button, Card, Image } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserSignUp } from '../../utils/types';
@@ -31,10 +31,10 @@ function Signup() {
   return (
     <>
       <div
-        className='flex items-center justify-center h-screen bg-cover bg-slate-200'
+        className='flex items-center justify-center h-screen bg-cover bg-theme-1-200'
         // style={{ backgroundImage: `url(${backgroundImage})` }}
       >
-        <div className='absolute top-0 left-0 right-0 bottom-0 bg-gray-100/50 z-10' />
+        <div className='absolute top-0 left-0 right-0 bottom-0 bg-gray-100/10 z-10' />
 
         <Card className='w-11/12 p-0 rounded-lg flex z-10 h-5/6'>
           <div className='flex h-full'>
@@ -42,16 +42,16 @@ function Signup() {
               <div className='max-h-full flex flex-col justify-center  mx-auto w-full max-w-sm lg:w-96'>
                 <div className='flex items-end'>
                   <Image
-                    className='h-10 mr-1'
+                    className='h-10 mr-2'
                     src='assets/logo.png'
                     alt='Colorful Days'
                   />
-                  <div className='font-custom text-3xl font-bold text-[#5a3a1b]'>
+                  <div className='font-custom text-3xl font-bold text-theme-1-300'>
                     Colorful Days
                   </div>
                 </div>
 
-                <h2 className='mt-2 mb-10 text-3xl font-bold tracking-tight text-gray-900'>
+                <h2 className='mt-2 mb-10 text-3xl font-bold tracking-tight'>
                   Create your colorful days
                 </h2>
 
@@ -72,7 +72,7 @@ function Signup() {
                         required
                         value={userInput.name}
                         onChange={updateUserInput}
-                        className='leading-[44px] h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
+                        className='leading-[44px] h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
                       />
                     </div>
                     <div className='flex flex-col gap-1'>
@@ -90,7 +90,7 @@ function Signup() {
                         required
                         value={userInput.email}
                         onChange={updateUserInput}
-                        className='leading-[44px] h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
+                        className='leading-[44px] h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
                       />
                     </div>
 
@@ -109,7 +109,7 @@ function Signup() {
                         required
                         value={userInput.password}
                         onChange={updateUserInput}
-                        className='tracking-widest h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
+                        className='tracking-widest h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
                       />
                     </div>
 
@@ -119,14 +119,14 @@ function Signup() {
                       </div>
                       <Link
                         to='/signin'
-                        className='font-medium text-slate-600 hover:text-slate-500 underline'
+                        className='font-medium text-slate-600 hover:text-theme-1-300 underline'
                       >
                         Sign in
                       </Link>
                     </div>
 
                     <div>
-                      <button
+                      <Button
                         type='button'
                         disabled={
                           !userInput.name ||
@@ -141,10 +141,10 @@ function Signup() {
                             },
                           })
                         }
-                        className='h-11 flex w-full justify-center rounded-md border border-transparent bg-slate-700 py-2 px-4 font-medium text-white shadow-sm hover:bg-slate-600 disabled:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2'
+                        className='h-11 w-full text-base rounded-lg bg-theme-1-300 text-white'
                       >
                         Create account
-                      </button>
+                      </Button>
                     </div>
                   </form>
                 </div>

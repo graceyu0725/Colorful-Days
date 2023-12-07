@@ -21,10 +21,10 @@ const TagFilter: React.FC<Props> = ({ calendarTags }) => {
   const { selectedEventTags, setSelectedEventTags } = useEventsStore();
 
   return (
-    <div className='h-1/2 px-2 mb-4 mt-1'>
-      <Card className='w-full h-full rounded-lg shadow border'>
+    <div className='mb-2'>
+      <Card className='w-full h-full shadow border'>
         <CardHeader className='flex justify-between'>
-          <p>Tags</p>
+          <p>Tag Filter</p>
           <div className='flex gap-2'>
             <MaterialSymbolsSelectCheckBox
               className='hover:cursor-pointer'
