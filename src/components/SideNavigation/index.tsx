@@ -19,7 +19,6 @@ import {
   getAllCalendarDetail,
   getAllMemberDetail,
 } from '../../utils/handleUserAndCalendar';
-import { themeColors } from '../../utils/theme';
 import { CalendarContent, Event, User } from '../../utils/types';
 import Members from './SidePanels/Members';
 import Memo from './SidePanels/Memo';
@@ -31,16 +30,15 @@ type Props = {
 };
 
 const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
-  const { currentUser, currentCalendarContent, currentCalendarId, resetUser } =
-    useAuthStore();
+  const {
+    currentUser,
+    currentCalendarContent,
+    currentCalendarId,
+    resetUser,
+    currentThemeColor,
+  } = useAuthStore();
   const { calendarAllEvents, resetAllEvents } = useEventsStore();
 
-  // Handle functions of icons
-  const themeColorIndex: number =
-    Number(currentCalendarContent.themeColor) || 0;
-  // const backgroundColor = themeColors[themeColorIndex]?.light || 'bg-slate-100';
-  const borderColor =
-    themeColors[themeColorIndex]?.border || 'border-slate-100';
   const userCalendars = currentUser.calendars || [''];
 
   const handleLogout = () => {
@@ -134,14 +132,17 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
               <button className='outline-none mt-1'>
                 {currentUser.avatar ? (
                   <Avatar
-                    className={clsx('w-10 h-10 p-0 border-2', borderColor)}
+                    className={clsx(
+                      'w-10 h-10 p-0 border-2',
+                      currentThemeColor.border,
+                    )}
                     src={currentUser.avatar}
                   />
                 ) : (
                   <img
                     className={clsx(
                       'w-9 h-9 p-0 border-2 rounded-full',
-                      borderColor,
+                      currentThemeColor.border,
                     )}
                     src={AvatarImage}
                   />

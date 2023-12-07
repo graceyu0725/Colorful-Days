@@ -55,7 +55,7 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
                 <div
                   className={clsx(
                     'ml-1 w-2 h-2 outline outline-1 outline-offset-2 outline-slate-300 rounded-full bg-slate-500',
-                    themeColors[Number(selectedTag)].bg,
+                    themeColors[Number(selectedTag)].darkBackground,
                   )}
                 />
               </PopoverTrigger>
@@ -72,7 +72,7 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
                         <div
                           className={clsx(
                             'w-3 h-3 rounded-full',
-                            themeColors[Number(tag.colorCode)].bg,
+                            themeColors[Number(tag.colorCode)].darkBackground,
                           )}
                         />
                         <div className='text-base'>{tag.name}</div>
@@ -83,7 +83,7 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
               </PopoverContent>
             </Popover>
             <input
-              className='border rounded px-2 w-36 text-sm h-8'
+              className='border rounded px-2 w-36 text-sm h-8 leading-8'
               placeholder='Press enter to input'
               value={memoInput}
               onChange={(e) => handleInputChange(e)}
@@ -110,7 +110,7 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
               key={index}
               className={clsx(
                 'flex items-center justify-center gap-2 w-full p-3 h-12 rounded-lg shadow hover:cursor-pointer',
-                themeColors[Number(event.tag)].light,
+                themeColors[Number(event.tag)].lightBackground,
               )}
               onClick={() => {
                 setIsEditModalOpen(true, event);

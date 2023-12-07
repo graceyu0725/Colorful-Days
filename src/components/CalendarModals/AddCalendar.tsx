@@ -41,6 +41,7 @@ export default function AddCalendar() {
   };
 
   const [borderColor, setBorderColor] = useState('border-slate-200');
+  const [backgroundColor, setBackgroundColor] = useState('bg-slate-200');
   const [isSelected, setIsSelected] = useState([
     false,
     false,
@@ -78,7 +79,7 @@ export default function AddCalendar() {
       >
         <ModalContent
           className={clsx(
-            'flex flex-col justify-center items-center p-8 overflow-y-auto gap-10 border-[20px]',
+            'flex flex-col justify-center items-center p-8 overflow-y-auto gap-10 border-[30px] transition-colors',
             borderColor,
           )}
         >
@@ -87,7 +88,7 @@ export default function AddCalendar() {
             <input
               name='name'
               className={clsx(
-                'border-2 w-72 h-16 rounded-lg px-5 text-lg',
+                'border-2 w-72 h-16 leading-[64px] rounded-lg px-5 text-lg',
                 borderColor,
               )}
               value={calendarInfo.name}
@@ -102,9 +103,9 @@ export default function AddCalendar() {
                   key={index}
                   className={clsx(
                     '-skew-x-12 bg-slate-200 w-12 h-48 rounded',
-                    color.bg,
+                    color.background,
                     {
-                      ['outline outline-3 outline-offset-2 outline-slate-500']:
+                      ['outline outline-3 outline-offset-2 outline-slate-300']:
                         isSelected[index],
                     },
                   )}
@@ -116,6 +117,7 @@ export default function AddCalendar() {
                     );
                     updateCalendarInfo(e);
                     setBorderColor(themeColors[index].border);
+                    setBackgroundColor(themeColors[index].background);
                   }}
                 />
               ))}
@@ -125,11 +127,14 @@ export default function AddCalendar() {
           <div>
             <Button
               color='default'
-              className='w-32'
+              className={clsx(
+                'w-32 text-slate-700 text-base transition-colors',
+                backgroundColor,
+              )}
               disabled={!calendarInfo.name || !calendarInfo.themeColor}
               onClick={handleSubmit}
             >
-              送出
+              Submit
             </Button>
           </div>
         </ModalContent>

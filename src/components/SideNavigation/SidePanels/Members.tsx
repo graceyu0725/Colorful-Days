@@ -163,7 +163,7 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
           <Divider />
           <div className='flex items-center justify-between mb-2'>
             <input
-              className='mt-2 border rounded px-2 w-40 text-sm h-8'
+              className='mt-2 border rounded px-2 w-40 text-sm h-8 leading-8'
               placeholder='Search by email'
               value={searchInput}
               onChange={(e) => handleInputChange(e)}

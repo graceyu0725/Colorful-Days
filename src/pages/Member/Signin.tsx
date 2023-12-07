@@ -2,6 +2,7 @@ import { Button, Card, Image } from '@nextui-org/react';
 // import { motion, useAnimation } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import EosIconsLoading from '~icons/eos-icons/loading';
 import LogosGoogleIcon from '~icons/logos/google-icon';
 import { firebase } from '../../utils/firebase';
 import { googleAuth } from '../../utils/googleAuth';
@@ -32,6 +33,7 @@ function Signin() {
   };
 
   const [isButtonLoading, setIsButtonLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const handleSignin = async () => {
     setIsButtonLoading(true);
@@ -80,7 +82,7 @@ function Signin() {
         <div className='flex h-full'>
           <div className='h-full flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24'>
             <div className='max-h-full flex flex-col justify-center  mx-auto w-full max-w-sm lg:w-96'>
-              <div className='flex items-center'>
+              <div className='flex items-end'>
                 <Image
                   className='h-10 mr-1'
                   src='assets/logo.png'
@@ -110,7 +112,7 @@ function Signin() {
                     stroke-dashoffset='2' // 定義虛線開始的偏移量
                   />
                 </motion.svg> */}
-                <div className='text-xl font-bold text-[#5a3a1b]'>
+                <div className='font-custom text-3xl font-bold text-[#5a3a1b]'>
                   Colorful Days
                 </div>
 
@@ -135,9 +137,17 @@ function Signin() {
               <div className='mt-8'>
                 <div
                   className='flex gap-4 items-center justify-center h-11 w-full rounded-md bg-slate-100 py-3 px-4 shadow-sm hover:bg-slate-200 hover:cursor-pointer'
-                  onClick={() => googleAuth.signIn(navigate)}
+                  onClick={async () => {
+                    setIsGoogleLoading(true);
+                    await googleAuth.signIn(navigate);
+                    setIsGoogleLoading(false);
+                  }}
                 >
-                  <LogosGoogleIcon className='h-11' />
+                  {isGoogleLoading ? (
+                    <EosIconsLoading />
+                  ) : (
+                    <LogosGoogleIcon className='h-11' />
+                  )}
                   <div className='font-medium text-gray-900'>
                     Sign in with Google
                   </div>
@@ -172,7 +182,7 @@ function Signin() {
                         required
                         value={userInput.email}
                         onChange={updateUserInput}
-                        className='h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
+                        className='leading-[44px] h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
                       />
                     </div>
 

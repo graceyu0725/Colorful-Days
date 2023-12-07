@@ -5,7 +5,6 @@ import { useAuthStore } from '../../../store/authStore';
 import { useModalStore } from '../../../store/modalStore';
 import { useViewStore } from '../../../store/viewStore';
 import { generateWeekDates } from '../../../utils/handleDatesAndEvents';
-import { themeColors } from '../../../utils/theme';
 import AllDayEventCells from './AllDayEventCells';
 import OneDayEventCells from './OneDayEventCells';
 
@@ -57,9 +56,7 @@ const WeeklyView: React.FC = () => {
   const { currentDate } = useViewStore();
   const weekDates = generateWeekDates(currentDate);
   const { setIsCreateModalOpen } = useModalStore();
-  const { currentCalendarContent } = useAuthStore();
-
-  const themeColorIndex = Number(currentCalendarContent.themeColor) || 0;
+  const { currentThemeColor } = useAuthStore();
 
   const getStartTime = (
     date: Date[],
@@ -151,7 +148,7 @@ const WeeklyView: React.FC = () => {
         <div
           className={clsx(
             'absolute w-full border-t top-1 right-0 z-20',
-            themeColors[themeColorIndex].border,
+            currentThemeColor.border,
           )}
           style={{ width: 'calc(100% - 80px)', top: `${topPosition}px` }}
         ></div>

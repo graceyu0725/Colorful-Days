@@ -146,8 +146,8 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
                       </div>
                       <div
                         className={clsx(
-                          'text-sm max-w-[200px] min-h-[28px] px-2 leading-7 break-words bg-slate-100 rounded-lg',
-                          themeColors[Number(selectedEvent.tag)].light,
+                          'text-sm max-w-[200px] min-h-[28px] px-2 leading-7 break-words rounded-lg',
+                          themeColors[Number(selectedEvent.tag)].lightBackground,
                         )}
                       >
                         {message.content}
@@ -207,7 +207,7 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
             <div
               className={clsx(
                 'w-3 h-3 rounded-full',
-                themeColors[Number(selectedEvent.tag)].bg,
+                themeColors[Number(selectedEvent.tag)].darkBackground,
               )}
             />
             <div>{calendarTags[Number(selectedEvent.tag)].name}</div>
@@ -226,7 +226,7 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
             <Divider />
             <div className='flex items-center gap-2'>
               <input
-                className='border rounded-lg text-sm h-10 px-2 grow'
+                className='border rounded-lg text-sm h-10 leading-10 px-2 grow'
                 placeholder='Add a comment'
                 value={commentInput}
                 onChange={(e) => setCommentInput(e.target.value)}

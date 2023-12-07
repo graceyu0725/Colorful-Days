@@ -40,13 +40,13 @@ function Signup() {
           <div className='flex h-full'>
             <div className='h-full flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24'>
               <div className='max-h-full flex flex-col justify-center  mx-auto w-full max-w-sm lg:w-96'>
-                <div className='flex items-center'>
+                <div className='flex items-end'>
                   <Image
                     className='h-10 mr-1'
                     src='assets/logo.png'
                     alt='Colorful Days'
                   />
-                  <div className='text-xl font-bold text-[#5a3a1b]'>
+                  <div className='font-custom text-3xl font-bold text-[#5a3a1b]'>
                     Colorful Days
                   </div>
                 </div>
@@ -72,7 +72,7 @@ function Signup() {
                         required
                         value={userInput.name}
                         onChange={updateUserInput}
-                        className='h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
+                        className='leading-[44px] h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
                       />
                     </div>
                     <div className='flex flex-col gap-1'>
@@ -90,7 +90,7 @@ function Signup() {
                         required
                         value={userInput.email}
                         onChange={updateUserInput}
-                        className='h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
+                        className='leading-[44px] h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
                       />
                     </div>
 

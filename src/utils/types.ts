@@ -64,11 +64,11 @@ export interface CalendarTag {
 export const defaultTags = [
   {
     colorCode: '0',
-    name: 'Work',
+    name: 'Appointments',
   },
   {
     colorCode: '1',
-    name: 'Appointments',
+    name: 'Work',
   },
   {
     colorCode: '2',

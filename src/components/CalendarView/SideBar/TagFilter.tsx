@@ -54,7 +54,7 @@ const TagFilter: React.FC<Props> = ({ calendarTags }) => {
                     <div
                       className={clsx(
                         'rounded-full w-3 h-3',
-                        themeColors[index].bg,
+                        themeColors[index].darkBackground,
                       )}
                     />
                     <div className='text-sm truncate'>{tag.name}</div>

@@ -87,8 +87,8 @@ export default function Create() {
             value={tag.colorCode}
             startContent={
               <div
-                className={clsx('w-4 h-4 rounded-full', themeColors[index].bg)}
-              ></div>
+                className={clsx('w-4 h-4 rounded-full', themeColors[index].darkBackground)}
+              />
             }
           >
             {tag.name}

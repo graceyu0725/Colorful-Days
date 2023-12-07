@@ -240,8 +240,8 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
   const startDate = event.startAt || new Date();
   const endDate = event.endAt || new Date();
 
-  const normalBackground = themeColors[Number(event.tag)].bg;
-  const lightBackground = themeColors[Number(event.tag)].light;
+  const normalBackground = themeColors[Number(event.tag)].darkBackground;
+  const lightBackground = themeColors[Number(event.tag)].lightBackground;
 
   // 若事件起始日 = 該格日期，在該格顯示事件標題
   if (isSameDay(startDate, cellDate)) {
@@ -252,7 +252,7 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
         return (
           <div
             className={clsx(
-              'truncate basis-0 rounded indent-1.5 hover:cursor-pointer',
+              'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white',
               normalBackground,
             )}
             style={{
@@ -297,7 +297,7 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
       return (
         <div
           className={clsx(
-            'truncate basis-0 rounded indent-1.5 hover:cursor-pointer',
+            'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white',
             normalBackground,
           )}
           // style={{ flexGrow: 7 - getDay(startDate) }}
@@ -316,7 +316,7 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
     return (
       <div
         className={clsx(
-          'truncate basis-0 rounded indent-1.5 hover:cursor-pointer',
+          'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white',
           normalBackground,
         )}
         // style={{ flexGrow: lastDays }}
@@ -343,7 +343,7 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
       return (
         <div
           className={clsx(
-            'truncate basis-0 rounded indent-1.5 hover:cursor-pointer',
+            'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white',
             normalBackground,
           )}
           // style={{ flexGrow: lastDaysThisWeek }}
@@ -362,7 +362,7 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
     return (
       <div
         className={clsx(
-          'truncate basis-0 rounded indent-1.5 hover:cursor-pointer',
+          'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white',
           normalBackground,
         )}
         style={{
@@ -377,10 +377,6 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
       </div>
     );
   }
-
-  if (event.title) {
-    // return <div className=''>{event.title}</div>;
-  }
 };
 
 // ================================================================
@@ -388,13 +384,13 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
 // ================================================================
 
 const eventCellStyles = [
-  'col-start-1 px-2 truncate max-h-5 hover:cursor-pointer',
-  'col-start-2 px-2 truncate max-h-5 hover:cursor-pointer',
-  'col-start-3 px-2 truncate max-h-5 hover:cursor-pointer',
-  'col-start-4 px-2 truncate max-h-5 hover:cursor-pointer',
-  'col-start-5 px-2 truncate max-h-5 hover:cursor-pointer',
-  'col-start-6 px-2 truncate max-h-5 hover:cursor-pointer',
-  'col-start-7 px-2 truncate max-h-5 hover:cursor-pointer',
+  'col-start-1 px-2 truncate max-h-5 hover:cursor-pointer text-white',
+  'col-start-2 px-2 truncate max-h-5 hover:cursor-pointer text-white',
+  'col-start-3 px-2 truncate max-h-5 hover:cursor-pointer text-white',
+  'col-start-4 px-2 truncate max-h-5 hover:cursor-pointer text-white',
+  'col-start-5 px-2 truncate max-h-5 hover:cursor-pointer text-white',
+  'col-start-6 px-2 truncate max-h-5 hover:cursor-pointer text-white',
+  'col-start-7 px-2 truncate max-h-5 hover:cursor-pointer text-white',
 ];
 
 // 傳入的事件已經篩選過，皆為 all-day 事件
@@ -402,6 +398,7 @@ export const renderWeeklyAllDayEvent = (
   weekDates: Date[],
   index: number,
   events: (Event | null)[],
+  setIsMoreModalOpen
 ) => {
   const { setIsEditModalOpen } = useModalStore();
   const handleClick = (event: React.MouseEvent, e: Event) => {
@@ -424,14 +421,14 @@ export const renderWeeklyAllDayEvent = (
             gridColumnStart: index + 1,
             pointerEvents: 'auto',
           }}
-          onClick={() => console.log('more', events)}
+          onClick={() => setIsMoreModalOpen(true, events)}
         >
           more
         </div>
       );
     }
 
-    const normalBackground = themeColors[Number(event.tag)].bg;
+    const normalBackground = themeColors[Number(event.tag)].darkBackground;
 
     // 事件起始日 = 該格日期
     if (isSameDay(startDate, weekDates[index])) {
@@ -558,7 +555,7 @@ export const renderWeeklyOneDayEvent = (
   const startDate = event.startAt || new Date();
   const endDate = event.endAt || new Date();
   const borderColor = themeColors[Number(event.tag)].border;
-  const lightBackground = themeColors[Number(event.tag)].light;
+  const lightBackground = themeColors[Number(event.tag)].lightBackground;
 
   // 起始日 = 該格日期下
   // 若起始日 = 結束日，按事件時間 render， 若起始日 ！= 結束日，起始日當天 render 所有格子

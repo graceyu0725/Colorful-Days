@@ -81,7 +81,7 @@ export default function Edit() {
             <div
               className={clsx(
                 'w-3 h-3 rounded-full',
-                themeColors[Number(userInput.tag)].bg,
+                themeColors[Number(userInput.tag)].darkBackground,
               )}
             />
             <div>{calendarTags[Number(userInput.tag)].name}</div>
@@ -94,7 +94,7 @@ export default function Edit() {
             value={tag.colorCode}
             startContent={
               <div
-                className={clsx('w-4 h-4 rounded-full', themeColors[index].bg)}
+                className={clsx('w-4 h-4 rounded-full', themeColors[index].darkBackground)}
               ></div>
             }
           >

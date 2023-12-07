@@ -20,7 +20,6 @@ export default function More() {
   const eventsToRender = eventsToShow.filter((event) => event !== null);
 
   return (
-    // <div className='absolute w-screen h-screen bg-slate-100 top-0 left-0'>
     <Modal
       isOpen={isMoreModalOpen}
       onOpenChange={(isOpen) => setIsMoreModalOpen(isOpen, eventsToRender)}
@@ -39,7 +38,9 @@ export default function More() {
               className={clsx(
                 'flex items-center justify-between shrink-0 truncate px-2 h-6 rounded hover:cursor-pointer',
                 event.isAllDay
-                  ? themeColors[Number(event.tag)].bg
+                  ? `${
+                      themeColors[Number(event.tag)].darkBackground
+                    } text-white`
                   : 'bg-slate-100',
               )}
               onClick={() => {
@@ -55,9 +56,9 @@ export default function More() {
                     <div
                       className={clsx(
                         'w-1 h-2/3 rounded',
-                        themeColors[Number(event.tag)].bg,
+                        themeColors[Number(event.tag)].darkBackground,
                       )}
-                    ></div>
+                    />
                     <div className='truncate'>{event.title}</div>
                   </div>
 
@@ -71,6 +72,5 @@ export default function More() {
         </ModalBody>
       </ModalContent>
     </Modal>
-    // </div>
   );
 }

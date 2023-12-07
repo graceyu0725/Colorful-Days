@@ -19,6 +19,7 @@ import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
 import { updateAllEvents } from '../../utils/handleDatesAndEvents';
 import { updateCurrentUser } from '../../utils/handleUserAndCalendar';
+import { themeColors } from '../../utils/theme';
 
 function Calendar() {
   const {
@@ -28,6 +29,7 @@ function Calendar() {
     currentCalendarId,
     setCurrentCalendarId,
     setCurrentCalendarContent,
+    setCurrentThemeColor,
   } = useAuthStore();
   const { setCalendarAllEvents } = useEventsStore();
   const { selectedEvent, setSelectedEvent } = useModalStore();
@@ -82,6 +84,11 @@ function Calendar() {
           themeColor: docSnapshot.data().themeColor,
           calendarId: docSnapshot.data().calendarId,
         });
+        setCurrentThemeColor(
+          themeColors[Number(docSnapshot.data().themeColor)],
+        );
+
+        document.title = `${docSnapshot.data().name} - Colorful Days`;
       } else {
         console.log('Calendar not found');
       }

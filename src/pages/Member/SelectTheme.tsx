@@ -51,7 +51,7 @@ export default function SelectTheme() {
     false,
     false,
   ]);
-  const [backGroundColor, setBackGroundColor] = useState('bg-slate-200');
+  const [backgroundColor, setBackgroundColor] = useState('bg-slate-200');
   const [borderColor, setBorderColor] = useState('border-slate-200');
 
   const [isButtonLoading, setIsButtonLoading] = useState(false);
@@ -68,17 +68,17 @@ export default function SelectTheme() {
     <>
       <div
         className={clsx(
-          'flex items-center justify-center h-screen bg-cover bg-slate-200',
-          backGroundColor,
+          'flex items-center justify-center h-screen bg-cover bg-slate-200 transition-colors',
+          backgroundColor,
         )}
       >
-        <Card className='w-11/12 p-0 rounded-none flex flex-col items-center justify-center gap-10 z-10 h-5/6'>
+        <Card className='w-10/12 h-3/4 p-0 rounded-2xl flex flex-col items-center justify-center gap-10 z-10'>
           <div className='flex flex-col items-center gap-5'>
             <div className='text-2xl font-bold'>Name Your Calendar</div>
             <input
               name='name'
               className={clsx(
-                'border-2 w-72 h-16 rounded-lg px-5 text-lg',
+                'leading-[64px] border-2 w-72 h-16 rounded-lg px-5 text-lg',
                 borderColor,
               )}
               value={calendarInfo.name}
@@ -93,9 +93,9 @@ export default function SelectTheme() {
                   key={index}
                   className={clsx(
                     '-skew-x-12 bg-slate-200 w-12 h-48 rounded',
-                    color.bg,
+                    color.background,
                     {
-                      ['outline outline-3 outline-offset-2 outline-slate-500']:
+                      ['outline outline-3 outline-offset-2 outline-slate-300']:
                         isSelected[index],
                     },
                   )}
@@ -106,7 +106,7 @@ export default function SelectTheme() {
                       prevState.map((_, idx) => (idx === index ? true : false)),
                     );
                     updateCalendarInfo(e);
-                    setBackGroundColor(themeColors[index].bg);
+                    setBackgroundColor(themeColors[index].background);
                     setBorderColor(themeColors[index].border);
                   }}
                 />
@@ -116,11 +116,11 @@ export default function SelectTheme() {
           <Button
             isLoading={isButtonLoading}
             color='default'
-            className='w-32'
+            className={clsx('w-32 text-slate-700 text-base transition-colors',backgroundColor)}
             disabled={!calendarInfo.name || !calendarInfo.themeColor}
             onClick={handleSubmit}
           >
-            送出
+            Submit
           </Button>
         </Card>
       </div>

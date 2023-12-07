@@ -3,6 +3,7 @@ import { addDays, addMonths, subDays, subMonths } from 'date-fns';
 import CodiconFilter from '~icons/codicon/filter';
 import LucideAlignJustify from '~icons/lucide/align-justify';
 // import MaterialSymbolsStickyNote2OutlineRounded from '~icons/material-symbols/sticky-note-2-outline-rounded';
+import { useNavigate } from 'react-router-dom';
 import TdesignAdd from '~icons/tdesign/add';
 import { useModalStore } from '../../store/modalStore';
 import { CalendarViewCategory, useViewStore } from '../../store/viewStore';
@@ -40,6 +41,7 @@ const Navigation: React.FC<Props> = ({
     setCurrentDate,
     formateDate,
   } = useViewStore();
+  const navigate = useNavigate();
 
   const changeMonth = (actionType: string) => {
     switch (actionType) {
@@ -70,15 +72,24 @@ const Navigation: React.FC<Props> = ({
     <div className={styles.container}>
       <div className='flex items-center'>
         <LucideAlignJustify
-          className='mr-4 text-xl text-[#5a3a1b] hover:cursor-pointer'
+          className='mr-4 text-xl hover:cursor-pointer'
           onClick={() => setIsSideNavigationOpen((prev) => !prev)}
         />
 
         <div className='flex items-center justify-center'>
-          <img src='/assets/logo.png' className='w-10 ml-6' />
-          <h1 className='px-1 text-lg font-bold text-[#5a3a1b] mr-4'>
-            Colorful Days
-          </h1>
+          <div className='flex items-end'>
+            <img
+              src='/assets/logo.png'
+              className='hover:cursor-pointer w-9 ml-6'
+              onClick={() => navigate('/calendar')}
+            />
+            <h1
+              className='hover:cursor-pointer font-custom font-bold px-1 text-2xl mr-4 text-theme-1-300'
+              onClick={() => navigate('/calendar')}
+            >
+              Colorful Days
+            </h1>
+          </div>
 
           <Button
             variant='bordered'
