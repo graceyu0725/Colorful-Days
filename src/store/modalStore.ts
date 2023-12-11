@@ -17,9 +17,9 @@ interface ModalState {
   selectedEvent: Event;
   setSelectedEvent: (event: Event) => void;
   setIsEditModalOpen: (isOpen: boolean, event: Event) => void;
-  eventsToShow: Event[];
+  eventsToShow: (Event|null)[];
   isMoreModalOpen: boolean;
-  setIsMoreModalOpen: (isOpen: boolean, events: Event[]) => void;
+  setIsMoreModalOpen: (isOpen: boolean, events: (Event | null)[]) => void;
   isAddCalendarModalOpen: boolean;
   setIsAddCalendarModalOpen: (isOpen: boolean) => void;
 }

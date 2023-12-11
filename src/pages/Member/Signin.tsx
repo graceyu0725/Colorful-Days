@@ -178,9 +178,10 @@ function Signin() {
                         type='email'
                         autoComplete='email'
                         required
+                        placeholder='email@example.com'
                         value={userInput.email}
                         onChange={updateUserInput}
-                        className='leading-[44px] h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
+                        className='placeholder:h-11 placeholder:text-sm leading-[44px] h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
                       />
                     </div>
 
@@ -197,9 +198,10 @@ function Signin() {
                         type='password'
                         autoComplete='current-password'
                         required
+                        placeholder='At least 6 characters'
                         value={userInput.password}
                         onChange={updateUserInput}
-                        className='tracking-widest h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
+                        className='placeholder:h-11 placeholder:tracking-normal placeholder:text-sm tracking-widest h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
                       />
                     </div>
 

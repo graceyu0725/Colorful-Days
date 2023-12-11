@@ -1,4 +1,5 @@
-import { Timestamp } from "firebase/firestore";
+import { addMinutes } from 'date-fns';
+import { Timestamp } from 'firebase/firestore';
 
 export interface EventMessages {
   arthur: User;
@@ -24,7 +25,7 @@ export const initialEvent = {
   eventId: 0,
   title: '',
   startAt: new Date(),
-  endAt: new Date(),
+  endAt: addMinutes(new Date(), 15),
   isAllDay: false,
   isMemo: false,
   tag: '0',

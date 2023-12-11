@@ -14,14 +14,17 @@ import {
   format,
 } from 'date-fns';
 import { Timestamp, collection, deleteDoc, doc } from 'firebase/firestore';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import FluentNotepad28Filled from '~icons/fluent/notepad-28-filled';
 import MaterialSymbolsSubdirectoryArrowLeftRounded from '~icons/material-symbols/subdirectory-arrow-left-rounded';
+import MdiTag from '~icons/mdi/tag';
+import UisCommentDots from '~icons/uis/comment-dots';
 import { useAuthStore } from '../../store/authStore';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
 import { addNewComment } from '../../utils/handleUserAndCalendar';
 import { themeColors } from '../../utils/theme';
-import { defaultTags, initialEvent } from '../../utils/types';
+import { defaultTags } from '../../utils/types';
 import avatarImage from '../SideNavigation/avatar.png';
 
 interface Props {
@@ -32,6 +35,23 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
   const { selectedEvent, setIsEditModalOpen } = useModalStore();
   const { currentUser, currentCalendarId, currentCalendarContent } =
     useAuthStore();
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [selectedEvent.messages]);
+
+  const [isComposing, setIsComposing] = useState(false);
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
+  };
 
   const renderTime = () => {
     const startDate = selectedEvent.startAt
@@ -44,27 +64,53 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     }
 
     if (selectedEvent.isAllDay) {
-      const start = format(startDate, 'yyyy E, LLL dd');
-      const end = format(endDate, 'yyyy E, LLL dd');
-      if (start === end) {
-        return <div>{start}</div>;
-      }
+      const startDateYear = format(startDate, 'LLL dd, yyyy');
+      const startTime = format(startDate, 'E');
+      const endDateYear = format(endDate, 'LLL dd, yyyy');
+      const endTime = format(endDate, 'E');
+
       return (
-        <>
-          <div>{start}</div>
-          <div>－</div>
-          <div>{end}</div>
-        </>
+        <div className='flex gap-6 items-center justify-center'>
+          <div className='flex flex-col'>
+            <div className='text-base'>{startTime}</div>
+            <div className='text-xl'>{startDateYear}</div>
+          </div>
+          <div
+            className={clsx(
+              'w-5 h-5 border-t-5 border-r-5 rounded rotate-45',
+              themeColors[Number(selectedEvent.tag)].border,
+            )}
+          />
+          <div className='flex flex-col'>
+            <div className='text-base'>{endTime}</div>
+            <div className='text-xl'>{endDateYear}</div>
+          </div>
+        </div>
       );
     }
-    const start = format(startDate, 'E, LLL dd yyyy HH:mm');
-    const end = format(endDate, 'E, LLL dd yyyy HH:mm');
+
+    const startDay = format(startDate, 'E, LLL dd yyyy');
+    const startTime = format(startDate, 'HH:mm');
+    const endDay = format(endDate, 'E, LLL dd yyyy');
+    const endTime = format(endDate, 'HH:mm');
+
     return (
-      <>
-        <div>{start}</div>
-        <div>－</div>
-        <div>{end}</div>
-      </>
+      <div className='flex gap-6 items-center justify-center'>
+        <div className='flex flex-col'>
+          <div className='text-base'>{startDay}</div>
+          <div className='text-xl'>{startTime}</div>
+        </div>
+        <div
+          className={clsx(
+            'w-5 h-5 border-t-5 border-r-5 rounded rotate-45',
+            themeColors[Number(selectedEvent.tag)].border,
+          )}
+        />
+        <div className='flex flex-col'>
+          <div className='text-base'>{endDay}</div>
+          <div className='text-xl'>{endTime}</div>
+        </div>
+      </div>
     );
   };
 
@@ -81,7 +127,7 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     );
     const eventRef = doc(eventsCollection, selectedEvent.eventId.toString());
     await deleteDoc(eventRef);
-    setIsEditModalOpen(false, initialEvent);
+    setIsEditModalOpen(false, selectedEvent);
   };
 
   const calendarTags = currentCalendarContent.tags || defaultTags;
@@ -107,19 +153,17 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     const daysDiff = differenceInDays(now, originTime);
 
     if (secondsDiff < 30) return 'just now';
-    if (secondsDiff < 61) return '1 min ago';
+    if (secondsDiff < 120) return '1 min ago';
     if (minutesDiff < 45) return `${minutesDiff} mins ago`;
-    if (minutesDiff < 90) return '1 hr ago';
+    if (minutesDiff < 120) return '1 hr ago';
     if (hoursDiff < 24) return `${hoursDiff} hrs ago`;
-    if (hoursDiff < 42) return '1 day ago';
+    if (hoursDiff < 48) return '1 day ago';
     if (daysDiff < 30) return `${daysDiff} days ago`;
     if (daysDiff < 45) return '1 month ago';
     if (daysDiff >= 45) return format(originTime, 'LLL dd, yyyy');
   };
 
   const renderComments = () => {
-    if (selectedEvent.isMemo) return;
-
     return (
       <div className='h-40 flex flex-col gap-2 overflow-y-auto px-1'>
         {selectedEvent.messages.map((message, index) => (
@@ -147,7 +191,8 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
                       <div
                         className={clsx(
                           'text-sm max-w-[200px] min-h-[28px] px-2 leading-7 break-words rounded-lg',
-                          themeColors[Number(selectedEvent.tag)].lightBackground,
+                          themeColors[Number(selectedEvent.tag)]
+                            .lightBackground,
                         )}
                       >
                         {message.content}
@@ -183,6 +228,7 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
     );
   };
@@ -191,69 +237,102 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     <>
       <ModalHeader className='py-3'>View Event</ModalHeader>
       <Divider />
-      <ModalBody>
-        <div className='flex items-center'>
-          <div className='w-14 border-r-1 border-gray-500 mr-4'>Title</div>
-          <div>{selectedEvent.title}</div>
-        </div>
-        <div className='flex items-center'>
-          <div className='w-14 border-r-1 border-gray-500 mr-4'>Time</div>
-          {renderTime()}
-        </div>
-        <div className='flex items-center'>
-          <div className='w-14 border-r-1 border-gray-500 mr-4'>Tag</div>
-
-          <div className='flex items-center gap-1'>
-            <div
-              className={clsx(
-                'w-3 h-3 rounded-full',
-                themeColors[Number(selectedEvent.tag)].darkBackground,
-              )}
-            />
-            <div>{calendarTags[Number(selectedEvent.tag)].name}</div>
+      <ModalBody className='pt-3'>
+        <div className='flex items-center px-2'>
+          <div
+            className={clsx(
+              'w-full text-2xl break-words text-center',
+              themeColors[Number(selectedEvent.tag)].text,
+            )}
+          >
+            {selectedEvent.title}
           </div>
         </div>
-        <div className='flex items-center'>
-          <div className='w-14 border-r-1 border-gray-500 mr-4'>Note</div>
-          <div>{selectedEvent.note}</div>
+
+        <div className='flex items-center justify-center px-2 gap-1 text-sm'>
+          <MdiTag
+            className={clsx(themeColors[Number(selectedEvent.tag)].text)}
+          />
+          <div className='leading-4'>
+            {calendarTags[Number(selectedEvent.tag)].name}
+          </div>
         </div>
-        {!selectedEvent.isMemo && (
+
+        <div className='flex items-center justify-center text-lg'>
+          {renderTime()}
+        </div>
+
+        {selectedEvent.note && (
           <>
             <Divider />
-            <div>Comments</div>
-            <Divider />
-            {renderComments()}
-            <Divider />
-            <div className='flex items-center gap-2'>
-              <input
-                className='border rounded-lg text-sm h-10 leading-10 px-2 grow'
-                placeholder='Add a comment'
-                value={commentInput}
-                onChange={(e) => setCommentInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleAddComment();
-                  }
-                }}
-              />
-              <MaterialSymbolsSubdirectoryArrowLeftRounded
-                className='w-5 h-5 hover:cursor-pointer'
-                onClick={handleAddComment}
-              />
+            <div className='flex items-center gap-5'>
+              <div className='flex items-center gap-1'>
+                <FluentNotepad28Filled
+                  className={clsx(themeColors[Number(selectedEvent.tag)].text)}
+                />
+                <div>Note</div>
+              </div>
+              <div className={clsx('w-4/5 break-words rounded-lg p-2')}>
+                {selectedEvent.note}
+              </div>
             </div>
-
-            <Divider />
           </>
         )}
+
+        <Divider />
+        <div className='flex items-center gap-1'>
+          <UisCommentDots
+            className={clsx(themeColors[Number(selectedEvent.tag)].text)}
+          />
+          <div>Comments</div>
+        </div>
+        <Divider />
+        {renderComments()}
+        <div className='flex items-center gap-2'>
+          <input
+            className={clsx(
+              'border rounded-lg text-sm h-10 leading-10 px-2 grow',
+              themeColors[Number(selectedEvent.tag)].outline,
+            )}
+            placeholder='Add a comment'
+            value={commentInput}
+            onChange={(e) => setCommentInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !isComposing) {
+                handleAddComment();
+              }
+            }}
+            onCompositionStart={handleCompositionStart}
+            onCompositionEnd={handleCompositionEnd}
+          />
+          <MaterialSymbolsSubdirectoryArrowLeftRounded
+            className='w-5 h-5 hover:cursor-pointer'
+            onClick={handleAddComment}
+          />
+        </div>
+        <Divider />
       </ModalBody>
 
-      <ModalFooter>
-        <Button color='primary' onPress={handleEdit} className='w-1/2'>
-          編輯
-        </Button>
-        <Button color='danger' onPress={handleDelete} className='w-1/2'>
-          刪除
-        </Button>
+      <ModalFooter className='flex items-center pt-1'>
+        <div className='w-full flex gap-2'>
+          <Button
+            variant='bordered'
+            onPress={handleDelete}
+            className='w-1/2 text-red-500'
+          >
+            Delete
+          </Button>
+          <Button
+            color='primary'
+            onPress={handleEdit}
+            className={clsx(
+              'w-1/2',
+              themeColors[Number(selectedEvent.tag)].darkBackground,
+            )}
+          >
+            Edit
+          </Button>
+        </div>
       </ModalFooter>
     </>
   );

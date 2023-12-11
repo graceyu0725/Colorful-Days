@@ -15,7 +15,7 @@ export default function SelectTheme() {
   if (!state) return <Navigate to='/signup' replace />;
 
   const [calendarInfo, setCalendarInfo] = useState<CalendarInfo>({
-    name: "Pikachu's calendar",
+    name: `${state.userInfo.name}'s Calendar`,
     themeColor: '',
   });
 
@@ -78,7 +78,7 @@ export default function SelectTheme() {
             <input
               name='name'
               className={clsx(
-                'leading-[64px] border-2 w-72 h-16 rounded-lg px-5 text-lg',
+                'leading-[64px] border-2 w-72 h-16 rounded-lg px-5 text-lg focus:outline-none',
                 borderColor,
               )}
               value={calendarInfo.name}
@@ -116,7 +116,10 @@ export default function SelectTheme() {
           <Button
             isLoading={isButtonLoading}
             color='default'
-            className={clsx('w-32 text-slate-700 text-base transition-colors',backgroundColor)}
+            className={clsx(
+              'w-32 text-slate-700 text-base transition-colors',
+              backgroundColor,
+            )}
             disabled={!calendarInfo.name || !calendarInfo.themeColor}
             onClick={handleSubmit}
           >

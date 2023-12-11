@@ -74,7 +74,7 @@ const WeeklyView: React.FC = () => {
     return startTime;
   };
 
-  const [topPosition, setTopPosition] = useState(0);
+  const [topPosition, setTopPosition] = useState(1440);
   useEffect(() => {
     const updatePosition = () => {
       const today = startOfToday();
@@ -99,7 +99,7 @@ const WeeklyView: React.FC = () => {
         id='weekly-view-header'
         className='w-full min-h-[120px] bg-gray-50 grid grid-rows-weeklyHeader grid-cols-weeklyHeader'
       >
-        <div className='col-start-1'></div>
+        <div className='col-start-1 border-r -mr-px'/>
         <div className='col-start-2 pl-1 text-sm font-bold'>Sun</div>
         <div className='col-start-3 pl-1 text-sm font-bold'>Mon</div>
         <div className='col-start-4 pl-1 text-sm font-bold'>Tue</div>
@@ -108,6 +108,7 @@ const WeeklyView: React.FC = () => {
         <div className='col-start-7 pl-1 text-sm font-bold'>Fri</div>
         <div className='col-start-8 pl-1 text-sm font-bold'>Sat</div>
 
+      <div className= 'col-start-1 row-start-2 border-r -mr-px z-10'/>
         {weekDates.map((weekDate, index) => (
           <div
             key={index}
@@ -128,21 +129,17 @@ const WeeklyView: React.FC = () => {
           </div>
         ))}
 
-        <div className='col-start-1 row-start-3 border-b pl-4 text-sm mt-2'>
+        <div className='col-start-1 row-start-3 border-b border-r pl-4 text-sm pt-2 -mr-px'>
           All-day
         </div>
         {/* 這裡用來放整日的時間  */}
         <AllDayEventCells weekDates={weekDates} />
-
-        {/* <div className='col-start-2 row-start-3 border-b col-span-7 grid grid-cols-7 text-sm mt-2'>
-          <div>Event rowwww Events</div>
-        </div> */}
       </div>
 
       {/* 一個大 Grid 包含左邊時間列及中間 Time table，Time table 也需要一個 Grid */}
       <div
         id='weekly-view-time-table'
-        className='relative w-full grid grid-cols-weeklyTimeTable grid-rows-weeklyTimeTable overflow-y-scroll pr-[14px]'
+        className='relative w-full grid grid-cols-weeklyTimeTable grid-rows-weeklyTimeTable overflow-y-scroll'
       >
         {/* 時間線 */}
         <div
@@ -172,7 +169,7 @@ const WeeklyView: React.FC = () => {
                 <>
                   <div
                     key={`row-1-${timeStyle}-${index}`}
-                    className='border-b border-dashed hover:bg-slate-50'
+                    className='border-b border-dashed hover:bg-slate-100'
                     onClick={() =>
                       setIsCreateModalOpen(
                         true,
@@ -184,7 +181,7 @@ const WeeklyView: React.FC = () => {
                   ></div>
                   <div
                     key={`row-2-${index}`}
-                    className='border-b hover:bg-slate-50'
+                    className='border-b hover:bg-slate-100'
                     onClick={() =>
                       setIsCreateModalOpen(
                         true,

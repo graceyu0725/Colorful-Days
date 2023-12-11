@@ -34,7 +34,7 @@ const SideBar: React.FC<Props> = ({ isSideBarOpen }) => {
     <>
       <div
         className={clsx(
-          'w-0 overflow-hidden border-slate-300 transition-all flex flex-col',
+          'w-0 overflow-y-scroll border-slate-300 transition-all flex flex-col',
           {
             'w-60 border-l px-3 py-4': isSideBarOpen,
           },

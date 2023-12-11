@@ -112,13 +112,18 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
 
   return (
     <div
-      className={clsx('flex', {
-        'w-0': !isSideNavigationOpen,
-      })}
+      className={clsx(
+        'flex transition-all duration-300 ease-in-out',
+        isSideNavigationOpen
+          ? currentPanel
+            ? 'w-72'
+            : 'opacity-100 w-16'
+          : 'opacity-0 w-0',
+      )}
     >
       <div
         className={clsx(
-          'w-16 pl-1 pt-3 h-full flex flex-col border-r transition-all',
+          'w-16 pl-1 pt-3 h-full flex flex-col border-r',
           { 'w-0 hidden': !isSideNavigationOpen },
           // {
           //   ['hidden']: !isSideNavigationOpen,
@@ -129,7 +134,7 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
         <div className='flex items-center flex-col gap-4 overflow-hidden h-full'>
           <Popover placement='bottom-start'>
             <PopoverTrigger>
-              <button className='outline-none mt-1'>
+              <button className='outline-none mt-1 w-full flex justify-center mr-px'>
                 {currentUser.avatar ? (
                   <Avatar
                     className={clsx(
@@ -141,7 +146,7 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
                 ) : (
                   <img
                     className={clsx(
-                      'w-9 h-9 p-0 border-2 rounded-full',
+                      'w-9 h-9 p-0 border-2 rounded-full ',
                       currentThemeColor.border,
                     )}
                     src={AvatarImage}

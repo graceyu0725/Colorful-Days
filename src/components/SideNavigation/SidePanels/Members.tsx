@@ -43,15 +43,24 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
   const [searchResult, setSearchResult] = useState<User | string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isMemberExist, setIsMemberExist] = useState(false);
+  const [isComposing, setIsComposing] = useState(false);
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value);
+    const updatedValue = e.target.value.replace(/\s+/g, '');
+    setSearchInput(updatedValue);
     setSearchResult(null);
     setIsMemberExist(false);
   };
 
   const handleSearch = async () => {
-    if (!searchInput) return;
     setIsLoading(true);
     const result = await getMemberSearchResults(searchInput);
 
@@ -183,7 +192,12 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
       </div>
 
       <div className='flex-col items-center justify-center gap-2'>
-        <Card className='mt-2 shadow border'>
+        <Card
+          className={clsx(
+            'mt-2 shadow border-2',
+            currentThemeColor.lightBorder,
+          )}
+        >
           <CardHeader>
             <div>Invite Friends</div>
           </CardHeader>
@@ -191,22 +205,31 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
           <CardBody className='relative'>
             <div className='flex items-center justify-between'>
               <input
-                className='border rounded-lg px-2 w-[150px] text-sm h-9 leading-9 mb-2 focus:outline-slate-300'
+                className={clsx(
+                  'border rounded-lg px-2 w-[150px] text-sm h-9 leading-9 placeholder:h-9 mb-2 placeholder',
+                  currentThemeColor.outline,
+                )}
                 placeholder='Search by email'
                 value={searchInput}
                 onChange={(e) => handleInputChange(e)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === 'Enter' && !isComposing && searchInput) {
                     handleSearch();
                   }
                 }}
+                onCompositionStart={handleCompositionStart}
+                onCompositionEnd={handleCompositionEnd}
               />
               <IcRoundSearch
                 className={clsx(
                   'text-2xl mb-2 -mr-2 hover:cursor-pointer',
                   currentThemeColor.text,
                 )}
-                onClick={handleSearch}
+                onClick={() => {
+                  if (searchInput) {
+                    handleSearch();
+                  }
+                }}
               />
             </div>
 
@@ -233,7 +256,12 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
           </CardBody>
         </Card>
 
-        <Card className='mt-4 shadow border'>
+        <Card
+          className={clsx(
+            'mt-4 shadow border-2',
+            currentThemeColor.lightBorder,
+          )}
+        >
           <CardHeader>
             <div>Member List ({memberDetails.length})</div>
           </CardHeader>

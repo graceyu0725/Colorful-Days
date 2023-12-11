@@ -42,16 +42,17 @@ export default function AddCalendar() {
 
   const [borderColor, setBorderColor] = useState('border-slate-200');
   const [backgroundColor, setBackgroundColor] = useState('bg-slate-200');
-  const [isSelected, setIsSelected] = useState([
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ]);
+  const [isSelected, setIsSelected] = useState(Array(8).fill(false));
+
+  const resetInfo = () => {
+    setCalendarInfo({
+      name: '',
+      themeColor: '',
+    });
+    setBorderColor('border-slate-200');
+    setBackgroundColor('bg-slate-200');
+    setIsSelected(Array(8).fill(false));
+  };
 
   const handleSubmit = () => {
     createNewCalendar(
@@ -64,17 +65,19 @@ export default function AddCalendar() {
       resetAllEvents,
     );
     setIsAddCalendarModalOpen(false);
-    setCalendarInfo({
-      name: '',
-      themeColor: '',
-    });
+    resetInfo();
   };
 
   return (
     <>
       <Modal
         isOpen={isAddCalendarModalOpen}
-        onOpenChange={(isOpen) => setIsAddCalendarModalOpen(isOpen)}
+        onOpenChange={(isOpen) => {
+          setIsAddCalendarModalOpen(isOpen);
+          if (!isOpen) {
+            resetInfo();
+          }
+        }}
         size='4xl'
       >
         <ModalContent
@@ -88,7 +91,7 @@ export default function AddCalendar() {
             <input
               name='name'
               className={clsx(
-                'border-2 w-72 h-16 leading-[64px] rounded-lg px-5 text-lg',
+                'border-2 w-72 h-16 leading-[64px] rounded-lg px-5 text-lg focus:outline-none',
                 borderColor,
               )}
               value={calendarInfo.name}

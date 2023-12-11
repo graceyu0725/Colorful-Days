@@ -9,6 +9,7 @@ import {
 import clsx from 'clsx';
 import MaterialSymbolsRemoveSelection from '~icons/material-symbols/remove-selection';
 import MaterialSymbolsSelectCheckBox from '~icons/material-symbols/select-check-box';
+import { useAuthStore } from '../../../store/authStore';
 import { useEventsStore } from '../../../store/eventsStore';
 import { themeColors } from '../../../utils/theme';
 import { CalendarTag } from '../../../utils/types';
@@ -19,10 +20,16 @@ type Props = {
 
 const TagFilter: React.FC<Props> = ({ calendarTags }) => {
   const { selectedEventTags, setSelectedEventTags } = useEventsStore();
+  const { currentThemeColor } = useAuthStore();
 
   return (
     <div className='mb-2'>
-      <Card className='w-full h-full shadow border'>
+      <Card
+        className={clsx(
+          'w-full h-full shadow border-2',
+          currentThemeColor.lightBorder,
+        )}
+      >
         <CardHeader className='flex justify-between'>
           <p>Tag Filter</p>
           <div className='flex gap-2'>
