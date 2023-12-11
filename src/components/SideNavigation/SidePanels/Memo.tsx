@@ -12,9 +12,10 @@ import {
 } from '@nextui-org/react';
 import clsx from 'clsx';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import MaterialSymbolsNoteStackAddRounded from '~icons/material-symbols/note-stack-add-rounded';
 import MaterialSymbolsStickyNote2OutlineRounded from '~icons/material-symbols/sticky-note-2-outline-rounded';
-import MdiTag from '~icons/mdi/tag'
+import MdiTag from '~icons/mdi/tag';
 import { useAuthStore } from '../../../store/authStore';
 import { useModalStore } from '../../../store/modalStore';
 import { addNewMemo } from '../../../utils/handleUserAndCalendar';
@@ -50,6 +51,18 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
     await addNewMemo(selectedTag, memoInput, currentCalendarContent.calendarId);
     setMemoInput('');
     setSelectedTag('0');
+
+    toast.success('Memo added successfully!', {
+      style: {
+        border: '1px solid #7a615a',
+        padding: '8px',
+        color: '#7a615a',
+      },
+      iconTheme: {
+        primary: '#7a615a',
+        secondary: '#FFFAEE',
+      },
+    });
   };
 
   return (
@@ -149,7 +162,10 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
         </Card>
 
         <Card
-          className={clsx('mt-4 shadow border-2', currentThemeColor.lightBorder)}
+          className={clsx(
+            'mt-4 shadow border-2',
+            currentThemeColor.lightBorder,
+          )}
         >
           <CardHeader>
             <div>Memo List ({memoEvents.length})</div>

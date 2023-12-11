@@ -20,7 +20,7 @@ const firebaseConfig = {
   appId: '1:105839792711:web:43e06f4fb81161f93e9762',
 };
 
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
@@ -42,10 +42,30 @@ export const firebase = {
       navigate('/calendar');
     } catch (e: any) {
       if (e.message === 'Firebase: Error (auth/email-already-in-use).') {
-        toast.error('此 Email 已被註冊');
+        toast.error('This email has already been registered.', {
+          style: {
+            border: '1px solid #7a615a',
+            padding: '8px',
+            color: '#7a615a',
+          },
+          iconTheme: {
+            primary: '#7a615a',
+            secondary: '#FFFAEE',
+          },
+        });
         navigate('/signup');
       } else {
-        toast.error('資料格式不正確，請再試一次');
+        toast.error('The data format is incorrect, please try again.', {
+          style: {
+            border: '1px solid #7a615a',
+            padding: '8px',
+            color: '#7a615a',
+          },
+          iconTheme: {
+            primary: '#7a615a',
+            secondary: '#FFFAEE',
+          },
+        });
         navigate('/signup');
       }
       localStorage.removeItem('uid');
@@ -61,7 +81,7 @@ export const firebase = {
       localStorage.setItem('uid', data.user.uid);
       navigate('/calendar');
     } catch (e) {
-      toast.error('帳號或密碼錯誤');
+      toast.error('Incorrect username or password.');
       localStorage.removeItem('uid');
       console.error(e);
     }
@@ -76,5 +96,6 @@ export const firebase = {
         localStorage.removeItem('uid');
         console.error(error);
       });
+    document.title = 'Colorful Days';
   },
 };

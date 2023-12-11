@@ -102,7 +102,6 @@ export const addUserForGoogle = async (
       calendars: [calendarDocRef.id],
     };
     await setDoc(docRef, newUser);
-    // alert('註冊成功');
     // updateCurrentUser(userInfo.uid,setCurrentUser);
     navigate('/calendar');
   }

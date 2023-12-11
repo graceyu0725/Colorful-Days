@@ -2,6 +2,7 @@ import { Modal, ModalContent } from '@nextui-org/react';
 import { addMinutes } from 'date-fns';
 import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useAuthStore } from '../../store/authStore';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
@@ -24,7 +25,7 @@ export default function Create() {
 
   const [userInput, setUserInput] = useState<Event | CreateEvent>({
     ...initialEvent,
-    tag: currentCalendarContent.themeColor,
+    // tag: currentCalendarContent.themeColor,
   });
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isTitleEmpty, setIsTitleEmpty] = useState(false);
@@ -46,6 +47,17 @@ export default function Create() {
     const calendarRef = doc(db, 'Calendars', currentCalendarId);
     const eventRef = doc(calendarRef, 'events', id);
     await setDoc(eventRef, data);
+    toast.success('Event added successfully!', {
+      style: {
+        border: '1px solid #7a615a',
+        padding: '8px',
+        color: '#7a615a',
+      },
+      iconTheme: {
+        primary: '#7a615a',
+        secondary: '#FFFAEE',
+      },
+    });
   };
 
   const handleSubmit = async () => {
@@ -114,7 +126,7 @@ export default function Create() {
             isTitleEmpty,
             handleCancel,
             handleSubmit,
-            true
+            true,
           )}
         </ModalContent>
       </Modal>

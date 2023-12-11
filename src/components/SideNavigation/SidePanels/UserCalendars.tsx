@@ -8,6 +8,7 @@ import {
 } from '@nextui-org/react';
 import clsx from 'clsx';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import MaterialSymbolsAddBoxOutlineRounded from '~icons/material-symbols/add-box-outline-rounded';
 import PhDotsThreeVerticalBold from '~icons/ph/dots-three-vertical-bold';
 import UilSchedule from '~icons/uil/schedule';
@@ -43,8 +44,10 @@ const UserCalendars: React.FC<Props> = ({
   const [hoveredCalendarId, setHoveredCalendarId] = useState<string | null>(
     null,
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDeleteCalendar = async (calendarDetail: CalendarContent) => {
+    setIsLoading(true);
     await deleteCalendar(calendarDetail);
     // updateCalendarContent(
     //   previousCalendarId,
@@ -58,6 +61,19 @@ const UserCalendars: React.FC<Props> = ({
       setCurrentCalendarId,
       setCurrentCalendarContent,
     );
+    setIsLoading(false);
+
+    toast.success('Calendar removed successfully!', {
+      style: {
+        border: '1px solid #7a615a',
+        padding: '8px',
+        color: '#7a615a',
+      },
+      iconTheme: {
+        primary: '#7a615a',
+        secondary: '#FFFAEE',
+      },
+    });
   };
 
   return (
@@ -121,6 +137,7 @@ const UserCalendars: React.FC<Props> = ({
                   </PopoverTrigger>
                   <PopoverContent className='p-0 rounded-lg'>
                     <Button
+                      isLoading={isLoading}
                       color='danger'
                       variant='bordered'
                       className='p-0 border-0'

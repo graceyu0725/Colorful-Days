@@ -35,7 +35,7 @@ const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
       {children}
     </div>
   );
-
+  
   return (
     <EventCellsWrapper id='eventCellsWrapper'>
       <EventRow id='eventRow'>

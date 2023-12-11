@@ -19,11 +19,10 @@ import { Event } from './types';
 // ================================================================
 export const updateAllEvents = (
   snapshot: any,
-  setAllEvents: (event: Event[]) => void,
+  setCalendarAllEvents: (event: Event[]) => void,
   selectedEvent?: Event,
   setSelectedEvent?: (event: Event) => void,
 ) => {
-  console.log('updateAllEvents');
   const newEvents = snapshot.docs.map((doc: any) => {
     const eventData = {
       ...doc.data(),
@@ -41,7 +40,7 @@ export const updateAllEvents = (
     return eventData;
   }) as Event[];
 
-  setAllEvents(newEvents);
+  setCalendarAllEvents(newEvents);
 };
 
 export function splitDatesIntoWeeks(monthDates: Date[]) {
@@ -335,7 +334,6 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
 
   // 若為當週第一天，且事件起始日 != 該格日期，需判斷該格是否有需要接續的事件
   if (getDay(cellDate) === 0) {
-    console.log('遇到跨週事件');
     const lastDays = differenceInCalendarDays(endDate, startDate) + 1;
     const lastDaysThisWeek =
       lastDays - differenceInCalendarDays(cellDate, startDate);

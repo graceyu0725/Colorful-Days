@@ -8,6 +8,7 @@ import { useModalStore } from '../../store/modalStore';
 import { createNewCalendar } from '../../utils/handleUserAndCalendar';
 import { themeColors } from '../../utils/theme';
 import { CalendarInfo } from '../../utils/types';
+import toast from 'react-hot-toast';
 
 export default function AddCalendar() {
   const { currentUser, setCurrentCalendarId, setCurrentCalendarContent } =
@@ -43,6 +44,7 @@ export default function AddCalendar() {
   const [borderColor, setBorderColor] = useState('border-slate-200');
   const [backgroundColor, setBackgroundColor] = useState('bg-slate-200');
   const [isSelected, setIsSelected] = useState(Array(8).fill(false));
+  const [isLoading, setIsLoading] = useState(false);
 
   const resetInfo = () => {
     setCalendarInfo({
@@ -54,8 +56,9 @@ export default function AddCalendar() {
     setIsSelected(Array(8).fill(false));
   };
 
-  const handleSubmit = () => {
-    createNewCalendar(
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    await createNewCalendar(
       currentUser.email,
       currentUser.userId,
       calendarInfo.name,
@@ -66,6 +69,19 @@ export default function AddCalendar() {
     );
     setIsAddCalendarModalOpen(false);
     resetInfo();
+    setIsLoading(false);
+
+    toast.success('Calendar added successfully!', {
+      style: {
+        border: '1px solid #7a615a',
+        padding: '8px',
+        color: '#7a615a',
+      },
+      iconTheme: {
+        primary: '#7a615a',
+        secondary: '#FFFAEE',
+      },
+    });
   };
 
   return (
@@ -129,6 +145,7 @@ export default function AddCalendar() {
 
           <div>
             <Button
+              isLoading={isLoading}
               color='default'
               className={clsx(
                 'w-32 text-slate-700 text-base transition-colors',

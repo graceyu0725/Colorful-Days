@@ -15,6 +15,7 @@ import {
 } from 'date-fns';
 import { Timestamp, collection, deleteDoc, doc } from 'firebase/firestore';
 import { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import FluentNotepad28Filled from '~icons/fluent/notepad-28-filled';
 import MaterialSymbolsSubdirectoryArrowLeftRounded from '~icons/material-symbols/subdirectory-arrow-left-rounded';
 import MdiTag from '~icons/mdi/tag';
@@ -128,6 +129,18 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     const eventRef = doc(eventsCollection, selectedEvent.eventId.toString());
     await deleteDoc(eventRef);
     setIsEditModalOpen(false, selectedEvent);
+
+    toast.success('Event deleted successfully!', {
+      style: {
+        border: '1px solid #7a615a',
+        padding: '8px',
+        color: '#7a615a',
+      },
+      iconTheme: {
+        primary: '#7a615a',
+        secondary: '#FFFAEE',
+      },
+    });
   };
 
   const calendarTags = currentCalendarContent.tags || defaultTags;
@@ -265,14 +278,18 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
         {selectedEvent.note && (
           <>
             <Divider />
-            <div className='flex items-center gap-5'>
+            <div className='flex items-start gap-5'>
               <div className='flex items-center gap-1'>
                 <FluentNotepad28Filled
                   className={clsx(themeColors[Number(selectedEvent.tag)].text)}
                 />
                 <div>Note</div>
               </div>
-              <div className={clsx('w-4/5 break-words rounded-lg p-2')}>
+              <div
+                className={clsx(
+                  'w-4/5 break-words rounded-lg whitespace-pre-line',
+                )}
+              >
                 {selectedEvent.note}
               </div>
             </div>
@@ -306,7 +323,10 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
             onCompositionEnd={handleCompositionEnd}
           />
           <MaterialSymbolsSubdirectoryArrowLeftRounded
-            className='w-5 h-5 hover:cursor-pointer'
+            className={clsx(
+              'w-5 h-5 hover:cursor-pointer',
+              themeColors[Number(selectedEvent.tag)].text,
+            )}
             onClick={handleAddComment}
           />
         </div>

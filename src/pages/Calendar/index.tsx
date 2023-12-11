@@ -140,7 +140,6 @@ function Calendar() {
           setCurrentCalendarId,
           setCurrentCalendarContent,
         );
-        // TODO: 取得該使用者下有的calendarId & name
       } else {
         localStorage.removeItem('uid');
         navigate('/signin');

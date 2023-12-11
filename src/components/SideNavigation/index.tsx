@@ -8,6 +8,7 @@ import {
 } from '@nextui-org/react';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
+import MaterialSymbolsAccountCircleOutline from '~icons/material-symbols/account-circle-outline';
 import MaterialSymbolsExitToAppRounded from '~icons/material-symbols/exit-to-app-rounded';
 import MaterialSymbolsStickyNote2OutlineRounded from '~icons/material-symbols/sticky-note-2-outline-rounded';
 import OcticonPeople16 from '~icons/octicon/people-16';
@@ -22,6 +23,7 @@ import {
 import { CalendarContent, Event, User } from '../../utils/types';
 import Members from './SidePanels/Members';
 import Memo from './SidePanels/Memo';
+import Profile from './SidePanels/Profile';
 import UserCalendars from './SidePanels/UserCalendars';
 import AvatarImage from './avatar.png';
 
@@ -60,6 +62,7 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
   const [calendarDetails, setCalendarDetails] = useState<CalendarContent[]>([]);
   const [memberDetails, setMemberDetails] = useState<User[]>([]);
   const [memoEvents, setMemoEvents] = useState<Event[]>([]);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const fetchDetails = async () => {
     const filteredMemoEvents = calendarAllEvents.filter(
@@ -67,7 +70,8 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
     );
     setMemoEvents(filteredMemoEvents);
 
-    const detailsOfCalendar = await getAllCalendarDetail(userCalendars);
+    const detailsOfCalendar: CalendarContent[] =
+      await getAllCalendarDetail(userCalendars);
     setCalendarDetails(detailsOfCalendar);
 
     const detailsOfMember = await getAllMemberDetail(
@@ -121,6 +125,13 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
           : 'opacity-0 w-0',
       )}
     >
+      <Profile
+        isProfileModalOpen={isProfileModalOpen}
+        setIsProfileModalOpen={setIsProfileModalOpen}
+        currentUser={currentUser}
+        currentCalendarContent={currentCalendarContent}
+      />
+
       <div
         className={clsx(
           'w-16 pl-1 pt-3 h-full flex flex-col border-r',
@@ -138,7 +149,7 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
                 {currentUser.avatar ? (
                   <Avatar
                     className={clsx(
-                      'w-10 h-10 p-0 border-2',
+                      'w-9 h-9 p-0 border-2',
                       currentThemeColor.border,
                     )}
                     src={currentUser.avatar}
@@ -154,10 +165,17 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
                 )}
               </button>
             </PopoverTrigger>
-            <PopoverContent className='p-0'>
+            <PopoverContent className='p-1 flex flex-col'>
+              <Button
+                startContent={<MaterialSymbolsAccountCircleOutline />}
+                className='bg-white hover:bg-slate-100'
+                onClick={() => setIsProfileModalOpen(true)}
+              >
+                Profile
+              </Button>
               <Button
                 startContent={<MaterialSymbolsExitToAppRounded />}
-                className='bg-white'
+                className='bg-white hover:bg-slate-100'
                 onClick={handleLogout}
               >
                 Logout

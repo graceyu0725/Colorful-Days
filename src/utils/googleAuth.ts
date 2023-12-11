@@ -1,5 +1,4 @@
 import { GoogleAuthProvider, getAuth, signInWithPopup } from 'firebase/auth';
-import toast from 'react-hot-toast';
 import { NavigateFunction } from 'react-router-dom';
 import { isUserExists } from './handleUserAndCalendar';
 
@@ -16,7 +15,6 @@ export const googleAuth = {
       if (user.email) {
         const userExists = await isUserExists(user.email);
         if (userExists) {
-          toast.success('登入成功');
           localStorage.setItem('uid', user.uid);
           navigate('/calendar');
         } else {

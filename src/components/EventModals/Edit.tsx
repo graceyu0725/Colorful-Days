@@ -12,6 +12,7 @@ import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
 import { datePickerColors, renderModalContent } from './CommonComponents';
 import { View } from './View';
+import toast from 'react-hot-toast';
 
 export default function Edit() {
   const { isEditModalOpen, setIsEditModalOpen, selectedEvent } =
@@ -59,6 +60,18 @@ export default function Edit() {
     await updateEvent(data);
     setIsEditModalOpen(false, userInput);
     setIsEditing(false);
+
+    toast.success('Event updated successfully!', {
+      style: {
+        border: '1px solid #7a615a',
+        padding: '8px',
+        color: '#7a615a',
+      },
+      iconTheme: {
+        primary: '#7a615a',
+        secondary: '#FFFAEE',
+      },
+    });
   };
 
   const handleCancel = () => {
