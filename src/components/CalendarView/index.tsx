@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CalendarViewCategory, useViewStore } from '../../store/viewStore';
+import { ContextProvider } from '../DND';
 import SideNavigation from '../SideNavigation';
 import MonthlyView from './MonthlyView';
 import Navigation from './Navigation';
@@ -13,12 +14,17 @@ function CalendarView() {
 
   return (
     <div className='grow flex flex-col'>
-      <Navigation setIsSideBarOpen={setIsSideBarOpen} setIsSideNavigationOpen={setIsSideNavigationOpen}/>
+      <Navigation
+        setIsSideBarOpen={setIsSideBarOpen}
+        setIsSideNavigationOpen={setIsSideNavigationOpen}
+      />
       <div className='flex w-full' style={{ height: 'calc(100vh - 64px)' }}>
         <SideNavigation isSideNavigationOpen={isSideNavigationOpen} />
         <div className='px-6 py-4 flex grow overflow-auto'>
-          {currentView === CalendarViewCategory.Monthly && <MonthlyView />}
-          {currentView === CalendarViewCategory.Weekly && <WeeklyView />}
+          <ContextProvider>
+            {currentView === CalendarViewCategory.Monthly && <MonthlyView />}
+            {currentView === CalendarViewCategory.Weekly && <WeeklyView />}
+          </ContextProvider>
         </div>
         <SideBar isSideBarOpen={isSideBarOpen} />
       </div>

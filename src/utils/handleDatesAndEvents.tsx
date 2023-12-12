@@ -10,7 +10,7 @@ import {
   startOfDay,
   startOfWeek,
 } from 'date-fns';
-import { useModalStore } from '../store/modalStore';
+import { DraggableItem } from '../components/DND';
 import { themeColors } from './theme';
 import { Event } from './types';
 
@@ -223,18 +223,19 @@ export const getSplitEvents = (monthDates: Date[], allEvents: Event[]) => {
 // Render monthly events
 // ================================================================
 
-export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
-  const { setIsEditModalOpen } = useModalStore();
-  const handleClick = (event: React.MouseEvent, e: Event) => {
-    event.stopPropagation(); // 阻止事件冒泡
-    setIsEditModalOpen(true, e);
+export const renderEvent = (
+  event: any,
+  cellDate: Date,
+  eventIndex: number,
+  setIsEditModalOpen: (isOpen: boolean, event: Event) => void,
+) => {
+  const handleClick = (e: React.MouseEvent, event: Event) => {
+    e.stopPropagation(); // 阻止事件冒泡
+    setIsEditModalOpen(true, event);
   };
 
   // 如果是 memo，則不顯示在畫面上
   if (event.isMemo || !event) return;
-  // if (event.isMemo) {
-  //   return <div className=''></div>;
-  // }
 
   const startDate = event.startAt || new Date();
   const endDate = event.endAt || new Date();
@@ -249,9 +250,10 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
       // ALL-DAY
       if (event.isAllDay) {
         return (
-          <div
+          <DraggableItem
+            id={event.eventId}
             className={clsx(
-              'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
+              'flex truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
               normalBackground,
             )}
             style={{
@@ -260,18 +262,20 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
               pointerEvents: 'auto',
             }}
             onClick={(e) => handleClick(e, event)}
+            event={event}
           >
             {event.title}
-          </div>
+          </DraggableItem>
         );
       }
 
       // SAME-DAY
-      const formattedTime = format(startDate, 'h:mm a');
+      const formattedTime = format(startDate, 'HH:mm');
       return (
-        <div
+        <DraggableItem
+          id={event.eventId}
           className={clsx(
-            'truncate basis-0 rounded indent-1.5 hover:cursor-pointer flex items-center justify-between hover:-translate-y-px hover:shadow-md',
+            'truncate basis-0 rounded indent-1.5 hover:cursor-pointer hover:-translate-y-px hover:shadow-md',
             lightBackground,
           )}
           style={{
@@ -280,12 +284,15 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
             pointerEvents: 'auto',
           }}
           onClick={(e) => handleClick(e, event)}
+          event={event}
         >
-          <div className='truncate'>{event.title}</div>
-          <div className='truncate mr-1 text-xs text-slate-500 mt-1'>
-            {formattedTime}
+          <div className='flex items-center justify-between'>
+            <div className='truncate'>{event.title}</div>
+            <div className='truncate mr-1 text-xs text-slate-500 mt-1 min-w-fit'>
+              {formattedTime}
+            </div>
           </div>
-        </div>
+        </DraggableItem>
       );
     }
     const lastDays = differenceInCalendarDays(endDate, startDate) + 1;
@@ -294,7 +301,8 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
     // 若 事件日期長度 超過當週可佔據的格子數，則需要斷行
     if (getDay(startDate) + lastDays > 7) {
       return (
-        <div
+        <DraggableItem
+          id={event.eventId}
           className={clsx(
             'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
             normalBackground,
@@ -307,13 +315,15 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
             pointerEvents: 'auto',
           }}
           onClick={(e) => handleClick(e, event)}
+          event={event}
         >
           {event.title}
-        </div>
+        </DraggableItem>
       );
     }
     return (
-      <div
+      <DraggableItem
+        id={event.eventId}
         className={clsx(
           'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
           normalBackground,
@@ -326,9 +336,10 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
           pointerEvents: 'auto',
         }}
         onClick={(e) => handleClick(e, event)}
+        event={event}
       >
         {event.title}
-      </div>
+      </DraggableItem>
     );
   }
 
@@ -339,7 +350,8 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
       lastDays - differenceInCalendarDays(cellDate, startDate);
     if (lastDaysThisWeek <= 7) {
       return (
-        <div
+        <DraggableItem
+          id={event.eventId}
           className={clsx(
             'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
             normalBackground,
@@ -352,13 +364,15 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
             pointerEvents: 'auto',
           }}
           onClick={(e) => handleClick(e, event)}
+          event={event}
         >
           {event.title}
-        </div>
+        </DraggableItem>
       );
     }
     return (
-      <div
+      <DraggableItem
+        id={event.eventId}
         className={clsx(
           'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
           normalBackground,
@@ -370,9 +384,10 @@ export const renderEvent = (event: any, cellDate: Date, eventIndex: number) => {
           pointerEvents: 'auto',
         }}
         onClick={(e) => handleClick(e, event)}
+        event={event}
       >
         {event.title}
-      </div>
+      </DraggableItem>
     );
   }
 };
@@ -397,8 +412,8 @@ export const renderWeeklyAllDayEvent = (
   index: number,
   events: (Event | null)[],
   setIsMoreModalOpen: (isOpen: boolean, events: (Event | null)[]) => void,
+  setIsEditModalOpen: (isOpen: boolean, event: Event) => void,
 ) => {
-  const { setIsEditModalOpen } = useModalStore();
   const handleClick = (event: React.MouseEvent, e: Event) => {
     event.stopPropagation(); // 阻止事件冒泡
     setIsEditModalOpen(true, e);
