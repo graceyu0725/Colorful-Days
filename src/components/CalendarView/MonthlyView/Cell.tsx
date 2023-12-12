@@ -8,13 +8,6 @@ interface Props extends React.PropsWithChildren {
   dayCounts: number;
   firstDayOfNextMonth?: number;
   cellDate: Date;
-  isMouseDown: boolean[][];
-  initialIsMouseDown: boolean[][];
-  setIsMouseDown: React.Dispatch<React.SetStateAction<boolean[][]>>;
-  row: number;
-  col: number;
-  startCell: number[];
-  setStartCell: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 const Cell: React.FC<Props> = ({
@@ -23,57 +16,8 @@ const Cell: React.FC<Props> = ({
   header,
   dayCounts,
   cellDate,
-  isMouseDown,
-  setIsMouseDown,
-  initialIsMouseDown,
-  row,
-  col,
-  startCell,
-  setStartCell,
 }) => {
-  const { setIsCreateModalOpen, setSelectedStartDate, selectedStartDate } =
-    useModalStore();
-
-  const mouseDown = () => {
-    if (!header) {
-      let newArray = isMouseDown.map((innerArray) => [...innerArray]);
-      newArray[row][col] = true;
-      setIsMouseDown(newArray);
-      setSelectedStartDate(cellDate);
-      setStartCell([row, col]);
-    }
-  };
-
-  const mouseOver = () => {
-    if (!header) {
-      if (isMouseDown.some((r) => r.includes(true))) {
-        let newArray = isMouseDown.map((innerArray) => [...innerArray]);
-        for (let i = startCell[0]; i <= row; i++) {
-          if (i > startCell[0]) {
-            for (let j = 0; j < newArray[i].length; j++) {
-              if (i < row || j <= col) {
-                newArray[i][j] = true;
-              }
-            }
-          } else {
-            for (let j = startCell[1]; j < newArray[i].length; j++) {
-              if (i < row || j <= col) {
-                newArray[i][j] = true;
-              }
-            }
-          }
-        }
-        setIsMouseDown(newArray);
-      }
-    }
-  };
-
-  const mouseUp = () => {
-    if (!header) {
-      setIsMouseDown(initialIsMouseDown);
-      setIsCreateModalOpen(true, selectedStartDate, cellDate, false);
-    }
-  };
+  const { setIsCreateModalOpen } = useModalStore();
 
   return (
     <div
@@ -83,16 +27,13 @@ const Cell: React.FC<Props> = ({
           setIsCreateModalOpen(true, cellDate, cellDate, false);
         }
       }}
-      onMouseDown={mouseDown}
-      onMouseOver={mouseOver}
-      onMouseUp={mouseUp}
       className={clsx(
-        'flex select-none flex-col items-start border-b text-sm w-5',
+        'flex select-none flex-col items-start border-b text-sm w-full',
         {
           [header
             ? 'h-10 px-2 justify-center'
             : dayCounts > 35
-              ? 'h-[100px] px-2 py-1 hover:bg-slate-100 active:bg-gray-200'
+              ? 'h-[104px] px-2 py-1 hover:bg-slate-100 active:bg-gray-200'
               : 'h-28 px-2 py-1 hover:bg-slate-100 active:bg-gray-200']: true,
         },
         className,

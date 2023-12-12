@@ -86,46 +86,16 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
       setSearchInput('');
       setSearchResult(null);
       setIsMemberExist(false);
-      toast.success('Member added successfully!', {
-        style: {
-          border: '1px solid #7a615a',
-          padding: '8px',
-          color: '#7a615a',
-        },
-        iconTheme: {
-          primary: '#7a615a',
-          secondary: '#FFFAEE',
-        },
-      });
+      toast.success('Member added successfully!');
     } else {
-      toast.error('Failed to add member.', {
-        style: {
-          border: '1px solid #7a615a',
-          padding: '8px',
-          color: '#7a615a',
-        },
-        iconTheme: {
-          primary: '#7a615a',
-          secondary: '#FFFAEE',
-        },
-      });
+      toast.error('Failed to add member.');
     }
   };
 
   const handleRemoveMember = async (calendarId: string, userId: string) => {
     await removeMember(calendarId, userId);
 
-    toast.success('Member removed successfully!', {
-      style: {
-        border: '1px solid #7a615a',
-        padding: '8px',
-        color: '#7a615a',
-      },
-      iconTheme: {
-        primary: '#7a615a',
-        secondary: '#FFFAEE',
-      },
-    });
+    toast.success('Member removed successfully!');
   };
 
   interface UserAvatarProps {

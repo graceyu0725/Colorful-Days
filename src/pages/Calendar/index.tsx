@@ -8,6 +8,7 @@ import {
 } from 'firebase/firestore';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import EosIconsLoading from '~icons/eos-icons/loading';
 import AddCalendarModal from '../../components/CalendarModals/AddCalendar';
 import CalendarView from '../../components/CalendarView';
 import CreateEventModal from '../../components/EventModals/Create';
@@ -33,6 +34,7 @@ function Calendar() {
   } = useAuthStore();
   const { setCalendarAllEvents } = useEventsStore();
   const { selectedEvent, setSelectedEvent } = useModalStore();
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -142,7 +144,7 @@ function Calendar() {
         );
       } else {
         localStorage.removeItem('uid');
-        navigate('/signin');
+        navigate('/');
       }
     });
   }, []);
@@ -198,7 +200,7 @@ function Calendar() {
           <AddCalendarModal />
         </>
       ) : (
-        <div>Loading...</div>
+        <EosIconsLoading />
       )}
     </div>
   );

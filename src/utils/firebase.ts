@@ -42,31 +42,11 @@ export const firebase = {
       navigate('/calendar');
     } catch (e: any) {
       if (e.message === 'Firebase: Error (auth/email-already-in-use).') {
-        toast.error('This email has already been registered.', {
-          style: {
-            border: '1px solid #7a615a',
-            padding: '8px',
-            color: '#7a615a',
-          },
-          iconTheme: {
-            primary: '#7a615a',
-            secondary: '#FFFAEE',
-          },
-        });
-        navigate('/signup');
+        toast.error('This email has already been registered.');
+        navigate('/signin');
       } else {
-        toast.error('The data format is incorrect, please try again.', {
-          style: {
-            border: '1px solid #7a615a',
-            padding: '8px',
-            color: '#7a615a',
-          },
-          iconTheme: {
-            primary: '#7a615a',
-            secondary: '#FFFAEE',
-          },
-        });
-        navigate('/signup');
+        toast.error('The data format is incorrect, please try again.');
+        navigate('/signin');
       }
       localStorage.removeItem('uid');
     }

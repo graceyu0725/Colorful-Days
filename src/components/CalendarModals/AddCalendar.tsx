@@ -2,13 +2,13 @@ import { Button, Modal, ModalContent } from '@nextui-org/react';
 import clsx from 'clsx';
 import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
+import toast from 'react-hot-toast';
 import { useAuthStore } from '../../store/authStore';
 import { useEventsStore } from '../../store/eventsStore';
 import { useModalStore } from '../../store/modalStore';
 import { createNewCalendar } from '../../utils/handleUserAndCalendar';
 import { themeColors } from '../../utils/theme';
 import { CalendarInfo } from '../../utils/types';
-import toast from 'react-hot-toast';
 
 export default function AddCalendar() {
   const { currentUser, setCurrentCalendarId, setCurrentCalendarContent } =
@@ -16,9 +16,18 @@ export default function AddCalendar() {
   const { resetAllEvents } = useEventsStore();
   const { isAddCalendarModalOpen, setIsAddCalendarModalOpen } = useModalStore();
   const [calendarInfo, setCalendarInfo] = useState<CalendarInfo>({
-    name: '',
+    name: `${currentUser.name}'s Calendar`,
     themeColor: '',
   });
+  const [isComposing, setIsComposing] = useState(false);
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
+  };
 
   const updateCalendarInfo = (
     event:
@@ -71,17 +80,7 @@ export default function AddCalendar() {
     resetInfo();
     setIsLoading(false);
 
-    toast.success('Calendar added successfully!', {
-      style: {
-        border: '1px solid #7a615a',
-        padding: '8px',
-        color: '#7a615a',
-      },
-      iconTheme: {
-        primary: '#7a615a',
-        secondary: '#FFFAEE',
-      },
-    });
+    toast.success('Calendar added successfully!');
   };
 
   return (
@@ -112,6 +111,18 @@ export default function AddCalendar() {
               )}
               value={calendarInfo.name}
               onChange={updateCalendarInfo}
+              onKeyDown={(e) => {
+                if (
+                  e.key === 'Enter' &&
+                  !isComposing &&
+                  calendarInfo.name &&
+                  calendarInfo.themeColor
+                ) {
+                  handleSubmit();
+                }
+              }}
+              onCompositionStart={handleCompositionStart}
+              onCompositionEnd={handleCompositionEnd}
             />
           </div>
           <div className='flex flex-col items-center gap-5'>

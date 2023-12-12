@@ -20,7 +20,7 @@ export const googleAuth = {
         } else {
           const userInfo = {
             uid: user.uid,
-            displayName: user.displayName,
+            name: user.displayName,
             email: user.email,
             photoURL: user.photoURL,
           };

@@ -52,17 +52,7 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
     setMemoInput('');
     setSelectedTag('0');
 
-    toast.success('Memo added successfully!', {
-      style: {
-        border: '1px solid #7a615a',
-        padding: '8px',
-        color: '#7a615a',
-      },
-      iconTheme: {
-        primary: '#7a615a',
-        secondary: '#FFFAEE',
-      },
-    });
+    toast.success('Memo added successfully!');
   };
 
   return (

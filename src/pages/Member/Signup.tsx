@@ -85,7 +85,7 @@ const Signup: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
               Email
             </label>
             <input
-              id='email'
+              id='signupEmail'
               name='email'
               type='email'
               autoComplete='email'
@@ -105,7 +105,7 @@ const Signup: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
               Password
             </label>
             <input
-              id='password'
+              id='signupPassword'
               name='password'
               type='password'
               autoComplete='current-password'
@@ -114,6 +114,21 @@ const Signup: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
               value={userInput.password}
               onChange={updateUserInput}
               className='placeholder:h-11 placeholder:tracking-normal placeholder:text-sm tracking-widest h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
+              onKeyDown={(e) => {
+                if (
+                  e.key === 'Enter' &&
+                  userInput.name &&
+                  userInput.email &&
+                  userInput.password
+                ) {
+                  navigate('/select', {
+                    state: {
+                      userInfo: userInput,
+                      isNativeSignup: true,
+                    },
+                  });
+                }
+              }}
             />
           </div>
 

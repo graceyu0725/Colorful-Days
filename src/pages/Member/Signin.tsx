@@ -1,5 +1,4 @@
 import { Button, Image } from '@nextui-org/react';
-// import { motion, useAnimation } from 'framer-motion';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -111,7 +110,7 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
                 Email
               </label>
               <input
-                id='email'
+                id='signinEmail'
                 name='email'
                 type='email'
                 autoComplete='email'
@@ -131,7 +130,7 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
                 Password
               </label>
               <input
-                id='password'
+                id='signinPassword'
                 name='password'
                 type='password'
                 autoComplete='current-password'
@@ -140,13 +139,21 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
                 value={userInput.password}
                 onChange={updateUserInput}
                 className='placeholder:h-11 placeholder:tracking-normal placeholder:text-sm tracking-widest h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
+                onKeyDown={(e) => {
+                  if (
+                    e.key === 'Enter' &&
+                    userInput.email &&
+                    userInput.password
+                  ) {
+                    handleSignin();
+                  }
+                }}
               />
             </div>
 
             <div className='flex items-center text-sm'>
               <div className='font-medium mr-2'>Don't have an account?</div>
               <div
-                // to='/signup'
                 className='font-medium text-slate-600 hover:text-theme-1-300 hover:cursor-pointer underline'
                 onClick={() => setIsFlipped(true)}
               >

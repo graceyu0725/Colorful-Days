@@ -10,7 +10,7 @@ type Props = {
 };
 
 const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
-  const { setIsMoreModalOpen } = useModalStore();
+  const { setIsMoreModalOpen, setIsEditModalOpen } = useModalStore();
 
   // ================================================================
   // Handle rendering
@@ -31,11 +31,11 @@ const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
   );
 
   const EventRow: React.FC<WrapperProps> = ({ children }) => (
-    <div className='grid gap-px grid-cols-7 auto-rows-auto' id='eventRow'>
+    <div className='grid gap-0.5 grid-cols-7 auto-rows-auto' id='eventRow'>
       {children}
     </div>
   );
-  
+
   return (
     <EventCellsWrapper id='eventCellsWrapper'>
       <EventRow id='eventRow'>
@@ -43,7 +43,12 @@ const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
           events.map((event, eventIndex) =>
             eventIndex < 2 ? (
               event ? (
-                renderEvent(event, week[eventsIndex], eventIndex)
+                renderEvent(
+                  event,
+                  week[eventsIndex],
+                  eventIndex,
+                  setIsEditModalOpen,
+                )
               ) : null
             ) : eventIndex === 2 && !event.isMemo ? (
               <div

@@ -12,7 +12,7 @@ type Props = {
 
 const AllDayEventCells: React.FC<Props> = ({ weekDates }) => {
   const { allEvents } = useEventsStore();
-  const { setIsMoreModalOpen } = useModalStore();
+  const { setIsMoreModalOpen, setIsEditModalOpen } = useModalStore();
 
   const spiltEvents = getSplitEvents(weekDates, allEvents);
 
@@ -61,7 +61,13 @@ const AllDayEventCells: React.FC<Props> = ({ weekDates }) => {
     <WeeklyEventsWrapper id='weeklyEventsWrapper'>
       <EventRow id='eventRow'>
         {filteredAllDayEvents.map((events, index) =>
-          renderWeeklyAllDayEvent(weekDates, index, events, setIsMoreModalOpen),
+          renderWeeklyAllDayEvent(
+            weekDates,
+            index,
+            events,
+            setIsMoreModalOpen,
+            setIsEditModalOpen,
+          ),
         )}
       </EventRow>
     </WeeklyEventsWrapper>

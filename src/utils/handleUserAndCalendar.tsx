@@ -96,7 +96,7 @@ export const addUserForGoogle = async (
     );
     const newUser = {
       userId: userInfo.uid,
-      name: userInfo.displayName,
+      name: userInfo.name,
       email: userInfo.email,
       avatar: userInfo.photoURL,
       calendars: [calendarDocRef.id],

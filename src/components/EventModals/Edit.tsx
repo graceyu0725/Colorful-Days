@@ -7,12 +7,12 @@ import {
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
+import toast from 'react-hot-toast';
 import { useAuthStore } from '../../store/authStore';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
 import { datePickerColors, renderModalContent } from './CommonComponents';
 import { View } from './View';
-import toast from 'react-hot-toast';
 
 export default function Edit() {
   const { isEditModalOpen, setIsEditModalOpen, selectedEvent } =
@@ -22,6 +22,7 @@ export default function Edit() {
   const [userInput, setUserInput] = useState(selectedEvent);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isTitleEmpty, setIsTitleEmpty] = useState(false);
+  const [isComposing, setIsComposing] = useState(false);
 
   useEffect(() => {
     setUserInput({
@@ -61,17 +62,7 @@ export default function Edit() {
     setIsEditModalOpen(false, userInput);
     setIsEditing(false);
 
-    toast.success('Event updated successfully!', {
-      style: {
-        border: '1px solid #7a615a',
-        padding: '8px',
-        color: '#7a615a',
-      },
-      iconTheme: {
-        primary: '#7a615a',
-        secondary: '#FFFAEE',
-      },
-    });
+    toast.success('Event updated successfully!');
   };
 
   const handleCancel = () => {
@@ -106,6 +97,8 @@ export default function Edit() {
             <View setIsEditing={setIsEditing} />
           ) : (
             renderModalContent(
+              isComposing,
+              setIsComposing,
               'Update Event',
               userInput,
               setUserInput,

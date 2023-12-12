@@ -252,6 +252,8 @@ export const renderDatePicker = (
 };
 
 export const renderModalContent = (
+  isComposing: boolean,
+  setIsComposing: React.Dispatch<React.SetStateAction<boolean>>,
   header: string,
   userInput: CreateEvent | Event,
   setUserInput: (value: React.SetStateAction<Event | CreateEvent>) => void,
@@ -264,6 +266,14 @@ export const renderModalContent = (
   handleSubmit: () => Promise<void>,
   isEditing?: boolean,
 ) => {
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
+  };
+
   return (
     <>
       <ModalHeader className='py-3'>{header}</ModalHeader>
@@ -284,6 +294,13 @@ export const renderModalContent = (
               setIsTitleEmpty,
             )
           }
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !isComposing) {
+              handleSubmit();
+            }
+          }}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
         />
         {userInput.isAllDay &&
           !userInput.isMemo &&

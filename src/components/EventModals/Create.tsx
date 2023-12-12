@@ -25,10 +25,10 @@ export default function Create() {
 
   const [userInput, setUserInput] = useState<Event | CreateEvent>({
     ...initialEvent,
-    // tag: currentCalendarContent.themeColor,
   });
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isTitleEmpty, setIsTitleEmpty] = useState(false);
+  const [isComposing, setIsComposing] = useState(false);
 
   useEffect(() => {
     setUserInput((prev) => ({
@@ -47,17 +47,7 @@ export default function Create() {
     const calendarRef = doc(db, 'Calendars', currentCalendarId);
     const eventRef = doc(calendarRef, 'events', id);
     await setDoc(eventRef, data);
-    toast.success('Event added successfully!', {
-      style: {
-        border: '1px solid #7a615a',
-        padding: '8px',
-        color: '#7a615a',
-      },
-      iconTheme: {
-        primary: '#7a615a',
-        secondary: '#FFFAEE',
-      },
-    });
+    toast.success('Event added successfully!');
   };
 
   const handleSubmit = async () => {
@@ -116,6 +106,8 @@ export default function Create() {
       >
         <ModalContent>
           {renderModalContent(
+            isComposing,
+            setIsComposing,
             'New Event',
             userInput,
             setUserInput,

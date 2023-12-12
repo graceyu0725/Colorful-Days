@@ -1,5 +1,5 @@
 import { addMinutes } from 'date-fns';
-import { Timestamp } from 'firebase/firestore';
+import { FieldValue, Timestamp } from 'firebase/firestore';
 
 export interface EventMessages {
   arthur: User;
@@ -17,7 +17,7 @@ export interface Event {
   tag: string;
   note: string;
   createdAt: Date | null;
-  updatedAt: Date | null;
+  updatedAt: Date | null | FieldValue;
   messages: EventMessages[];
 }
 
@@ -136,7 +136,7 @@ export interface CalendarInfo {
 
 export interface GoogleUserInfo {
   uid: string;
-  displayName: string | null;
+  name: string | null;
   email: string | null;
   photoURL: string | null;
 }

@@ -99,7 +99,7 @@ const WeeklyView: React.FC = () => {
         id='weekly-view-header'
         className='w-full min-h-[120px] bg-gray-50 grid grid-rows-weeklyHeader grid-cols-weeklyHeader'
       >
-        <div className='col-start-1 border-r -mr-px'/>
+        <div className='col-start-1 border-r -mr-px' />
         <div className='col-start-2 pl-1 text-sm font-bold'>Sun</div>
         <div className='col-start-3 pl-1 text-sm font-bold'>Mon</div>
         <div className='col-start-4 pl-1 text-sm font-bold'>Tue</div>
@@ -108,7 +108,7 @@ const WeeklyView: React.FC = () => {
         <div className='col-start-7 pl-1 text-sm font-bold'>Fri</div>
         <div className='col-start-8 pl-1 text-sm font-bold'>Sat</div>
 
-      <div className= 'col-start-1 row-start-2 border-r -mr-px z-10'/>
+        <div className='col-start-1 row-start-2 border-r -mr-px z-10' />
         {weekDates.map((weekDate, index) => (
           <div
             key={index}
@@ -116,11 +116,10 @@ const WeeklyView: React.FC = () => {
             onClick={() => setIsCreateModalOpen(true, weekDate, weekDate, true)}
           >
             <div
-              className={
-                isSameDay(new Date(), weekDate)
-                  ? 'w-5 text-center rounded-full bg-amber-800 text-white'
-                  : ''
-              }
+              className={clsx('w-5 h-5 text-center', {
+                [`${currentThemeColor.darkBackground} rounded-full text-white w-5 text-center`]:
+                  isSameDay(weekDate, new Date()),
+              })}
             >
               {isFirstDayOfMonth(weekDate)
                 ? `${weekDate.getMonth() + 1}/${weekDate.getDate()}`

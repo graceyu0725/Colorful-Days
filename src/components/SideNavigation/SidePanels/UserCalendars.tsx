@@ -63,17 +63,7 @@ const UserCalendars: React.FC<Props> = ({
     );
     setIsLoading(false);
 
-    toast.success('Calendar removed successfully!', {
-      style: {
-        border: '1px solid #7a615a',
-        padding: '8px',
-        color: '#7a615a',
-      },
-      iconTheme: {
-        primary: '#7a615a',
-        secondary: '#FFFAEE',
-      },
-    });
+    toast.success('Calendar removed successfully!');
   };
 
   return (
