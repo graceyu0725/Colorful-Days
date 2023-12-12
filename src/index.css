@@ -2,6 +2,102 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'openhuninn';
+  src: url('/src/fonts/jf-openhuninn-2.0.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --main-bg-color: #9879704d;
+}
+
+body {
+  @apply text-default;
+}
+
 .react-datepicker__triangle {
-    display: none;
+  display: none;
+}
+
+.react-datepicker__tab-loop {
+  z-index: 20;
+}
+
+.react-datepicker {
+  font-family: 'openhuninn';
+}
+
+.react-datepicker__navigation {
+  margin-top: 7px;
+}
+
+.react-datepicker__header {
+  background-color: var(--main-bg-color);
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: #a8a29e;
+}
+
+* {
+  -ms-overflow-style: scrollbar;
+  scrollbar-width: 12px;
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 6px;
+  border: 2px solid #f8fafc;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+@keyframes push-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%);
   }
+  60% {
+    opacity: 1;
+    transform: translateY(10%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes push-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  60% {
+    opacity: 0;
+    transform: translateY(110%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+.animate-push-in {
+  animation: push-in 1s forwards;
+}
+
+.animate-push-out {
+  animation: push-out 1s forwards;
+}

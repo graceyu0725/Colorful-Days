@@ -8,6 +8,7 @@ import {
 } from 'firebase/firestore';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import EosIconsLoading from '~icons/eos-icons/loading';
 import AddCalendarModal from '../../components/CalendarModals/AddCalendar';
 import CalendarView from '../../components/CalendarView';
 import CreateEventModal from '../../components/EventModals/Create';
@@ -18,10 +19,8 @@ import { useEventsStore } from '../../store/eventsStore';
 import { useModalStore } from '../../store/modalStore';
 import { db } from '../../utils/firebase';
 import { updateAllEvents } from '../../utils/handleDatesAndEvents';
-import {
-  updateCalendarContent,
-  updateCurrentUser,
-} from '../../utils/handleUserAndCalendar';
+import { updateCurrentUser } from '../../utils/handleUserAndCalendar';
+import { themeColors } from '../../utils/theme';
 
 function Calendar() {
   const {
@@ -30,21 +29,18 @@ function Calendar() {
     setCurrentUser,
     currentCalendarId,
     setCurrentCalendarId,
-    currentCalendarContent,
     setCurrentCalendarContent,
+    setCurrentThemeColor,
   } = useAuthStore();
   const { setCalendarAllEvents } = useEventsStore();
-  const { selectedEvent, setSelectedEvent, setIsEditModalOpen } =
-    useModalStore();
+  const { selectedEvent, setSelectedEvent } = useModalStore();
+
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!currentCalendarId) {
-      console.log('沒有calendarId');
       return;
     }
-    console.log('現在的calendarId', currentCalendarId);
-    // const calendarId = currentUser.calendars[0]
 
     const eventsCollection = collection(
       db,
@@ -61,8 +57,6 @@ function Calendar() {
     const unsubscribeEvents = onSnapshot(
       orderedEventsCollection,
       (snapshot) => {
-        console.log('Calendar data 行事曆 snapshot:', snapshot);
-
         snapshot.docChanges().forEach((change) => {
           if (change.type === 'added') {
             updateAllEvents(snapshot, setCalendarAllEvents);
@@ -74,7 +68,6 @@ function Calendar() {
               selectedEvent,
               setSelectedEvent,
             );
-            console.log('selectedEvent', selectedEvent);
           }
           if (change.type === 'removed') {
             updateAllEvents(snapshot, setCalendarAllEvents);
@@ -93,53 +86,46 @@ function Calendar() {
           themeColor: docSnapshot.data().themeColor,
           calendarId: docSnapshot.data().calendarId,
         });
-        // docSnapshot.data())
-        // updateCalendarContent(
-        //   docSnapshot.data().calendarId,
-        //   setCurrentCalendarId,
-        //   setCurrentCalendarContent,
-        // );
+        setCurrentThemeColor(
+          themeColors[Number(docSnapshot.data().themeColor)],
+        );
+
+        document.title = `${docSnapshot.data().name} - Colorful Days`;
       } else {
         console.log('Calendar not found');
       }
     });
 
     return () => {
-      console.log(`取消訂閱: ${currentCalendarId}`);
       unsubscribeEvents();
       unsubscribeCalendar();
     };
-  }, [currentCalendarId, selectedEvent]);
+  }, [currentCalendarId]);
 
   useEffect(() => {
     if (!currentUser || !currentUser.email) {
-      console.log('沒有 currentUser 或 currentUser.email');
       return;
     }
 
     const usersCollectionRef = collection(db, 'Users');
     const docRef = doc(usersCollectionRef, currentUser.email);
     const unsubscribeByEmail = onSnapshot(docRef, (docSnapshot) => {
-      console.log('Matching users:', docSnapshot.data());
-      console.log('currentUser:', currentUser);
       if (docSnapshot.exists()) {
         const updatedUser = {
           ...currentUser,
           calendars: docSnapshot.data().calendars,
         };
         setCurrentUser(updatedUser);
-
       }
-      // updateCurrentUser(
-      //   docSnapshot.data()?.userId,
-      //   setCurrentUser,
-      //   setCurrentCalendarId,
-      //   setCurrentCalendarContent,
-      // );
+      updateCurrentUser(
+        docSnapshot.data()?.userId,
+        setCurrentUser,
+        setCurrentCalendarId,
+        setCurrentCalendarContent,
+      );
     });
 
     return () => {
-      console.log('取消訂閱 user');
       unsubscribeByEmail();
     };
   }, [currentUser.email]);
@@ -156,13 +142,52 @@ function Calendar() {
           setCurrentCalendarId,
           setCurrentCalendarContent,
         );
-        // TODO: 取得該使用者下有的calendarId & name
       } else {
         localStorage.removeItem('uid');
-        navigate('/signin');
+        navigate('/');
       }
     });
   }, []);
+
+  useEffect(() => {
+    if (!selectedEvent || !selectedEvent.eventId) {
+      return;
+    }
+
+    const eventDocRef = doc(
+      db,
+      'Calendars',
+      currentCalendarId,
+      'events',
+      selectedEvent.eventId.toString(),
+    );
+    const unsubscribeFromEvent = onSnapshot(eventDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const updatedEvent = {
+          startAt: docSnapshot.data().startAt.toDate(),
+          endAt: docSnapshot.data().endAt.toDate(),
+          eventId: docSnapshot.data().eventId,
+          title: docSnapshot.data().title,
+          isAllDay: docSnapshot.data().isAllDay,
+          isMemo: docSnapshot.data().isMemo,
+          tag: docSnapshot.data().tag,
+          note: docSnapshot.data().note,
+          createdAt: docSnapshot.data().createdAt
+            ? docSnapshot.data().createdAt.toDate()
+            : null,
+          updatedAt: docSnapshot.data().updatedAt
+            ? docSnapshot.data().updatedAt.toDate()
+            : null,
+          messages: docSnapshot.data().messages,
+        };
+        setSelectedEvent(updatedEvent);
+      }
+    });
+
+    return () => {
+      unsubscribeFromEvent();
+    };
+  }, [selectedEvent?.eventId]);
 
   return (
     <div className='flex w-screen'>
@@ -175,7 +200,7 @@ function Calendar() {
           <AddCalendarModal />
         </>
       ) : (
-        <div>Loading...</div>
+        <EosIconsLoading />
       )}
     </div>
   );

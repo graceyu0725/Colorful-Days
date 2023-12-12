@@ -15,13 +15,12 @@ export const googleAuth = {
       if (user.email) {
         const userExists = await isUserExists(user.email);
         if (userExists) {
-          alert('登入成功');
           localStorage.setItem('uid', user.uid);
           navigate('/calendar');
         } else {
           const userInfo = {
             uid: user.uid,
-            displayName: user.displayName,
+            name: user.displayName,
             email: user.email,
             photoURL: user.photoURL,
           };

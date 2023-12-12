@@ -1,7 +1,10 @@
+import { addMinutes } from 'date-fns';
+import { FieldValue, Timestamp } from 'firebase/firestore';
+
 export interface EventMessages {
-  arthur: object;
+  arthur: User;
   content: string;
-  createdAt: Date | null;
+  createdAt: Timestamp | null;
 }
 
 export interface Event {
@@ -14,7 +17,7 @@ export interface Event {
   tag: string;
   note: string;
   createdAt: Date | null;
-  updatedAt: Date | null;
+  updatedAt: Date | null | FieldValue;
   messages: EventMessages[];
 }
 
@@ -22,7 +25,7 @@ export const initialEvent = {
   eventId: 0,
   title: '',
   startAt: new Date(),
-  endAt: new Date(),
+  endAt: addMinutes(new Date(), 15),
   isAllDay: false,
   isMemo: false,
   tag: '0',
@@ -62,35 +65,35 @@ export interface CalendarTag {
 export const defaultTags = [
   {
     colorCode: '0',
-    name: 'tag1',
+    name: 'Appointments',
   },
   {
     colorCode: '1',
-    name: 'tag2',
+    name: 'Work',
   },
   {
     colorCode: '2',
-    name: 'tag3',
+    name: 'Fitness',
   },
   {
     colorCode: '3',
-    name: 'tag4',
+    name: 'Family',
   },
   {
     colorCode: '4',
-    name: 'tag5',
+    name: 'Holidays',
   },
   {
     colorCode: '5',
-    name: 'tag6',
+    name: 'Travel',
   },
   {
     colorCode: '6',
-    name: 'tag7',
+    name: 'Education',
   },
   {
     colorCode: '7',
-    name: 'tag8',
+    name: 'Important Dates',
   },
 ];
 
@@ -133,7 +136,7 @@ export interface CalendarInfo {
 
 export interface GoogleUserInfo {
   uid: string;
-  displayName: string | null;
+  name: string | null;
   email: string | null;
   photoURL: string | null;
 }

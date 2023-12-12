@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { isSameDay, isSameMonth } from 'date-fns';
-import { useState } from 'react';
+import { useAuthStore } from '../../../store/authStore';
 import { useEventsStore } from '../../../store/eventsStore';
 import { useViewStore } from '../../../store/viewStore';
 import {
@@ -8,6 +8,7 @@ import {
   getSplitEvents,
   splitDatesIntoWeeks,
 } from '../../../utils/handleDatesAndEvents';
+import { DroppableArea } from '../../DND';
 import Cell from './Cell';
 import EventCells from './EventCells';
 
@@ -15,6 +16,7 @@ const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 const MonthlyView: React.FC = () => {
   const { currentDate } = useViewStore();
+  const { currentThemeColor } = useAuthStore();
 
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth();
@@ -46,41 +48,6 @@ const MonthlyView: React.FC = () => {
     </div>
   );
 
-  // 處理日曆格子的選取
-  const weeks = splitDatesIntoWeeks(monthDates);
-  const convertDatesToFalse = (weeks: Date[][]) => {
-    return weeks.map((week) => week.map(() => false));
-  };
-  const initialIsMouseDown = convertDatesToFalse(weeks);
-  const [isMouseDown, setIsMouseDown] = useState(initialIsMouseDown);
-  const [startCell, setStartCell] = useState([0, 0]);
-  // const mouseDown = (row: number, col: number, cellDate: Date) => {
-  //   let newArray = isMouseDown.map((innerArray) => [...innerArray]);
-  //   newArray[row][col] = true;
-  //   setIsMouseDown(newArray);
-  //   setSelectedStartDate(cellDate);
-  //   console.log('newArray', newArray);
-  // };
-
-  // const mouseOver = (row: number, col: number, cellDate: Date) => {
-  //   if (isMouseDown.some((r) => r.includes(true))) {
-  //     let newArray = isMouseDown.map((innerArray) => [...innerArray]);
-  //     for (let i = 0; i <= row; i++) {
-  //       for (let j = 0; j < newArray[i].length; j++) {
-  //         if (i < row || j <= col) {
-  //           newArray[i][j] = true;
-  //         }
-  //       }
-  //     }
-  //     setIsMouseDown(newArray);
-  //   }
-  // };
-
-  // const mouseUp = (cellDate: Date) => {
-  //   setIsMouseDown(convertDatesToFalse(weeks));
-  //   setIsCreateModalOpen(true, selectedStartDate, cellDate);
-  // };
-
   // 生成日曆格子，每一週用 DayCellWrapper 包住 DayCells
   const CalendarView: React.FC<CalendarViewProps> = ({ monthDates }) => {
     const weeks = splitDatesIntoWeeks(monthDates);
@@ -95,14 +62,6 @@ const MonthlyView: React.FC = () => {
               cellDate={new Date()}
               dayCounts={monthDates.length}
               header
-              isMouseDown={isMouseDown}
-              setIsMouseDown={setIsMouseDown}
-              row={index}
-              col={index}
-              initialIsMouseDown={initialIsMouseDown}
-              startCell={startCell}
-              setStartCell={setStartCell}
-              // isSelected={false}
             >
               {weekday}
             </Cell>
@@ -114,38 +73,25 @@ const MonthlyView: React.FC = () => {
             <DayCellsWrapper id='dayCellsWrapper'>
               {week.map((cellDate, idx) => {
                 return (
-                  <Cell
-                    key={`${index}-${idx}`}
-                    className={clsx(
-                      'grow',
-                      {
+                  <DroppableArea id={cellDate.toDateString()} date={cellDate}>
+                    <Cell
+                      key={`${index}-${idx}`}
+                      className={clsx('grow', {
                         ['text-gray-400']: !isSameMonth(cellDate, currentDate),
-                      },
-                      // {
-                      //   ['bg-gray-200']: isMouseDown[index],
-                      // },
-                    )}
-                    cellDate={cellDate}
-                    dayCounts={monthDates.length}
-                    isMouseDown={isMouseDown}
-                    setIsMouseDown={setIsMouseDown}
-                    row={index}
-                    col={idx}
-                    initialIsMouseDown={initialIsMouseDown}
-                    startCell={startCell}
-                    setStartCell={setStartCell}
-                    // isSelected={isMouseDown[index][idx]}
-                  >
-                    <div
-                      className={clsx('w-5 h-5 text-center', {
-                        [isSameDay(cellDate, new Date())
-                          ? 'rounded-full bg-amber-800 text-white'
-                          : '']: true,
                       })}
+                      cellDate={cellDate}
+                      dayCounts={monthDates.length}
                     >
-                      {cellDate.getDate()}
-                    </div>
-                  </Cell>
+                      <div
+                        className={clsx('w-5 h-5 text-center', {
+                          [`${currentThemeColor.darkBackground} rounded-full text-white`]:
+                            isSameDay(cellDate, new Date()),
+                        })}
+                      >
+                        {cellDate.getDate()}
+                      </div>
+                    </Cell>
+                  </DroppableArea>
                 );
               })}
             </DayCellsWrapper>

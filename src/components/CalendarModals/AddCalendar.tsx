@@ -2,6 +2,7 @@ import { Button, Modal, ModalContent } from '@nextui-org/react';
 import clsx from 'clsx';
 import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
+import toast from 'react-hot-toast';
 import { useAuthStore } from '../../store/authStore';
 import { useEventsStore } from '../../store/eventsStore';
 import { useModalStore } from '../../store/modalStore';
@@ -15,9 +16,18 @@ export default function AddCalendar() {
   const { resetAllEvents } = useEventsStore();
   const { isAddCalendarModalOpen, setIsAddCalendarModalOpen } = useModalStore();
   const [calendarInfo, setCalendarInfo] = useState<CalendarInfo>({
-    name: "Pikachu's calendar",
+    name: `${currentUser.name}'s Calendar`,
     themeColor: '',
   });
+  const [isComposing, setIsComposing] = useState(false);
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
+  };
 
   const updateCalendarInfo = (
     event:
@@ -41,19 +51,23 @@ export default function AddCalendar() {
   };
 
   const [borderColor, setBorderColor] = useState('border-slate-200');
-  const [isSelected, setIsSelected] = useState([
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ]);
+  const [backgroundColor, setBackgroundColor] = useState('bg-slate-200');
+  const [isSelected, setIsSelected] = useState(Array(8).fill(false));
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = () => {
-    createNewCalendar(
+  const resetInfo = () => {
+    setCalendarInfo({
+      name: '',
+      themeColor: '',
+    });
+    setBorderColor('border-slate-200');
+    setBackgroundColor('bg-slate-200');
+    setIsSelected(Array(8).fill(false));
+  };
+
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    await createNewCalendar(
       currentUser.email,
       currentUser.userId,
       calendarInfo.name,
@@ -63,22 +77,27 @@ export default function AddCalendar() {
       resetAllEvents,
     );
     setIsAddCalendarModalOpen(false);
-    setCalendarInfo({
-      name: '',
-      themeColor: '',
-    });
+    resetInfo();
+    setIsLoading(false);
+
+    toast.success('Calendar added successfully!');
   };
 
   return (
     <>
       <Modal
         isOpen={isAddCalendarModalOpen}
-        onOpenChange={(isOpen) => setIsAddCalendarModalOpen(isOpen)}
+        onOpenChange={(isOpen) => {
+          setIsAddCalendarModalOpen(isOpen);
+          if (!isOpen) {
+            resetInfo();
+          }
+        }}
         size='4xl'
       >
         <ModalContent
           className={clsx(
-            'flex flex-col justify-center items-center p-8 overflow-y-auto gap-10 border-[20px]',
+            'flex flex-col justify-center items-center p-8 overflow-y-auto gap-10 border-[30px] transition-colors',
             borderColor,
           )}
         >
@@ -87,11 +106,23 @@ export default function AddCalendar() {
             <input
               name='name'
               className={clsx(
-                'border-2 w-72 h-16 rounded-lg px-5 text-lg',
+                'border-2 w-72 h-16 leading-[64px] rounded-lg px-5 text-lg focus:outline-none',
                 borderColor,
               )}
               value={calendarInfo.name}
               onChange={updateCalendarInfo}
+              onKeyDown={(e) => {
+                if (
+                  e.key === 'Enter' &&
+                  !isComposing &&
+                  calendarInfo.name &&
+                  calendarInfo.themeColor
+                ) {
+                  handleSubmit();
+                }
+              }}
+              onCompositionStart={handleCompositionStart}
+              onCompositionEnd={handleCompositionEnd}
             />
           </div>
           <div className='flex flex-col items-center gap-5'>
@@ -102,9 +133,9 @@ export default function AddCalendar() {
                   key={index}
                   className={clsx(
                     '-skew-x-12 bg-slate-200 w-12 h-48 rounded',
-                    color.bg,
+                    color.background,
                     {
-                      ['outline outline-3 outline-offset-2 outline-slate-500']:
+                      ['outline outline-3 outline-offset-2 outline-slate-300']:
                         isSelected[index],
                     },
                   )}
@@ -116,6 +147,7 @@ export default function AddCalendar() {
                     );
                     updateCalendarInfo(e);
                     setBorderColor(themeColors[index].border);
+                    setBackgroundColor(themeColors[index].background);
                   }}
                 />
               ))}
@@ -124,12 +156,16 @@ export default function AddCalendar() {
 
           <div>
             <Button
+              isLoading={isLoading}
               color='default'
-              className='w-32'
+              className={clsx(
+                'w-32 text-slate-700 text-base transition-colors',
+                backgroundColor,
+              )}
               disabled={!calendarInfo.name || !calendarInfo.themeColor}
               onClick={handleSubmit}
             >
-              送出
+              Submit
             </Button>
           </div>
         </ModalContent>

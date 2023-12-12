@@ -6,6 +6,7 @@ import {
   signOut,
 } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import toast from 'react-hot-toast';
 import { NavigateFunction } from 'react-router-dom';
 import { CalendarInfo, UserSignIn, UserSignUp } from '../utils/types';
 import { addUserForNative } from './handleUserAndCalendar';
@@ -19,46 +20,51 @@ const firebaseConfig = {
   appId: '1:105839792711:web:43e06f4fb81161f93e9762',
 };
 
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 
 export const firebase = {
-  signUp(
+  async signUp(
     userInfo: UserSignUp,
     navigate: NavigateFunction,
     calendarInfo: CalendarInfo,
   ) {
-    createUserWithEmailAndPassword(auth, userInfo.email, userInfo.password)
-      .then((userCredential) => {
-        addUserForNative(userInfo, userCredential.user.uid, calendarInfo);
-        localStorage.setItem('uid', userCredential.user.uid);
-        alert('註冊成功');
-        navigate('/calendar');
-      })
-      .catch((error) => {
-        if (error.message === 'Firebase: Error (auth/email-already-in-use).') {
-          alert('此 Email 已被註冊');
-          navigate('/signup');
-        } else {
-          alert('資料格式不正確，請再試一次');
-          navigate('/signup');
-        }
-        localStorage.removeItem('uid');
-      });
+    try {
+      const data = await createUserWithEmailAndPassword(
+        auth,
+        userInfo.email,
+        userInfo.password,
+      );
+
+      addUserForNative(userInfo, data.user.uid, calendarInfo);
+      localStorage.setItem('uid', data.user.uid);
+      navigate('/calendar');
+    } catch (e: any) {
+      if (e.message === 'Firebase: Error (auth/email-already-in-use).') {
+        toast.error('This email has already been registered.');
+        navigate('/signin');
+      } else {
+        toast.error('The data format is incorrect, please try again.');
+        navigate('/signin');
+      }
+      localStorage.removeItem('uid');
+    }
   },
-  signIn(userInfo: UserSignIn, navigate: NavigateFunction) {
-    signInWithEmailAndPassword(auth, userInfo.email, userInfo.password)
-      .then((userCredential) => {
-        localStorage.setItem('uid', userCredential.user.uid);
-        alert('登入成功');
-        navigate('/calendar');
-      })
-      .catch((error) => {
-        alert('帳號或密碼錯誤');
-        localStorage.removeItem('uid');
-        console.error(error);
-      });
+  async signIn(userInfo: UserSignIn, navigate: NavigateFunction) {
+    try {
+      const data = await signInWithEmailAndPassword(
+        auth,
+        userInfo.email,
+        userInfo.password,
+      );
+      localStorage.setItem('uid', data.user.uid);
+      navigate('/calendar');
+    } catch (e) {
+      toast.error('Incorrect username or password.');
+      localStorage.removeItem('uid');
+      console.error(e);
+    }
   },
   logOut() {
     const auth = getAuth();
@@ -70,5 +76,6 @@ export const firebase = {
         localStorage.removeItem('uid');
         console.error(error);
       });
+    document.title = 'Colorful Days';
   },
 };

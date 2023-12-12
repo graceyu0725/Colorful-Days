@@ -9,6 +9,7 @@ import {
 import clsx from 'clsx';
 import MaterialSymbolsRemoveSelection from '~icons/material-symbols/remove-selection';
 import MaterialSymbolsSelectCheckBox from '~icons/material-symbols/select-check-box';
+import { useAuthStore } from '../../../store/authStore';
 import { useEventsStore } from '../../../store/eventsStore';
 import { themeColors } from '../../../utils/theme';
 import { CalendarTag } from '../../../utils/types';
@@ -19,12 +20,18 @@ type Props = {
 
 const TagFilter: React.FC<Props> = ({ calendarTags }) => {
   const { selectedEventTags, setSelectedEventTags } = useEventsStore();
+  const { currentThemeColor } = useAuthStore();
 
   return (
-    <div className='h-1/2 px-2 mb-4 mt-1'>
-      <Card className='w-full h-full rounded-lg shadow border'>
+    <div className='mb-2'>
+      <Card
+        className={clsx(
+          'w-full h-full shadow border-2',
+          currentThemeColor.lightBorder,
+        )}
+      >
         <CardHeader className='flex justify-between'>
-          <p>Tags Filter</p>
+          <p>Tag Filter</p>
           <div className='flex gap-2'>
             <MaterialSymbolsSelectCheckBox
               className='hover:cursor-pointer'
@@ -54,10 +61,10 @@ const TagFilter: React.FC<Props> = ({ calendarTags }) => {
                     <div
                       className={clsx(
                         'rounded-full w-3 h-3',
-                        themeColors[index].bg,
+                        themeColors[index].darkBackground,
                       )}
-                    ></div>
-                    <p>{tag.name}</p>
+                    />
+                    <div className='text-sm truncate'>{tag.name}</div>
                   </div>
                 </Checkbox>
               ))}

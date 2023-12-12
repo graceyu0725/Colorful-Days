@@ -7,8 +7,11 @@ import {
   ScrollShadow,
 } from '@nextui-org/react';
 import clsx from 'clsx';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 import MaterialSymbolsAddBoxOutlineRounded from '~icons/material-symbols/add-box-outline-rounded';
 import PhDotsThreeVerticalBold from '~icons/ph/dots-three-vertical-bold';
+import UilSchedule from '~icons/uil/schedule';
 import { useAuthStore } from '../../../store/authStore';
 import { useEventsStore } from '../../../store/eventsStore';
 import { useModalStore } from '../../../store/modalStore';
@@ -33,43 +36,61 @@ const UserCalendars: React.FC<Props> = ({
     setCurrentCalendarId,
     setCurrentCalendarContent,
     setCurrentUser,
+    currentThemeColor,
   } = useAuthStore();
   const { setIsAddCalendarModalOpen } = useModalStore();
   const { setCalendarAllEvents } = useEventsStore();
 
-  const handleDeleteCalendar = async (
-    calendarDetail: CalendarContent,
-    previousCalendarId: string,
-  ) => {
+  const [hoveredCalendarId, setHoveredCalendarId] = useState<string | null>(
+    null,
+  );
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleDeleteCalendar = async (calendarDetail: CalendarContent) => {
+    setIsLoading(true);
     await deleteCalendar(calendarDetail);
-    console.log('previousCalendarId', typeof previousCalendarId);
-    updateCalendarContent(
-      previousCalendarId,
-      setCurrentCalendarId,
-      setCurrentCalendarContent,
-      setCalendarAllEvents,
-    );
+    // updateCalendarContent(
+    //   previousCalendarId,
+    //   setCurrentCalendarId,
+    //   setCurrentCalendarContent,
+    //   setCalendarAllEvents,
+    // );
     updateCurrentUser(
       currentUser.userId,
       setCurrentUser,
       setCurrentCalendarId,
       setCurrentCalendarContent,
     );
+    setIsLoading(false);
+
+    toast.success('Calendar removed successfully!');
   };
 
   return (
-    <div className='py-3 px-4 flex flex-col gap-3 overflow-y-auto'>
-      <div className='text-center'>My Calendars</div>
+    <div className='py-4 px-3 flex flex-col gap-3 overflow-y-auto'>
+      <div
+        className={clsx(
+          'mb-2 shadow-md flex items-center justify-center gap-2 h-10 text-lg leading-10 bg-slate-200 rounded-xl outline outline-1 outline-offset-2 text-white transition',
+          currentThemeColor.darkBackground,
+          currentThemeColor.outline,
+        )}
+      >
+        <UilSchedule />
+        My Calendars
+      </div>
+
       {calendarDetails.map((calendarDetail, index) => (
         <Card
           key={index}
           className={clsx(
-            'h-12 rounded-lg shadow border hover:cursor-pointer text-center',
+            'h-12 shrink-0 rounded-xl shadow border hover:cursor-pointer text-center transform transition hover:scale-105',
             {
-              ['outline outline-slate-300']:
+              [`outline hover:scale-100 border-none shadow-md ${currentThemeColor.outline}`]:
                 calendarDetail.calendarId === currentCalendarId,
             },
           )}
+          onMouseEnter={() => setHoveredCalendarId(calendarDetail.calendarId)}
+          onMouseLeave={() => setHoveredCalendarId(null)}
         >
           <div
             className='flex items-center justify-between gap-2 w-full h-full p-3'
@@ -95,27 +116,22 @@ const UserCalendars: React.FC<Props> = ({
               </ScrollShadow>
             </div>
 
-            {calendarDetail.calendarId === currentCalendarId &&
+            {(hoveredCalendarId === calendarDetail.calendarId ||
+              currentCalendarId === calendarDetail.calendarId) &&
               calendarDetails.length > 1 && (
                 <Popover placement='bottom'>
-                  <PopoverTrigger>
+                  <PopoverTrigger className='border-none outline-none'>
                     <button>
                       <PhDotsThreeVerticalBold className='w-4 h-4 p-0' />
                     </button>
                   </PopoverTrigger>
                   <PopoverContent className='p-0 rounded-lg'>
                     <Button
+                      isLoading={isLoading}
                       color='danger'
                       variant='bordered'
                       className='p-0 border-0'
-                      onClick={() => {
-                        const newIndex =
-                          index === 0 ? calendarDetails.length - 1 : index - 1;
-                        handleDeleteCalendar(
-                          calendarDetail,
-                          calendarDetails[newIndex].calendarId,
-                        );
-                      }}
+                      onClick={() => handleDeleteCalendar(calendarDetail)}
                     >
                       delete
                     </Button>
@@ -126,15 +142,15 @@ const UserCalendars: React.FC<Props> = ({
         </Card>
       ))}
 
-      <Card className='h-12 rounded-lg shadow border hover:cursor-pointer flex-row items-center justify-center gap-2'>
+      <Card className='shrink-0 h-12 rounded-xl shadow border hover:cursor-pointer flex-row items-center justify-center gap-2 transform transition hover:scale-105'>
         <div
           className='flex items-center justify-center gap-2 w-full h-full'
           onClick={() => {
             setIsAddCalendarModalOpen(true);
           }}
         >
-          <MaterialSymbolsAddBoxOutlineRounded className='w-5 h-5 text-gray-500'></MaterialSymbolsAddBoxOutlineRounded>
-          <div className='text-gray-500'>Add Calendar</div>
+          <MaterialSymbolsAddBoxOutlineRounded className='w-5 h-5 text-slate-400'></MaterialSymbolsAddBoxOutlineRounded>
+          <div className='text-slate-400'>Add Calendar</div>
         </div>
       </Card>
     </div>

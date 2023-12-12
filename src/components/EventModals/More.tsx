@@ -20,7 +20,6 @@ export default function More() {
   const eventsToRender = eventsToShow.filter((event) => event !== null);
 
   return (
-    // <div className='absolute w-screen h-screen bg-slate-100 top-0 left-0'>
     <Modal
       isOpen={isMoreModalOpen}
       onOpenChange={(isOpen) => setIsMoreModalOpen(isOpen, eventsToRender)}
@@ -33,44 +32,48 @@ export default function More() {
         </ModalHeader>
         <Divider />
         <ModalBody className='gap-2 py-4'>
-          {eventsToRender.map((event, index) => (
-            <div
-              key={index}
-              className={clsx(
-                'flex items-center justify-between shrink-0 truncate px-2 h-6 rounded hover:cursor-pointer',
-                event.isAllDay
-                  ? themeColors[Number(event.tag)].bg
-                  : 'bg-slate-100',
-              )}
-              onClick={() => {
-                setIsEditModalOpen(true, event);
-                setIsMoreModalOpen(false, eventsToRender);
-              }}
-            >
-              {event.isAllDay ? (
-                <div className='truncate'>{event.title}</div>
-              ) : (
-                <>
-                  <div className='flex w-3/4 h-full items-center gap-2'>
-                    <div
-                      className={clsx(
-                        'w-1 h-2/3 rounded',
-                        themeColors[Number(event.tag)].bg,
-                      )}
-                    ></div>
+          {eventsToRender.map(
+            (event, index) =>
+              event && (
+                <div
+                  key={index}
+                  className={clsx(
+                    'flex items-center justify-between shrink-0 truncate px-2 h-6 rounded hover:cursor-pointer',
+                    event.isAllDay
+                      ? `${
+                          themeColors[Number(event.tag)].darkBackground
+                        } text-white`
+                      : 'bg-slate-100',
+                  )}
+                  onClick={() => {
+                    setIsEditModalOpen(true, event);
+                    setIsMoreModalOpen(false, eventsToRender);
+                  }}
+                >
+                  {event.isAllDay ? (
                     <div className='truncate'>{event.title}</div>
-                  </div>
+                  ) : (
+                    <>
+                      <div className='flex w-3/4 h-full items-center gap-2'>
+                        <div
+                          className={clsx(
+                            'w-1 h-2/3 rounded',
+                            themeColors[Number(event.tag)].darkBackground,
+                          )}
+                        />
+                        <div className='truncate'>{event.title}</div>
+                      </div>
 
-                  <div className='truncate mr-1 text-xs text-gray-400'>
-                    {format(event.startAt || new Date(), 'h:mm a')}
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+                      <div className='truncate mr-1 text-xs text-gray-400'>
+                        {format(event.startAt || new Date(), 'h:mm a')}
+                      </div>
+                    </>
+                  )}
+                </div>
+              ),
+          )}
         </ModalBody>
       </ModalContent>
     </Modal>
-    // </div>
   );
 }

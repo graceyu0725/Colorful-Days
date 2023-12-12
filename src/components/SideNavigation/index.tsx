@@ -8,9 +8,9 @@ import {
 } from '@nextui-org/react';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
+import MaterialSymbolsAccountCircleOutline from '~icons/material-symbols/account-circle-outline';
 import MaterialSymbolsExitToAppRounded from '~icons/material-symbols/exit-to-app-rounded';
 import MaterialSymbolsStickyNote2OutlineRounded from '~icons/material-symbols/sticky-note-2-outline-rounded';
-import MingcuteSettings2Line from '~icons/mingcute/settings-2-line';
 import OcticonPeople16 from '~icons/octicon/people-16';
 import UilSchedule from '~icons/uil/schedule';
 import { useAuthStore } from '../../store/authStore';
@@ -20,11 +20,10 @@ import {
   getAllCalendarDetail,
   getAllMemberDetail,
 } from '../../utils/handleUserAndCalendar';
-import { themeColors } from '../../utils/theme';
 import { CalendarContent, Event, User } from '../../utils/types';
 import Members from './SidePanels/Members';
 import Memo from './SidePanels/Memo';
-import Settings from './SidePanels/Settings';
+import Profile from './SidePanels/Profile';
 import UserCalendars from './SidePanels/UserCalendars';
 import AvatarImage from './avatar.png';
 
@@ -33,16 +32,15 @@ type Props = {
 };
 
 const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
-  const { currentUser, currentCalendarContent, currentCalendarId, resetUser } =
-    useAuthStore();
-  const { allEvents, calendarAllEvents, resetAllEvents } = useEventsStore();
+  const {
+    currentUser,
+    currentCalendarContent,
+    currentCalendarId,
+    resetUser,
+    currentThemeColor,
+  } = useAuthStore();
+  const { calendarAllEvents, resetAllEvents } = useEventsStore();
 
-  // Handle functions of icons
-  const themeColorIndex: number =
-    Number(currentCalendarContent.themeColor) || 0;
-  const backgroundColor = themeColors[themeColorIndex]?.light || 'bg-slate-100';
-  const borderColor =
-    themeColors[themeColorIndex]?.border || 'border-slate-100';
   const userCalendars = currentUser.calendars || [''];
 
   const handleLogout = () => {
@@ -57,7 +55,6 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
     Memo = 'Memo',
     Calendars = 'Calendars',
     Members = 'Members',
-    Settings = 'Settings',
   }
 
   // Handle data of props
@@ -65,15 +62,16 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
   const [calendarDetails, setCalendarDetails] = useState<CalendarContent[]>([]);
   const [memberDetails, setMemberDetails] = useState<User[]>([]);
   const [memoEvents, setMemoEvents] = useState<Event[]>([]);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const fetchDetails = async () => {
-    console.log("userCalendars",userCalendars)
     const filteredMemoEvents = calendarAllEvents.filter(
       (event) => event.isMemo,
     );
     setMemoEvents(filteredMemoEvents);
 
-    const detailsOfCalendar = await getAllCalendarDetail(userCalendars);
+    const detailsOfCalendar: CalendarContent[] =
+      await getAllCalendarDetail(userCalendars);
     setCalendarDetails(detailsOfCalendar);
 
     const detailsOfMember = await getAllMemberDetail(
@@ -93,14 +91,6 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
     currentCalendarId,
     calendarAllEvents,
   ]);
-
-  // const TooltippedIcon = ({ icon, tooltipContent, onClick }) => (
-  //   <Tooltip showArrow={true} placement='right' content={tooltipContent}>
-  //     <button className='outline-none' onClick={onClick}>
-  //       {icon}
-  //     </button>
-  //   </Tooltip>
-  // );
 
   const PANEL_COMPONENTS = {
     [PanelType.Profile]: <></>,
@@ -122,23 +112,29 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
         setMemberDetails={setMemberDetails}
       />
     ),
-    [PanelType.Settings]: (
-      <Settings
-        currentCalendarContent={currentCalendarContent}
-        currentCalendarId={currentCalendarId}
-      />
-    ),
   };
 
   return (
     <div
-      className={clsx('flex', {
-        'w-0': !isSideNavigationOpen,
-      })}
+      className={clsx(
+        'flex transition-all duration-300 ease-in-out',
+        isSideNavigationOpen
+          ? currentPanel
+            ? 'w-72'
+            : 'opacity-100 w-16'
+          : 'opacity-0 w-0',
+      )}
     >
+      <Profile
+        isProfileModalOpen={isProfileModalOpen}
+        setIsProfileModalOpen={setIsProfileModalOpen}
+        currentUser={currentUser}
+        currentCalendarContent={currentCalendarContent}
+      />
+
       <div
         className={clsx(
-          'w-16 pl-1 pt-3 h-full flex flex-col border-r transition-all',
+          'w-16 pl-1 pt-3 h-full flex flex-col border-r',
           { 'w-0 hidden': !isSideNavigationOpen },
           // {
           //   ['hidden']: !isSideNavigationOpen,
@@ -149,27 +145,37 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
         <div className='flex items-center flex-col gap-4 overflow-hidden h-full'>
           <Popover placement='bottom-start'>
             <PopoverTrigger>
-              <button className='outline-none mt-1'>
+              <button className='outline-none mt-1 w-full flex justify-center mr-px'>
                 {currentUser.avatar ? (
                   <Avatar
-                    className={clsx('w-10 h-10 p-0 border-2', borderColor)}
+                    className={clsx(
+                      'w-9 h-9 p-0 border-2',
+                      currentThemeColor.border,
+                    )}
                     src={currentUser.avatar}
                   />
                 ) : (
                   <img
                     className={clsx(
-                      'w-9 h-9 p-0 border-2 rounded-full',
-                      borderColor,
+                      'w-9 h-9 p-0 border-2 rounded-full ',
+                      currentThemeColor.border,
                     )}
                     src={AvatarImage}
                   />
                 )}
               </button>
             </PopoverTrigger>
-            <PopoverContent className='p-0'>
+            <PopoverContent className='p-1 flex flex-col'>
+              <Button
+                startContent={<MaterialSymbolsAccountCircleOutline />}
+                className='bg-white hover:bg-slate-100'
+                onClick={() => setIsProfileModalOpen(true)}
+              >
+                Profile
+              </Button>
               <Button
                 startContent={<MaterialSymbolsExitToAppRounded />}
-                className='bg-white'
+                className='bg-white hover:bg-slate-100'
                 onClick={handleLogout}
               >
                 Logout
@@ -177,34 +183,21 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
             </PopoverContent>
           </Popover>
 
-          {/* <Tooltip
-            showArrow={true}
-            placement='right'
-            content={currentUser.email}
-          >
-            <button className='outline-none'>
-              {currentUser.avatar ? (
-                <Avatar
-                  className={clsx('w-10 h-10 p-0 border-2', borderColor)}
-                  src={currentUser.avatar}
-                />
-              ) : (
-                <img
-                  className={clsx(
-                    'w-9 h-9 p-0 border-2 rounded-full ',
-                    borderColor,
-                  )}
-                  src={AvatarImage}
-                />
-                // <UserIcon className='w-9 text-2xl text-slate-700' />
+          <Tooltip showArrow={true} placement='right' content='Memos'>
+            <button
+              className={clsx(
+                'outline-none w-full',
+                {
+                  'border-r-4 pl-1': currentPanel === PanelType.Memo,
+                },
+                {
+                  [currentThemeColor.lightBorder]:
+                    currentPanel === PanelType.Memo,
+                },
               )}
-            </button>
-          </Tooltip> */}
-
-          <Tooltip showArrow={true} placement='right' content='Memo'>
-            <button className='outline-none'>
+            >
               <MaterialSymbolsStickyNote2OutlineRounded
-                className='mt-1 text-2xl text-slate-700 hover:cursor-pointer'
+                className='text-2xl text-slate-700 hover:cursor-pointer m-auto'
                 onClick={() =>
                   setCurrentPanel((prev) =>
                     prev
@@ -220,7 +213,16 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
 
           <Tooltip showArrow={true} placement='right' content='Calendars'>
             <button
-              className='outline-none'
+              className={clsx(
+                'outline-none w-full',
+                {
+                  'border-r-4 pl-1': currentPanel === PanelType.Calendars,
+                },
+                {
+                  [currentThemeColor.lightBorder]:
+                    currentPanel === PanelType.Calendars,
+                },
+              )}
               onClick={() =>
                 setCurrentPanel((prev) =>
                   prev
@@ -231,14 +233,25 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
                 )
               }
             >
-              <UilSchedule className='mt-1 text-2xl text-slate-700 hover:cursor-pointer' />
+              <UilSchedule className='text-2xl text-slate-700 hover:cursor-pointer m-auto' />
             </button>
           </Tooltip>
 
           <Tooltip showArrow={true} placement='right' content='Members'>
-            <button className='outline-none'>
+            <button
+              className={clsx(
+                'outline-none w-full',
+                {
+                  'border-r-4 pl-1': currentPanel === PanelType.Members,
+                },
+                {
+                  [currentThemeColor.lightBorder]:
+                    currentPanel === PanelType.Members,
+                },
+              )}
+            >
               <OcticonPeople16
-                className='text-2xl text-slate-700 hover:cursor-pointer'
+                className='text-2xl text-slate-700 hover:cursor-pointer m-auto'
                 onClick={() =>
                   setCurrentPanel((prev) =>
                     prev
@@ -251,32 +264,6 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
               />
             </button>
           </Tooltip>
-
-          <Tooltip showArrow={true} placement='right' content='Settings'>
-            <button className='outline-none'>
-              <MingcuteSettings2Line
-                className='text-2xl text-slate-700 hover:cursor-pointer'
-                onClick={() =>
-                  setCurrentPanel((prev) =>
-                    prev
-                      ? prev === PanelType.Settings
-                        ? PanelType.None
-                        : PanelType.Settings
-                      : PanelType.Settings,
-                  )
-                }
-              />
-            </button>
-          </Tooltip>
-
-          {/* <Tooltip showArrow={true} placement='right' content='Logout'>
-              <button
-                className='outline-none justify-end'
-                onClick={handleLogout}
-              >
-                <MaterialSymbolsExitToAppRounded className='text-2xl text-slate-700 hover:cursor-pointer' />
-              </button>
-            </Tooltip> */}
         </div>
       </div>
 

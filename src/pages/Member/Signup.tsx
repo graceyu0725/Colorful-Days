@@ -1,10 +1,15 @@
-import { Card, Image } from '@nextui-org/react';
+import { Button, Image } from '@nextui-org/react';
+import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { UserSignUp } from '../../utils/types';
-import signinImage from './signinImage.png';
 
-function Signup() {
+type Props = {
+  isFlipped: boolean;
+  setIsFlipped: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const Signup: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -14,9 +19,9 @@ function Signup() {
   }, []);
 
   const [userInput, setUserInput] = useState<UserSignUp>({
-    name: 'Pikachu',
-    email: 'pikachu@gmail.com',
-    password: '123456',
+    name: '',
+    email: '',
+    password: '',
   });
 
   // Update userInput when typing
@@ -29,140 +34,138 @@ function Signup() {
   };
 
   return (
-    <>
+    <motion.div
+      className='absolute inset-0 flex flex-col justify-center mx-auto w-full max-w-sm lg:w-96'
+      style={{ backfaceVisibility: 'hidden', perspective: '1000px' }}
+      transition={{ duration: 0.5 }}
+      initial={{ opacity: 0 }}
+      animate={{ rotateY: isFlipped ? 0 : -180, opacity: 1 }}
+    >
       <div
-        className='flex items-center justify-center h-screen bg-cover bg-slate-200'
-        // style={{ backgroundImage: `url(${backgroundImage})` }}
+        className='flex items-end hover:cursor-pointer max-w-fit'
+        onClick={() => navigate('/')}
       >
-        <div className='absolute top-0 left-0 right-0 bottom-0 bg-gray-100/50 z-10' />
+        <Image
+          className='h-10 mr-2'
+          src='assets/logo.png'
+          alt='Colorful Days'
+        />
+        <div className='font-custom text-3xl font-bold text-theme-1-300'>
+          Colorful Days
+        </div>
+      </div>
 
-        <Card className='w-11/12 p-0 rounded-lg flex z-10 h-5/6'>
-          <div className='flex h-full'>
-            <div className='h-full flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24'>
-              <div className='max-h-full flex flex-col justify-center  mx-auto w-full max-w-sm lg:w-96'>
-                <div className='flex items-center'>
-                  <Image
-                    className='h-10 mr-1'
-                    src='assets/logo.png'
-                    alt='Colorful Days'
-                  />
-                  <div className='text-xl font-bold text-[#5a3a1b]'>
-                    Colorful Days
-                  </div>
-                </div>
+      <h2 className='mt-2 mb-10 text-3xl font-bold tracking-tight'>
+        Create your colorful days
+      </h2>
 
-                <h2 className='mt-2 mb-10 text-3xl font-bold tracking-tight text-gray-900'>
-                  Create your colorful days
-                </h2>
+      <div className='mt-6'>
+        <form action='#' method='POST' className='space-y-6'>
+          <div className='flex flex-col'>
+            <label
+              htmlFor='userName'
+              className='block font-medium text-gray-700'
+            >
+              Name
+            </label>
+            <input
+              id='name'
+              name='name'
+              type='text'
+              autoComplete='name'
+              required
+              placeholder='Your name'
+              value={userInput.name}
+              onChange={updateUserInput}
+              className='placeholder:h-11 placeholder:text-sm leading-[44px] h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
+            />
+          </div>
+          <div className='flex flex-col gap-1'>
+            <label htmlFor='email' className='block font-medium text-gray-700'>
+              Email
+            </label>
+            <input
+              id='signupEmail'
+              name='email'
+              type='email'
+              autoComplete='email'
+              required
+              placeholder='email@example.com'
+              value={userInput.email}
+              onChange={updateUserInput}
+              className='placeholder:h-11 placeholder:text-sm leading-[44px] h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
+            />
+          </div>
 
-                <div className='mt-6'>
-                  <form action='#' method='POST' className='space-y-6'>
-                    <div className='flex flex-col'>
-                      <label
-                        htmlFor='userName'
-                        className='block font-medium text-gray-700'
-                      >
-                        Name
-                      </label>
-                      <input
-                        id='name'
-                        name='name'
-                        type='text'
-                        autoComplete='name'
-                        required
-                        value={userInput.name}
-                        onChange={updateUserInput}
-                        className='h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
-                      />
-                    </div>
-                    <div className='flex flex-col gap-1'>
-                      <label
-                        htmlFor='email'
-                        className='block font-medium text-gray-700'
-                      >
-                        Email
-                      </label>
-                      <input
-                        id='email'
-                        name='email'
-                        type='email'
-                        autoComplete='email'
-                        required
-                        value={userInput.email}
-                        onChange={updateUserInput}
-                        className='h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
-                      />
-                    </div>
+          <div className='flex flex-col gap-1'>
+            <label
+              htmlFor='password'
+              className='block font-medium text-gray-700'
+            >
+              Password
+            </label>
+            <input
+              id='signupPassword'
+              name='password'
+              type='password'
+              autoComplete='current-password'
+              required
+              placeholder='At least 6 characters'
+              value={userInput.password}
+              onChange={updateUserInput}
+              className='placeholder:h-11 placeholder:tracking-normal placeholder:text-sm tracking-widest h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
+              onKeyDown={(e) => {
+                if (
+                  e.key === 'Enter' &&
+                  userInput.name &&
+                  userInput.email &&
+                  userInput.password
+                ) {
+                  navigate('/select', {
+                    state: {
+                      userInfo: userInput,
+                      isNativeSignup: true,
+                    },
+                  });
+                }
+              }}
+            />
+          </div>
 
-                    <div className='flex flex-col gap-1'>
-                      <label
-                        htmlFor='password'
-                        className='block font-medium text-gray-700'
-                      >
-                        Password
-                      </label>
-                      <input
-                        id='password'
-                        name='password'
-                        type='password'
-                        autoComplete='current-password'
-                        required
-                        value={userInput.password}
-                        onChange={updateUserInput}
-                        className='tracking-widest h-11 block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-slate-400 focus:outline-none focus:ring-slate-400'
-                      />
-                    </div>
-
-                    <div className='flex items-center text-sm'>
-                      <div className='font-medium mr-2'>
-                        Already have an account?
-                      </div>
-                      <Link
-                        to='/signin'
-                        className='font-medium text-slate-600 hover:text-slate-500 underline'
-                      >
-                        Sign in
-                      </Link>
-                    </div>
-
-                    <div>
-                      <button
-                        type='button'
-                        disabled={
-                          !userInput.name ||
-                          !userInput.email ||
-                          !userInput.password
-                        }
-                        onClick={() =>
-                          navigate('/select', {
-                            state: {
-                              userInfo: userInput,
-                              isNativeSignup: true,
-                            },
-                          })
-                        }
-                        className='h-11 flex w-full justify-center rounded-md border border-transparent bg-slate-700 py-2 px-4 font-medium text-white shadow-sm hover:bg-slate-600 disabled:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2'
-                      >
-                        Create account
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-
-            <div className='relative hidden w-0 flex-1 lg:block lg:grow'>
-              <img
-                className='absolute h-full w-full object-cover'
-                src={signinImage}
-                alt=''
-              />
+          <div className='flex items-center text-sm'>
+            <div className='font-medium mr-2'>Already have an account?</div>
+            <div
+              // to='/signin'
+              className='font-medium text-slate-600 hover:text-theme-1-300 hover:cursor-pointer underline'
+              onClick={() => setIsFlipped(false)}
+            >
+              Sign in
             </div>
           </div>
-        </Card>
+
+          <div>
+            <Button
+              type='button'
+              disabled={
+                !userInput.name || !userInput.email || !userInput.password
+              }
+              onClick={() =>
+                navigate('/select', {
+                  state: {
+                    userInfo: userInput,
+                    isNativeSignup: true,
+                  },
+                })
+              }
+              className='h-11 w-full text-base rounded-lg bg-theme-1-300 text-white'
+            >
+              Create account
+            </Button>
+          </div>
+        </form>
       </div>
-    </>
+    </motion.div>
   );
-}
+};
 
 export default Signup;

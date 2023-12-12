@@ -1,8 +1,10 @@
 import { useEventsStore } from '../../../store/eventsStore';
+import { useModalStore } from '../../../store/modalStore';
 import {
   getSplitEvents,
   renderWeeklyAllDayEvent,
 } from '../../../utils/handleDatesAndEvents';
+import { Event } from '../../../utils/types';
 
 type Props = {
   weekDates: Date[];
@@ -10,30 +12,25 @@ type Props = {
 
 const AllDayEventCells: React.FC<Props> = ({ weekDates }) => {
   const { allEvents } = useEventsStore();
+  const { setIsMoreModalOpen, setIsEditModalOpen } = useModalStore();
 
   const spiltEvents = getSplitEvents(weekDates, allEvents);
 
-  const filterAllDayEventsF = (weekEvents) => {
-    // return events.map(event =>
-    //   event === null || event.isAllDay ? event : null
-    // );
-    return weekEvents.map(
-      (dayEvents) =>
-        dayEvents.map((event) =>
-          event === null || event.isAllDay ? event : null,
-        ),
-      //  console.log("回圈中",event)
+  // const filterAllDayEvents = (weekEvents: Event[][]) => {
+  //   return weekEvents.map((dayEvents) =>
+  //     dayEvents.map((event) =>
+  //       event === null || event.isAllDay ? event : null,
+  //     ),
+  //   );
+  // };
+
+  const filterAllDayEvents = (weekEvents: Event[][]): Event[][] => {
+    return weekEvents.map((dayEvents) =>
+      dayEvents.filter((event) => event && event.isAllDay),
     );
   };
 
-  // const filteredAllDayEvents = spiltEvents[0].map((spiltEvent) =>
-  //   spiltEvent.filter((event) => event.isAllDay === true || event === undefined),
-  // );
-
-  const filteredAllDayEvents = filterAllDayEventsF(spiltEvents[0]);
-
-  console.log('weekly1', spiltEvents[0]);
-  console.log('weekly2', filteredAllDayEvents);
+  const filteredAllDayEvents = filterAllDayEvents(spiltEvents[0]);
 
   interface WrapperProps {
     children: React.ReactNode;
@@ -64,7 +61,13 @@ const AllDayEventCells: React.FC<Props> = ({ weekDates }) => {
     <WeeklyEventsWrapper id='weeklyEventsWrapper'>
       <EventRow id='eventRow'>
         {filteredAllDayEvents.map((events, index) =>
-          renderWeeklyAllDayEvent(weekDates, index, events),
+          renderWeeklyAllDayEvent(
+            weekDates,
+            index,
+            events,
+            setIsMoreModalOpen,
+            setIsEditModalOpen,
+          ),
         )}
       </EventRow>
     </WeeklyEventsWrapper>

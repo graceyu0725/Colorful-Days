@@ -3,24 +3,12 @@ import { addDays, addMonths, subDays, subMonths } from 'date-fns';
 import CodiconFilter from '~icons/codicon/filter';
 import LucideAlignJustify from '~icons/lucide/align-justify';
 // import MaterialSymbolsStickyNote2OutlineRounded from '~icons/material-symbols/sticky-note-2-outline-rounded';
+import clsx from 'clsx';
+import { useNavigate } from 'react-router-dom';
 import TdesignAdd from '~icons/tdesign/add';
+import { useAuthStore } from '../../store/authStore';
 import { useModalStore } from '../../store/modalStore';
 import { CalendarViewCategory, useViewStore } from '../../store/viewStore';
-
-const styles = {
-  container: 'w-full h-16 flex justify-between items-center px-6 border-b',
-  borderButton: 'text-base border-1 hover:bg-gray-200 hover:cursor-pointer',
-  addButton:
-    'p-1 min-w-unit-10 text-base border-1 hover:bg-gray-200 hover:cursor-pointer rounded-md',
-  regularButton:
-    ' text-base p-2 min-w-0 w-8 h-8 rounded-full bg-white hover:bg-gray-200 hover:cursor-pointer',
-  wrapper: 'flex items-center',
-  title: 'font-bold mx-2 text-xl w-44 text-center',
-  viewButton:
-    'h-8 text-base border-0 bg-white hover:text-slate-500 hover:cursor-pointer rounded-md',
-  activeButton:
-    'h-8 text-base border-0 bg-white bg-slate-500 text-white hover:cursor-pointer rounded-md',
-};
 
 type Props = {
   value?: Date;
@@ -40,6 +28,34 @@ const Navigation: React.FC<Props> = ({
     setCurrentDate,
     formateDate,
   } = useViewStore();
+  const { currentThemeColor } = useAuthStore();
+  const navigate = useNavigate();
+
+  const styles = {
+    container: 'w-full h-16 flex justify-between items-center px-6 border-b',
+    borderButton: clsx(
+      'text-base border-1 text-slate-700 hover:bg-gray-200 hover:cursor-pointer',
+      currentThemeColor.hover,
+    ),
+    addButton: clsx(
+      'p-0 min-w-unit-10 text-base border-1 text-slate-700 hover:bg-gray-200 hover:cursor-pointer rounded-md',
+      currentThemeColor.hover,
+    ),
+    wrapper: 'flex items-center',
+    title: 'font-bold mx-2 text-xl w-44 text-center',
+    viewButton: clsx(
+      'h-8 text-base border-0 bg-white text-slate-700 hover:text-slate-500 hover:cursor-pointer rounded-md',
+      currentThemeColor.hover,
+    ),
+    activeButton: clsx(
+      'h-8 text-base border-0 bg-white bg-slate-500 text-white hover:cursor-pointer rounded-md',
+      currentThemeColor.darkBackground,
+    ),
+    changeButton: clsx(
+      'border-1 border-r-0 min-w-0 w-8 p-0',
+      currentThemeColor.hover,
+    ),
+  };
 
   const changeMonth = (actionType: string) => {
     switch (actionType) {
@@ -70,15 +86,24 @@ const Navigation: React.FC<Props> = ({
     <div className={styles.container}>
       <div className='flex items-center'>
         <LucideAlignJustify
-          className='mr-4 text-xl text-[#5a3a1b] hover:cursor-pointer'
+          className='mr-4 text-xl text-slate-700 hover:cursor-pointer'
           onClick={() => setIsSideNavigationOpen((prev) => !prev)}
         />
 
         <div className='flex items-center justify-center'>
-          <img src='/assets/logo.png' className='w-10 ml-6' />
-          <h1 className='px-1 text-lg font-bold text-[#5a3a1b] mr-4'>
-            Colorful Days
-          </h1>
+          <div className='flex items-end'>
+            <img
+              src='/assets/logo.png'
+              className='hover:cursor-pointer w-9 ml-6'
+              onClick={() => navigate('/calendar')}
+            />
+            <h1
+              className='hover:cursor-pointer font-custom font-bold px-1 text-2xl mr-4 text-theme-1-300'
+              onClick={() => navigate('/calendar')}
+            >
+              Colorful Days
+            </h1>
+          </div>
 
           <Button
             variant='bordered'
@@ -92,7 +117,7 @@ const Navigation: React.FC<Props> = ({
 
           <ButtonGroup className='min-w-0 ml-2' variant='bordered'>
             <Button
-              className='border-1 border-r-0 min-w-0 w-8 p-0 hover:bg-slate-300'
+              className={styles.changeButton}
               onClick={() => {
                 changeMonth('sub');
               }}
@@ -100,7 +125,7 @@ const Navigation: React.FC<Props> = ({
               {'<'}
             </Button>
             <Button
-              className='border-1 border-l-0 min-w-0 w-8 p-0 hover:bg-slate-300'
+              className={clsx(styles.changeButton, 'border-r-1')}
               onClick={() => {
                 changeMonth('add');
               }}
@@ -168,7 +193,7 @@ const Navigation: React.FC<Props> = ({
               setIsCreateModalOpen(true, new Date(), new Date(), false)
             }
           >
-            <TdesignAdd className='text-xl text-[#5a3a1b] hover:cursor-pointer' />
+            <TdesignAdd className='text-xl text-slate-700 hover:cursor-pointer' />
           </Button>
         </Tooltip>
 
@@ -190,7 +215,7 @@ const Navigation: React.FC<Props> = ({
             className={styles.addButton}
             onClick={() => setIsSideBarOpen((prev) => !prev)}
           >
-            <CodiconFilter className='text-xl text-[#5a3a1b] hover:cursor-pointer' />{' '}
+            <CodiconFilter className='text-xl text-slate-700 hover:cursor-pointer' />
           </Button>
         </Tooltip>
       </div>
