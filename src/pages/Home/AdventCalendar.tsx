@@ -61,11 +61,6 @@ export default function AdventCalendar() {
           transformStyle: 'preserve-3d',
           perspective: '2800px',
         }}
-        // whileHover={{
-        //   rotateY: isFlipped ? 0 : 20,
-        //   rotateZ: isFlipped ? 0 : -0.5,
-        //   rotateX: isFlipped ? 0 : -0.5,
-        // }}
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ rotate: 0, scale: 1, opacity: 1 }}
         transition={{
@@ -85,7 +80,7 @@ export default function AdventCalendar() {
         <motion.div
           className='min-h-content absolute top-10 bottom-10 right-20 shadow-xl flex flex-col justify-center gap-4 px-10 rounded-3xl bg-theme-1-300 hover:cursor-pointer'
           style={{ backfaceVisibility: 'hidden' }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.7 }}
           initial={false}
           animate={{ rotateY: isFlipped ? 0 : -180 }}
         >
@@ -103,7 +98,7 @@ export default function AdventCalendar() {
         <motion.div
           className='min-h-content absolute top-10 bottom-10 shadow-xl flex flex-col justify-center gap-4 px-10 rounded-3xl bg-theme-1-300 hover:cursor-pointer overflow-hidden'
           style={{ backfaceVisibility: 'hidden' }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.7 }}
           initial={false}
           animate={{ rotateY: isFlipped ? 180 : 0 }}
         >

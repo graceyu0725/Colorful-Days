@@ -130,7 +130,7 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     await deleteDoc(eventRef);
     setIsEditModalOpen(false, selectedEvent);
 
-    toast.success('Event deleted successfully!');
+    toast.success('Event deleted successfully.');
   };
 
   const calendarTags = currentCalendarContent.tags || defaultTags;
@@ -168,32 +168,32 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
 
   const renderComments = () => {
     return (
-      <div className='h-40 flex flex-col gap-2 overflow-y-auto px-1'>
+      <div className='h-52 flex flex-col gap-2 overflow-y-auto px-1 min-h-[180px]'>
         {selectedEvent.messages.map((message, index) => (
           <div
             key={index}
             className={clsx('flex gap-1', {
-              'justify-end': currentUser.userId === message.arthur.userId,
+              'pl-10': currentUser.userId === message.arthur.userId,
             })}
           >
             <div
-              className={clsx('flex gap-1 w-3/5', {
-                'justify-end': currentUser.userId === message.arthur.userId,
+              className={clsx('flex gap-2 grow', {
+                // 'justify-end': currentUser.userId === message.arthur.userId,
               })}
             >
               {currentUser.userId === message.arthur.userId ? (
                 <>
-                  <div className='flex items-end gap-2'>
-                    <div className='text-xs w-24 text-slate-500 text-right'>
-                      {formatTime(message.createdAt)}
+                  <div className='flex flex-col items-end grow gap-0.5'>
+                    <div className='px-px text-xs text-slate-500 truncate text-right max-w-[300px]'>
+                      {message.arthur.name}
                     </div>
-                    <div className='flex flex-col items-end'>
-                      <div className='px-px text-xs text-slate-500 truncate max-w-[92px] text-right'>
-                        {message.arthur.name}
+                    <div className='flex items-end gap-2 max-w-full'>
+                      <div className='text-xs text-slate-500 text-right min-w-fit'>
+                        {formatTime(message.createdAt)}
                       </div>
                       <div
                         className={clsx(
-                          'text-sm max-w-[200px] min-h-[28px] px-2 leading-7 break-words rounded-lg',
+                          'text-sm px-2 py-1 break-words rounded-lg max-w-[280px]',
                           themeColors[Number(selectedEvent.tag)]
                             .lightBackground,
                         )}
@@ -204,21 +204,21 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
                   </div>
                   <img
                     src={message.arthur.avatar || avatarImage}
-                    className='w-11 h-11 rounded-full'
+                    className='w-11 h-11 rounded-full object-cover object-center'
                   />
                 </>
               ) : (
                 <>
                   <img
                     src={message.arthur.avatar || avatarImage}
-                    className='w-11 h-11 rounded-full'
+                    className='w-11 h-11 rounded-full object-cover object-center'
                   />
-                  <div className='flex flex-col'>
-                    <div className='px-px text-xs text-slate-500 truncate max-w-[92px]'>
+                  <div className='flex flex-col items-start grow gap-0.5'>
+                    <div className='px-px text-xs text-slate-500 truncate'>
                       {message.arthur.name}
                     </div>
-                    <div className='flex items-end gap-2'>
-                      <div className='text-sm max-w-[200px] min-h-[28px] px-2 leading-7 break-words bg-slate-100 rounded-lg'>
+                    <div className='flex items-end gap-2 max-w-full'>
+                      <div className='text-sm px-2 py-1 break-words max-w-[280px] bg-slate-100 rounded-lg'>
                         {message.content}
                       </div>
                       <div className='text-xs w-24 text-slate-500'>
@@ -240,7 +240,7 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     <>
       <ModalHeader className='py-3'>View Event</ModalHeader>
       <Divider />
-      <ModalBody className='pt-3'>
+      <ModalBody className='pt-3 max-h-[calc(100vh_-_100px)] overflow-y-auto'>
         <div className='flex items-center px-2'>
           <div
             className={clsx(

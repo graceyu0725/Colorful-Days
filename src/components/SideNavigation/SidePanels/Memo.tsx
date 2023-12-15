@@ -21,6 +21,7 @@ import { useModalStore } from '../../../store/modalStore';
 import { addNewMemo } from '../../../utils/handleUserAndCalendar';
 import { themeColors } from '../../../utils/theme';
 import { CalendarContent, Event } from '../../../utils/types';
+import { DraggableItem } from '../../DND';
 
 type Props = {
   memoEvents: Event[];
@@ -48,11 +49,20 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
   };
 
   const handleAddMemo = async () => {
-    await addNewMemo(selectedTag, memoInput, currentCalendarContent.calendarId);
+    if (memoInput.replace(/\s+/g, '').length === 0) {
+      toast.error('Memo title can not be empty!');
+      return;
+    }
+
+    await addNewMemo(
+      selectedTag,
+      memoInput.trim(),
+      currentCalendarContent.calendarId,
+    );
     setMemoInput('');
     setSelectedTag('0');
 
-    toast.success('Memo added successfully!');
+    toast.success('Memo added successfully.');
   };
 
   return (
@@ -153,7 +163,7 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
 
         <Card
           className={clsx(
-            'mt-4 shadow border-2',
+            'mt-4 shadow border-2 relative',
             currentThemeColor.lightBorder,
           )}
         >
@@ -165,18 +175,21 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
             {memoEvents.length > 0 ? (
               <div className='flex flex-col gap-2'>
                 {memoEvents.map((event, index) => (
-                  <div
+                  <DraggableItem
+                    id={event.eventId.toString()}
                     key={index}
                     className={clsx(
-                      'transform transition hover:scale-105 flex items-center justify-center gap-2 w-full p-3 h-12 rounded-lg shadow-md hover:cursor-pointer',
+                      'relative transition hover:scale-105 flex items-center justify-center gap-2 w-full p-3 h-12 rounded-lg shadow-md hover:cursor-pointer',
                       themeColors[Number(event.tag)].lightBackground,
                     )}
                     onClick={() => {
                       setIsEditModalOpen(true, event);
                     }}
+                    event={event}
+                    style={{}}
                   >
-                    <div className='truncate'>{event.title}</div>
-                  </div>
+                    {event.title}
+                  </DraggableItem>
                 ))}
               </div>
             ) : (

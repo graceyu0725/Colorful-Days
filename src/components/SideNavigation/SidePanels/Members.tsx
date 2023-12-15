@@ -86,7 +86,7 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
       setSearchInput('');
       setSearchResult(null);
       setIsMemberExist(false);
-      toast.success('Member added successfully!');
+      toast.success('Member added successfully.');
     } else {
       toast.error('Failed to add member.');
     }
@@ -95,7 +95,7 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
   const handleRemoveMember = async (calendarId: string, userId: string) => {
     await removeMember(calendarId, userId);
 
-    toast.success('Member removed successfully!');
+    toast.success('Member removed successfully.');
   };
 
   interface UserAvatarProps {
@@ -103,7 +103,7 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
   }
   const UserAvatar: React.FC<UserAvatarProps> = ({ avatarUrl }) => (
     <img
-      className='w-10 h-10 mr-2 rounded-full'
+      className='w-10 h-10 mr-2 rounded-full object-cover object-center'
       src={avatarUrl || AvatarImage}
     />
   );

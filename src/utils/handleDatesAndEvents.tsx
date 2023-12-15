@@ -251,6 +251,7 @@ export const renderEvent = (
       if (event.isAllDay) {
         return (
           <DraggableItem
+            key={event.eventId}
             id={event.eventId}
             className={clsx(
               'flex truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
@@ -273,6 +274,7 @@ export const renderEvent = (
       const formattedTime = format(startDate, 'HH:mm');
       return (
         <DraggableItem
+          key={event.eventId}
           id={event.eventId}
           className={clsx(
             'truncate basis-0 rounded indent-1.5 hover:cursor-pointer hover:-translate-y-px hover:shadow-md',
@@ -302,6 +304,7 @@ export const renderEvent = (
     if (getDay(startDate) + lastDays > 7) {
       return (
         <DraggableItem
+          key={event.eventId}
           id={event.eventId}
           className={clsx(
             'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
@@ -323,6 +326,7 @@ export const renderEvent = (
     }
     return (
       <DraggableItem
+        key={event.eventId}
         id={event.eventId}
         className={clsx(
           'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
@@ -351,6 +355,7 @@ export const renderEvent = (
     if (lastDaysThisWeek <= 7) {
       return (
         <DraggableItem
+          key={event.eventId}
           id={event.eventId}
           className={clsx(
             'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
@@ -372,6 +377,7 @@ export const renderEvent = (
     }
     return (
       <DraggableItem
+        key={event.eventId}
         id={event.eventId}
         className={clsx(
           'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',

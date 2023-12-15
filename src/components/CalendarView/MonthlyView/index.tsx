@@ -73,9 +73,12 @@ const MonthlyView: React.FC = () => {
             <DayCellsWrapper id='dayCellsWrapper'>
               {week.map((cellDate, idx) => {
                 return (
-                  <DroppableArea id={cellDate.toDateString()} date={cellDate}>
+                  <DroppableArea
+                    key={`droppable-${index}-${idx}`}
+                    id={`droppable-${index}-${idx}`}
+                    date={cellDate}
+                  >
                     <Cell
-                      key={`${index}-${idx}`}
                       className={clsx('grow', {
                         ['text-gray-400']: !isSameMonth(cellDate, currentDate),
                       })}

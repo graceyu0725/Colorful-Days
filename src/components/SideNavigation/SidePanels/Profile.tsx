@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { collection, doc, updateDoc } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { ChangeEvent, useState } from 'react';
+import toast from 'react-hot-toast';
 import EosIconsLoading from '~icons/eos-icons/loading';
 import MaterialSymbolsEditOutlineRounded from '~icons/material-symbols/edit-outline-rounded';
 import { app, db } from '../../../utils/firebase';
@@ -34,10 +35,17 @@ const Profile: React.FC<Props> = ({
 
       const usersCollection = collection(db, 'Users');
       const userDocRef = doc(usersCollection, currentUser.email);
-      await updateDoc(userDocRef, {
-        avatar: downloadURL,
-      });
-      setIsLoading(false);
+
+      try {
+        await updateDoc(userDocRef, { avatar: downloadURL });
+        setIsLoading(false);
+        toast.success('Profile picture updated successfully.');
+      } catch (error) {
+        setIsLoading(false);
+        toast.error(
+          'There is an error when updating profile picture. Please try again!',
+        );
+      }
     }
   };
 
@@ -52,7 +60,7 @@ const Profile: React.FC<Props> = ({
       <ModalContent>
         <div
           className={clsx(
-            'w-full h-full p-10 flex flex-col items-center gap-5',
+            'max-h-[calc(100vh_-_130px)] overflow-y-auto w-full h-full p-10 flex flex-col items-center gap-5',
             themeColors[Number(currentCalendarContent.themeColor)]
               .lightBackground,
           )}
@@ -83,16 +91,16 @@ const Profile: React.FC<Props> = ({
               src={currentUser.avatar || AvatarImage}
               alt='Avatar'
               className={clsx(
-                'absolute -top-8 left-32 w-16 h-16 border-3 border-slate-50',
+                'absolute -top-8 left-32 w-16 h-16 border-3 border-slate-50 object-cover object-center',
                 //   themeColors[Number(currentCalendarContent.themeColor)]
                 //   .lightBorder,
               )}
             />
-            <div className='flex flex-col mt-10 mb-4 items-center justify-center gap-1'>
-              <div className='text-center text-2xl break-words'>
+            <div className='flex flex-col mt-10 mb-4 px-6 items-center justify-center gap-1 overflow-x-auto'>
+              <div className='text-center text-2xl break-words max-w-full'>
                 {currentUser.name}
               </div>
-              <div className='text-center text-lg break-words'>
+              <div className='text-center text-lg break-words max-w-full'>
                 {currentUser.email}
               </div>
             </div>

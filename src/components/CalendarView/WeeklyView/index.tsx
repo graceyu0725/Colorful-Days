@@ -147,7 +147,7 @@ const WeeklyView: React.FC = () => {
             currentThemeColor.border,
           )}
           style={{ width: 'calc(100% - 80px)', top: `${topPosition}px` }}
-        ></div>
+        />
 
         {/* 左邊時間列 */}
         {timeStyles.map((timeStyle, index) => (

@@ -26,12 +26,12 @@ export default function More() {
       size='xs'
       scrollBehavior='inside'
     >
-      <ModalContent>
+      <ModalContent className='max-h-[calc(100vh_-_130px)]'>
         <ModalHeader className='py-3'>
           {eventsToRender.length} Events
         </ModalHeader>
         <Divider />
-        <ModalBody className='gap-2 py-4'>
+        <ModalBody className='gap-2 py-4 overflow-y-auto'>
           {eventsToRender.map(
             (event, index) =>
               event && (

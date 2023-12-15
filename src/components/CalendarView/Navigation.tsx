@@ -91,14 +91,14 @@ const Navigation: React.FC<Props> = ({
         />
 
         <div className='flex items-center justify-center'>
-          <div className='flex items-end'>
+          <div className='items-end hidden md:flex'>
             <img
               src='/assets/logo.png'
-              className='hover:cursor-pointer w-9 ml-6'
+              className='hover:cursor-pointer w-9 ml-6 mr-2 lg:mr-0'
               onClick={() => navigate('/calendar')}
             />
             <h1
-              className='hover:cursor-pointer font-custom font-bold px-1 text-2xl mr-4 text-theme-1-300'
+              className='hover:cursor-pointer font-custom font-bold px-1 text-2xl mr-4 text-theme-1-300 hidden lg:block'
               onClick={() => navigate('/calendar')}
             >
               Colorful Days
@@ -107,7 +107,7 @@ const Navigation: React.FC<Props> = ({
 
           <Button
             variant='bordered'
-            className={styles.borderButton}
+            className={clsx("hidden md:block",styles.borderButton)}
             onClick={() => {
               setCurrentDate(new Date());
             }}
@@ -115,7 +115,7 @@ const Navigation: React.FC<Props> = ({
             Today
           </Button>
 
-          <ButtonGroup className='min-w-0 ml-2' variant='bordered'>
+          <ButtonGroup className='min-w-0 ml-6 md:ml-2' variant='bordered'>
             <Button
               className={styles.changeButton}
               onClick={() => {
@@ -162,7 +162,7 @@ const Navigation: React.FC<Props> = ({
       </div> */}
 
       <div className='flex items-center gap-1'>
-        <div className='border rounded-md p-1 flex gap-1'>
+        <div className='border rounded-md p-1 gap-1 hidden sm:flex'>
           <Button
             className={
               currentView === CalendarViewCategory.Monthly

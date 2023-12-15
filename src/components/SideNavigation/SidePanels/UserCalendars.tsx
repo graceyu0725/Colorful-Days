@@ -63,7 +63,7 @@ const UserCalendars: React.FC<Props> = ({
     );
     setIsLoading(false);
 
-    toast.success('Calendar removed successfully!');
+    toast.success('Calendar removed successfully.');
   };
 
   return (

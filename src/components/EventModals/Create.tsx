@@ -47,11 +47,16 @@ export default function Create() {
     const calendarRef = doc(db, 'Calendars', currentCalendarId);
     const eventRef = doc(calendarRef, 'events', id);
     await setDoc(eventRef, data);
-    toast.success('Event added successfully!');
+    toast.success('Event added successfully.');
   };
 
   const handleSubmit = async () => {
     if (!userInput.title) {
+      setIsTitleEmpty(true);
+      return;
+    }
+
+    if (userInput.title.replace(/\s+/g, '').length === 0) {
       setIsTitleEmpty(true);
       return;
     }
@@ -68,6 +73,7 @@ export default function Create() {
 
     const data = {
       ...userInput,
+      title: userInput.title.trim(),
       createdAt: currentTime,
       updatedAt: currentTime,
       eventId: eventUUID,
@@ -104,7 +110,7 @@ export default function Create() {
         }}
         size='lg'
       >
-        <ModalContent>
+        <ModalContent className='max-h-[calc(100vh_-_130px)]'>
           {renderModalContent(
             isComposing,
             setIsComposing,

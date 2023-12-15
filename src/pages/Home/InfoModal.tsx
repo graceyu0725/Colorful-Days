@@ -1,7 +1,7 @@
 import { Modal, ModalBody, ModalContent, ModalHeader } from '@nextui-org/react';
+import AdventCalendar from './img/advent-calendar.png';
 import ThemesImage from './img/theme-colors.gif';
 import UserInterface from './img/user-interface.gif';
-import AdventCalendar from './img/advent-calendar.png';
 
 type Props = {
   isInfoModalOpen: boolean;
@@ -61,9 +61,9 @@ const InfoModal: React.FC<Props> = ({
       onOpenChange={(isOpen) => {
         setIsInfoModalOpen(isOpen);
       }}
-      size='xl'
+      size='2xl'
     >
-      <ModalContent>
+      <ModalContent className='max-h-[calc(100vh_-_130px)] overflow-y-auto'>
         <ModalHeader className='mt-3'>
           {selectedCell && (
             <div className='text-xl text-[#EC8F3F]'>
@@ -73,18 +73,17 @@ const InfoModal: React.FC<Props> = ({
         </ModalHeader>
         <ModalBody className='pb-6'>
           {selectedCell && (
-            <div className='flex gap-4'>
+            <div className='flex flex-col gap-4'>
               <div
-                className='w-1/2 rounded-xl border'
+                className='h-80 rounded-xl border'
                 style={{
                   backgroundImage: `url(${Info[selectedCell].image})`,
-
                   backgroundSize: 'cover',
                   backgroundRepeat: 'no-repeat',
                   backgroundPosition: 'center',
                 }}
               ></div>
-              <div className='w-1/2 whitespace-pre-line'>
+              <div className=' whitespace-pre-line'>
                 {Info[selectedCell].content}
               </div>
             </div>

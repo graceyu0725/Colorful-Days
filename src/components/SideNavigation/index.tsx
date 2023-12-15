@@ -149,7 +149,7 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
                 {currentUser.avatar ? (
                   <Avatar
                     className={clsx(
-                      'w-9 h-9 p-0 border-2',
+                      'w-9 h-9 p-0 border-2 object-cover object-center',
                       currentThemeColor.border,
                     )}
                     src={currentUser.avatar}
@@ -157,7 +157,7 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
                 ) : (
                   <img
                     className={clsx(
-                      'w-9 h-9 p-0 border-2 rounded-full ',
+                      'w-9 h-9 p-0 border-2 rounded-full object-cover object-center',
                       currentThemeColor.border,
                     )}
                     src={AvatarImage}

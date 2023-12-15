@@ -1,6 +1,8 @@
 import { Button, Image } from '@nextui-org/react';
+import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { UserSignUp } from '../../utils/types';
 
@@ -24,13 +26,62 @@ const Signup: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
     password: '',
   });
 
+  // const [userInput, setUserInput] = useState<UserSignUp>({
+  //   name: '小丘',
+  //   email: 'pikachu@gmail.com',
+  //   password: '123456',
+  // });
+
   // Update userInput when typing
   const updateUserInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
+    if (name === 'email' || name === 'password') {
+      setUserInput((prevData) => ({
+        ...prevData,
+        [name]: value.trim(),
+      }));
+      return;
+    }
     setUserInput((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+  };
+
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+    return emailRegex.test(email);
+  };
+
+  const isValidPassword = (password: string) => {
+    const passwordRegex = /^[A-Za-z0-9!@#$%^&*()_+-=[\]{};':"\\|,.<>\/?]+$/g;
+    return passwordRegex.test(password);
+  };
+
+  const handleSubmit = () => {
+    if (userInput.name.replace(/\s+/g, '').length === 0) {
+      toast.error('Name can not be empty!');
+      return;
+    }
+    if (!isValidEmail(userInput.email)) {
+      toast.error('Invalid email!');
+      return;
+    }
+    if (userInput.password.length < 6) {
+      toast.error('Password must contain at least 6 characters!');
+      return;
+    }
+    if (!isValidPassword(userInput.password)) {
+      toast.error('Password can only contain letters, numbers, and symbols!');
+      return;
+    }
+
+    navigate('/select', {
+      state: {
+        userInfo: { ...userInput, name: userInput.name.trim() },
+        isNativeSignup: true,
+      },
+    });
   };
 
   return (
@@ -55,7 +106,7 @@ const Signup: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
         </div>
       </div>
 
-      <h2 className='mt-2 mb-10 text-3xl font-bold tracking-tight'>
+      <h2 className='mt-2 mb-6 text-3xl font-bold tracking-tight'>
         Create your colorful days
       </h2>
 
@@ -87,7 +138,6 @@ const Signup: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
             <input
               id='signupEmail'
               name='email'
-              type='email'
               autoComplete='email'
               required
               placeholder='email@example.com'
@@ -121,12 +171,7 @@ const Signup: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
                   userInput.email &&
                   userInput.password
                 ) {
-                  navigate('/select', {
-                    state: {
-                      userInfo: userInput,
-                      isNativeSignup: true,
-                    },
-                  });
+                  handleSubmit();
                 }
               }}
             />
@@ -147,17 +192,20 @@ const Signup: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
             <Button
               type='button'
               disabled={
-                !userInput.name || !userInput.email || !userInput.password
+                !userInput.name ||
+                !userInput.email ||
+                userInput.password.length < 6
               }
-              onClick={() =>
-                navigate('/select', {
-                  state: {
-                    userInfo: userInput,
-                    isNativeSignup: true,
-                  },
-                })
-              }
-              className='h-11 w-full text-base rounded-lg bg-theme-1-300 text-white'
+              onClick={handleSubmit}
+              className={clsx(
+                'h-11 w-full text-base rounded-lg bg-theme-1-300 text-white',
+                {
+                  ['pointer-events-none bg-theme-1-200 transition-colors']:
+                    !userInput.name ||
+                    !userInput.email ||
+                    userInput.password.length < 6,
+                },
+              )}
             >
               Create account
             </Button>

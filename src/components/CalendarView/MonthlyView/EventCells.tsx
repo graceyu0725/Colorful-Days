@@ -52,6 +52,7 @@ const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
               ) : null
             ) : eventIndex === 2 && !event.isMemo ? (
               <div
+                key={event.eventId}
                 className='truncate border-2 border-slate-200 text-xs text-center w-10 rounded hover:cursor-pointer'
                 style={{
                   gridColumnStart: getDay(week[eventsIndex]) + 1,

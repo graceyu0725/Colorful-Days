@@ -15,8 +15,9 @@ const DroppableArea: React.FC<Props> = ({ id, date, children }) => {
 
   return (
     <div
+      id={id}
       ref={setNodeRef}
-      className={clsx('grow', isOver ? 'bg-slate-100' : '')}
+      className={clsx('grow', isOver ? 'bg-slate-100 transition-colors' : '')}
     >
       {children}
     </div>

@@ -41,14 +41,23 @@ export const firebase = {
       localStorage.setItem('uid', data.user.uid);
       navigate('/calendar');
     } catch (e: any) {
-      if (e.message === 'Firebase: Error (auth/email-already-in-use).') {
-        toast.error('This email has already been registered.');
-        navigate('/signin');
+      if (e instanceof Error) {
+        if (e.message.includes('auth/email-already-in-use')) {
+          toast.error('This email has already been registered!');
+          navigate('/signin');
+          localStorage.removeItem('uid');
+          return;
+        }
+        toast.error('The data format is incorrect, please try again!');
+        console.error(e.message);
+        localStorage.removeItem('uid');
+        throw new Error(e.message);
       } else {
-        toast.error('The data format is incorrect, please try again.');
-        navigate('/signin');
+        toast.error('An unknown error occurred, please try again!');
+        console.error('An unknown error occurred');
+        localStorage.removeItem('uid');
+        throw new Error('An unknown error occurred');
       }
-      localStorage.removeItem('uid');
     }
   },
   async signIn(userInfo: UserSignIn, navigate: NavigateFunction) {
@@ -61,7 +70,7 @@ export const firebase = {
       localStorage.setItem('uid', data.user.uid);
       navigate('/calendar');
     } catch (e) {
-      toast.error('Incorrect username or password.');
+      toast.error('Incorrect username or password!');
       localStorage.removeItem('uid');
       console.error(e);
     }

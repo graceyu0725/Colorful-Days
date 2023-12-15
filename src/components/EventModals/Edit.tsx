@@ -62,7 +62,7 @@ export default function Edit() {
     setIsEditModalOpen(false, userInput);
     setIsEditing(false);
 
-    toast.success('Event updated successfully!');
+    toast.success('Event updated successfully.');
   };
 
   const handleCancel = () => {
@@ -92,7 +92,7 @@ export default function Edit() {
         }}
         size='lg'
       >
-        <ModalContent>
+        <ModalContent className='max-h-[calc(100vh_-_130px)]'>
           {!isEditing ? (
             <View setIsEditing={setIsEditing} />
           ) : (

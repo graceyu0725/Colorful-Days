@@ -1,4 +1,5 @@
 import { Button, Image } from '@nextui-org/react';
+import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -30,6 +31,14 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
   // Update userInput when typing
   const updateUserInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
+    console.log("name",value)
+    if (name === 'email' || name === 'password') {
+      setUserInput((prevData) => ({
+        ...prevData,
+        [name]: value.trim(),
+      }));
+      return;
+    }
     setUserInput((prevData) => ({
       ...prevData,
       [name]: value,
@@ -67,7 +76,7 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
         </div>
       </div>
 
-      <h2 className='mt-2 mb-4 text-3xl font-bold tracking-tight'>
+      <h2 className='mt-2 mb-2 text-3xl font-bold tracking-tight'>
         Sign in to your account
       </h2>
 
@@ -88,7 +97,7 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
           <div className='font-medium'>Sign in with Google</div>
         </div>
 
-        <div className='relative mt-6'>
+        <div className='relative mt-4'>
           <div
             className='absolute inset-0 flex items-center'
             aria-hidden='true'
@@ -100,7 +109,7 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
           </div>
         </div>
 
-        <div className='mt-6'>
+        <div className='mt-2'>
           <form action='#' method='POST' className='space-y-6'>
             <div className='flex flex-col gap-1'>
               <label
@@ -112,7 +121,6 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
               <input
                 id='signinEmail'
                 name='email'
-                type='email'
                 autoComplete='email'
                 required
                 placeholder='email@example.com'
@@ -165,9 +173,15 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
               <Button
                 isLoading={isButtonLoading}
                 type='button'
-                disabled={!userInput.email || !userInput.password}
+                disabled={!userInput.email || userInput.password.length < 6}
                 onClick={handleSignin}
-                className='h-11 w-full text-base rounded-lg bg-theme-1-300 text-white'
+                className={clsx(
+                  'h-11 w-full text-base rounded-lg bg-theme-1-300 text-white',
+                  {
+                    ['pointer-events-none bg-theme-1-200 transition-colors']:
+                      !userInput.email || userInput.password.length < 6,
+                  },
+                )}
               >
                 Sign in
               </Button>

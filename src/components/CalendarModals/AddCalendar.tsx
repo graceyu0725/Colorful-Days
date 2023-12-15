@@ -16,7 +16,7 @@ export default function AddCalendar() {
   const { resetAllEvents } = useEventsStore();
   const { isAddCalendarModalOpen, setIsAddCalendarModalOpen } = useModalStore();
   const [calendarInfo, setCalendarInfo] = useState<CalendarInfo>({
-    name: `${currentUser.name}'s Calendar`,
+    name: ``,
     themeColor: '',
   });
   const [isComposing, setIsComposing] = useState(false);
@@ -29,12 +29,14 @@ export default function AddCalendar() {
     setIsComposing(false);
   };
 
+  const [isNameValid, setIsNameValid] = useState(true);
   const updateCalendarInfo = (
     event:
       | React.ChangeEvent<HTMLInputElement>
       | React.MouseEvent<HTMLButtonElement>,
   ) => {
-    let name: string, value: string;
+    let name: string = '';
+    let value: string = '';
 
     if (event.target instanceof HTMLInputElement) {
       name = event.target.name;
@@ -42,6 +44,14 @@ export default function AddCalendar() {
     } else if (event.target instanceof HTMLButtonElement) {
       name = event.currentTarget.name;
       value = event.currentTarget.value;
+    }
+
+    if (name === 'name' && value.length > 30) {
+      setIsNameValid(false);
+      return;
+    }
+    if (name === 'name' && value.length <= 30) {
+      setIsNameValid(true);
     }
 
     setCalendarInfo((prevData) => ({
@@ -67,10 +77,17 @@ export default function AddCalendar() {
 
   const handleSubmit = async () => {
     setIsLoading(true);
+
+    if (calendarInfo.name.replace(/\s+/g, '').length === 0) {
+      toast.error('Calendar name can not be empty!');
+      setIsLoading(false);
+      return;
+    }
+
     await createNewCalendar(
       currentUser.email,
       currentUser.userId,
-      calendarInfo.name,
+      calendarInfo.name.trim(),
       calendarInfo.themeColor,
       setCurrentCalendarId,
       setCurrentCalendarContent,
@@ -80,7 +97,7 @@ export default function AddCalendar() {
     resetInfo();
     setIsLoading(false);
 
-    toast.success('Calendar added successfully!');
+    toast.success('Calendar added successfully.');
   };
 
   return (
@@ -97,16 +114,16 @@ export default function AddCalendar() {
       >
         <ModalContent
           className={clsx(
-            'flex flex-col justify-center items-center p-8 overflow-y-auto gap-10 border-[30px] transition-colors',
+            'max-h-[calc(100vh_-_200px)] flex flex-col justify-center items-center p-8 overflow-y-auto gap-10 border-[30px] transition-colors',
             borderColor,
           )}
         >
-          <div className='flex flex-col items-center gap-5 w-full'>
+          <div className='h-2/3 flex flex-col items-center gap-5 min-h-fit w-full'>
             <div className='text-2xl font-bold'>Name Your Calendar</div>
             <input
               name='name'
               className={clsx(
-                'border-2 w-72 h-16 leading-[64px] rounded-lg px-5 text-lg focus:outline-none',
+                'border-2 w-80 sm:w-96 h-16 leading-[64px] rounded-lg px-5 text-lg focus:outline-none',
                 borderColor,
               )}
               value={calendarInfo.name}
@@ -124,15 +141,20 @@ export default function AddCalendar() {
               onCompositionStart={handleCompositionStart}
               onCompositionEnd={handleCompositionEnd}
             />
+            {!isNameValid && (
+              <div className='text-sm text-red-500 -mt-3 -mb-7'>
+                Maximum length of calendar name is 30 characters.
+              </div>
+            )}
           </div>
-          <div className='flex flex-col items-center gap-5'>
+          <div className='flex flex-col items-center gap-5 h-1/3 w-full'>
             <div className='text-2xl font-bold'>Choose a Theme Color</div>
-            <div className='flex gap-4'>
+            <div className='flex justify-center gap-2.5 md:gap-4 h-full w-full'>
               {themeColors.map((color, index) => (
                 <button
                   key={index}
                   className={clsx(
-                    '-skew-x-12 bg-slate-200 w-12 h-48 rounded',
+                    '-skew-x-6 md:-skew-x-12 bg-slate-200 w-8 sm:w-12 h-full min-h-[160px] max-h-[192px] rounded',
                     color.background,
                     {
                       ['outline outline-3 outline-offset-2 outline-slate-300']:
