@@ -91,7 +91,7 @@ function Calendar() {
 
         document.title = `${docSnapshot.data().name} - Colorful Days`;
       } else {
-        console.log('Calendar not found');
+        console.error('Calendar not found');
       }
     });
 

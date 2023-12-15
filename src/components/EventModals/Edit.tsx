@@ -62,7 +62,7 @@ export default function Edit() {
     setIsEditModalOpen(false, userInput);
     setIsEditing(false);
 
-    toast.success('Event updated successfully.');
+    toast.success('Event updated successfully');
   };
 
   const handleCancel = () => {

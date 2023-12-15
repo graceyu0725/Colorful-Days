@@ -86,16 +86,16 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
       setSearchInput('');
       setSearchResult(null);
       setIsMemberExist(false);
-      toast.success('Member added successfully.');
+      toast.success('Member added successfully');
     } else {
-      toast.error('Failed to add member.');
+      toast.error('Failed to add member!');
     }
   };
 
   const handleRemoveMember = async (calendarId: string, userId: string) => {
     await removeMember(calendarId, userId);
 
-    toast.success('Member removed successfully.');
+    toast.success('Member removed successfully');
   };
 
   interface UserAvatarProps {

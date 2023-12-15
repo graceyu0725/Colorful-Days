@@ -46,6 +46,8 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
 
   const normalBackground =
     themeColors[Number(selectedItem?.tag)]?.darkBackground || 'bg-theme-1-300';
+  const lightBackground =
+    themeColors[Number(selectedItem?.tag)]?.lightBackground || 'bg-theme-1-100';
 
   const updateEvent = async (data: Event) => {
     const eventsCollection = collection(
@@ -89,11 +91,11 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
           isMemo: false,
           isAllDay: true,
           startAt: newStartDate,
-          endAt: addMinutes(newEndDate,15),
+          endAt: addMinutes(newEndDate, 15),
           updatedAt: currentTime,
         };
         await updateEvent(updatedEvent);
-        toast.success('Event updated successfully.');
+        toast.success('Event updated successfully');
         setSelectedItem(null);
         return;
       }
@@ -134,7 +136,7 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
         updatedAt: currentTime,
       };
       await updateEvent(updatedEvent);
-      toast.success('Event updated successfully.');
+      toast.success('Event updated successfully');
       setSelectedItem(null);
     }
   };
@@ -152,11 +154,14 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
       <DragOverlay dropAnimation={null} modifiers={[restrictToWindowEdges]}>
         {selectedItem ? (
           <DraggableItem
-            key={`overlay-${selectedItem.eventId}`}
-            id={`overlay-${selectedItem.eventId}`}
+            key={`${selectedItem.eventId}`}
+            id={`${selectedItem.eventId}`}
             className={clsx(
-              'flex truncate items-center z-30 basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
-              normalBackground,
+              'flex truncate items-center z-30 basis-0 rounded indent-1.5 hover:cursor-pointer hover:-translate-y-px hover:shadow-md',
+              !selectedItem.isAllDay &&
+                isSameDay(selectedItem.startAt, selectedItem.endAt)
+                ? `${lightBackground} text-slate-500`
+                : `${normalBackground} text-white`,
             )}
             event={selectedItem}
             isOverlay

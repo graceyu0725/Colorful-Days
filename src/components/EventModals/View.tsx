@@ -130,7 +130,7 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     await deleteDoc(eventRef);
     setIsEditModalOpen(false, selectedEvent);
 
-    toast.success('Event deleted successfully.');
+    toast.success('Event deleted successfully');
   };
 
   const calendarTags = currentCalendarContent.tags || defaultTags;

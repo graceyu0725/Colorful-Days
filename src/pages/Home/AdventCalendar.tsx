@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import BxBxsQuoteAltLeft from '~icons/bx/bxs-quote-alt-left';
 import BxBxsQuoteAltRight from '~icons/bx/bxs-quote-alt-right';
-import MajesticonsHandPointer2Line from '~icons/majesticons/hand-pointer-2-line';
+import PhArrowBendLeftUpBold from '~icons/ph/arrow-bend-left-up-bold';
 import InfoModal from './InfoModal';
 import backgroundImage from './img/background.png';
 import specialBackgroundImage from './img/special-background.png';
@@ -74,7 +74,10 @@ export default function AdventCalendar() {
         }}
       >
         {!isGuided && (
-          <MajesticonsHandPointer2Line className='absolute right-40 bottom-20 text-6xl text-white z-10 animate-bounce animate-infinite' />
+          <div className='z-10 absolute right-30 bottom-12 flex items-end gap-2 animate-bounce animate-infinite'>
+            <PhArrowBendLeftUpBold className='text-2xl text-white' />
+            <div className='text-white'>Flip the small cards to explore features of Colorful Days</div>
+          </div>
         )}
 
         <motion.div
@@ -114,10 +117,6 @@ export default function AdventCalendar() {
                         'hover:scale-110 transition':
                           specialDates.includes(date),
                       },
-                      // {
-                      //   'animate-rotate-y animate-thrice':
-                      //     isFlipped === true && specialDates.includes(date),
-                      // },
                       {
                         'animate-rotate-y animate-once': selectedCell === date,
                       },
@@ -134,6 +133,7 @@ export default function AdventCalendar() {
                     }}
                     onClick={(e) => {
                       if (specialDates.includes(date)) {
+                        if (!isGuided) setIsGuided(true);
                         handleClickCell(e, date);
                       }
                     }}

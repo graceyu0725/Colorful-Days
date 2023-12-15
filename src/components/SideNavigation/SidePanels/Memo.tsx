@@ -62,7 +62,7 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
     setMemoInput('');
     setSelectedTag('0');
 
-    toast.success('Memo added successfully.');
+    toast.success('Memo added successfully');
   };
 
   return (

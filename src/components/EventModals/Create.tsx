@@ -47,7 +47,7 @@ export default function Create() {
     const calendarRef = doc(db, 'Calendars', currentCalendarId);
     const eventRef = doc(calendarRef, 'events', id);
     await setDoc(eventRef, data);
-    toast.success('Event added successfully.');
+    toast.success('Event added successfully');
   };
 
   const handleSubmit = async () => {

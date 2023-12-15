@@ -97,7 +97,7 @@ export default function AddCalendar() {
     resetInfo();
     setIsLoading(false);
 
-    toast.success('Calendar added successfully.');
+    toast.success('Calendar added successfully');
   };
 
   return (

@@ -39,7 +39,7 @@ const Profile: React.FC<Props> = ({
       try {
         await updateDoc(userDocRef, { avatar: downloadURL });
         setIsLoading(false);
-        toast.success('Profile picture updated successfully.');
+        toast.success('Profile picture updated successfully');
       } catch (error) {
         setIsLoading(false);
         toast.error(

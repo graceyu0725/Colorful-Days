@@ -121,8 +121,6 @@ export const isUserExists = async (userEmail: string) => {
 // 更新 calendar 狀態
 const getCalendarContent = async (calendarId: string) => {
   try {
-    console.log('4. 取得日曆內容');
-
     const calendarsCollection = collection(db, 'Calendars');
     const docRef = doc(calendarsCollection, calendarId);
     const docSnap = await getDoc(docRef);
@@ -149,11 +147,8 @@ export const updateCalendarContent = async (
   setCurrentCalendarContent: (currentCalendarContent: CalendarContent) => void,
   setCalendarAllEvents?: (event: Event[]) => void,
 ) => {
-  console.log('3. 更新日曆內容');
   const calendarContent = await getCalendarContent(calendarId);
-  // const { setCurrentCalendarId, setCurrentCalendarContent } = useAuthStore();
   if (calendarContent) {
-    console.log('5. 設定日曆內容');
     setCurrentCalendarId(calendarId);
     setCurrentCalendarContent(calendarContent);
   }
@@ -184,12 +179,7 @@ export const updateCurrentUser = async (
   setCurrentCalendarId: (currentCalendarId: string) => void,
   setCurrentCalendarContent: (currentCalendarContent: CalendarContent) => void,
 ) => {
-  console.log('1. updateCurrentUser');
-  // const { setCurrentUser, setCurrentCalendarId } = useAuthStore();
-
-  console.log('2. 新增用戶');
   const q = query(collection(db, 'Users'), where('userId', '==', uid));
-
   const querySnapshot = await getDocs(q);
 
   if (!querySnapshot.empty) {
@@ -378,9 +368,6 @@ export const removeMember = async (calendarId: string, userId: string) => {
       await updateDoc(userDocRef, {
         calendars: arrayRemove(calendarId),
       });
-      console.log(`Removed calendarId ${calendarId} from user ${userId}`);
-    } else {
-      console.log(`No user found with userId ${userId}`);
     }
   } catch (error) {
     console.error('Error getting documents: ', error);
