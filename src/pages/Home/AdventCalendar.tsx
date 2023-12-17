@@ -7,6 +7,7 @@ import PhArrowBendLeftUpBold from '~icons/ph/arrow-bend-left-up-bold';
 import InfoModal from './InfoModal';
 import backgroundImage from './img/background.png';
 import specialBackgroundImage from './img/special-background.png';
+import MaterialSymbolsLineStartArrowRounded from '~icons/material-symbols/line-start-arrow-rounded'
 
 export default function AdventCalendar() {
   const createSpecialArray = () => {
@@ -43,7 +44,7 @@ export default function AdventCalendar() {
   return (
     <div
       id='adventCalendar'
-      className='w-1/2 h-[calc(100vh_-_64px)] mt-16 flex relative overflow-hidden'
+      className='hidden lg:flex w-1/2 h-[calc(100vh_-_64px)] mt-16 relative overflow-hidden'
     >
       <InfoModal
         isInfoModalOpen={isInfoModalOpen}
@@ -74,9 +75,9 @@ export default function AdventCalendar() {
         }}
       >
         {!isGuided && (
-          <div className='z-10 absolute right-30 bottom-12 flex items-end gap-2 animate-bounce animate-infinite'>
-            <PhArrowBendLeftUpBold className='text-2xl text-white' />
-            <div className='text-white'>Flip the small cards to explore features of Colorful Days</div>
+          <div className='z-10 absolute right-8 xl:right-20 top-20 flex items-center gap-2 animate-bounce animate-infinite'>
+            <MaterialSymbolsLineStartArrowRounded className='text-xl text-white' />
+            <div className='text-white w-40'>Flip the small cards to explore features of Colorful Days</div>
           </div>
         )}
 

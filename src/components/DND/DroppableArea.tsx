@@ -5,9 +5,10 @@ type Props = {
   id: string;
   date: Date;
   children: React.ReactNode;
+  className?: string;
 };
 
-const DroppableArea: React.FC<Props> = ({ id, date, children }) => {
+const DroppableArea: React.FC<Props> = ({ id, date, children, className }) => {
   const { setNodeRef, isOver } = useDroppable({
     id: id,
     data: date,
@@ -17,7 +18,11 @@ const DroppableArea: React.FC<Props> = ({ id, date, children }) => {
     <div
       id={id}
       ref={setNodeRef}
-      className={clsx('grow', isOver ? 'bg-slate-100 transition-colors' : '')}
+      className={clsx(
+        'grow',
+        isOver ? 'bg-slate-100 transition-colors' : '',
+        className,
+      )}
     >
       {children}
     </div>

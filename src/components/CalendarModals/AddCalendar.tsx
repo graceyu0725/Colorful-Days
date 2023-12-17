@@ -78,8 +78,17 @@ export default function AddCalendar() {
   const handleSubmit = async () => {
     setIsLoading(true);
 
-    if (calendarInfo.name.replace(/\s+/g, '').length === 0) {
+    if (
+      calendarInfo.name.replace(/\s+/g, '').length === 0 ||
+      !calendarInfo.name
+    ) {
       toast.error('Calendar name can not be empty!');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!calendarInfo.themeColor) {
+      toast.error('Please select a theme color!');
       setIsLoading(false);
       return;
     }
@@ -114,7 +123,7 @@ export default function AddCalendar() {
       >
         <ModalContent
           className={clsx(
-            'max-h-[calc(100vh_-_200px)] flex flex-col justify-center items-center p-8 overflow-y-auto gap-10 border-[30px] transition-colors',
+            'max-h-[calc(100vh_-_120px)] flex flex-col justify-center items-center p-8 overflow-y-auto gap-6 border-[30px] transition-colors',
             borderColor,
           )}
         >
@@ -154,7 +163,7 @@ export default function AddCalendar() {
                 <button
                   key={index}
                   className={clsx(
-                    '-skew-x-6 md:-skew-x-12 bg-slate-200 w-8 sm:w-12 h-full min-h-[160px] max-h-[192px] rounded',
+                    '-skew-x-6 md:-skew-x-12 bg-slate-200 w-8 sm:w-12 h-full min-h-[140px] max-h-[192px] rounded',
                     color.background,
                     {
                       ['outline outline-3 outline-offset-2 outline-slate-300']:
@@ -184,7 +193,6 @@ export default function AddCalendar() {
                 'w-32 text-slate-700 text-base transition-colors',
                 backgroundColor,
               )}
-              disabled={!calendarInfo.name || !calendarInfo.themeColor}
               onClick={handleSubmit}
             >
               Submit

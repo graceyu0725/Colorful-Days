@@ -1,6 +1,8 @@
 import { useDraggable } from '@dnd-kit/core';
 import clsx from 'clsx';
 import IcBaselineDragIndicator from '~icons/ic/baseline-drag-indicator';
+import { CalendarViewCategory, useViewStore } from '../../store/viewStore';
+import { themeColors } from '../../utils/theme';
 import { Event } from '../../utils/types';
 
 type Props = {
@@ -22,6 +24,7 @@ const DraggableItem: React.FC<Props> = ({
   event,
   isOverlay,
 }) => {
+  const { currentView } = useViewStore();
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: id,
     data: event,
@@ -33,17 +36,21 @@ const DraggableItem: React.FC<Props> = ({
         <div
           id={id}
           className={clsx(
-            'flex items-center z-50',
+            'flex z-50',
             className,
-            event.isMemo ? 'h-12 rounded-lg p-3' : 'h-6',
+            event.isMemo
+              ? 'h-12 rounded-lg p-3 items-center'
+              : currentView === CalendarViewCategory.Monthly
+                ? 'h-6 items-center'
+                : event.isAllDay
+                  ? 'h-5 text-sm text-white items-center'
+                  : `text-sm items-start h-full rounded-none border-l-2 pl-1 ${
+                      themeColors[Number(event.tag)].border
+                    }`,
           )}
-          style={{
-            ...style,
-            opacity: isDragging ? 0.5 : 1,
-          }}
         >
-          <IcBaselineDragIndicator className='drag-handler h-6 w-5 outline-none' />
-          <div className='truncate w-full h-full'>{children}</div>
+          <IcBaselineDragIndicator className='drag-handler h-5 shrink-0 outline-none' />
+          <div className='truncate grow h-full ml-0'>{children}</div>
         </div>
       ) : (
         <div
@@ -51,9 +58,15 @@ const DraggableItem: React.FC<Props> = ({
           ref={setNodeRef}
           onClick={onClick}
           className={clsx(
-            'flex items-center z-50',
+            'flex z-50',
             className,
-            event.isMemo ? 'h-10' : 'h-6',
+            event.isMemo
+              ? 'h-12 rounded-lg p-3 items-center'
+              : currentView === CalendarViewCategory.Monthly
+                ? 'h-6 items-center'
+                : event.isAllDay
+                  ? 'h-5 text-sm items-center'
+                  : 'text-sm items-start',
           )}
           style={{
             ...style,
@@ -61,11 +74,11 @@ const DraggableItem: React.FC<Props> = ({
           }}
         >
           <IcBaselineDragIndicator
-            className='drag-handler h-6 w-5 outline-none'
+            className='drag-handler h-5 shrink-0 outline-none'
             {...attributes}
             {...listeners}
           />
-          <div className='truncate w-full h-full'>{children}</div>
+          <div className='truncate grow h-full'>{children}</div>
         </div>
       )}
     </>

@@ -33,6 +33,11 @@ const Signup: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
   } = useForm<ValidationSchema>({
     resolver: zodResolver(validationSchema),
     mode: 'onBlur',
+    defaultValues: {
+      name: '小丘',
+      email: 'pikachu@gmail.com',
+      password: '123456',
+    },
   });
   const navigate = useNavigate();
 

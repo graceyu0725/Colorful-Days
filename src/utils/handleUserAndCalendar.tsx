@@ -13,6 +13,7 @@ import { NavigateFunction } from 'react-router-dom';
 // import { updateCalendarContent } from '../store/authStore';
 import { arrayUnion, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { DocumentData, DocumentReference } from 'firebase/firestore/lite';
+import toast from 'react-hot-toast';
 import {
   CalendarContent,
   CalendarInfo,
@@ -235,9 +236,16 @@ export const createNewCalendar = async (
   setCurrentCalendarContent: (currentCalendarContent: CalendarContent) => void,
   resetAllEvents: () => void,
 ) => {
+  if (!userEmail || !userId || !calendarName || !calendarThemeColor) {
+    toast.error(
+      'There is an error when creating new calendar. Please try again!',
+    );
+    return;
+  }
+
   const calendarsCollection = collection(db, 'Calendars');
   const calendarDocRef = doc(calendarsCollection);
-  addCalendar(userId, calendarName, calendarThemeColor, calendarDocRef);
+  await addCalendar(userId, calendarName, calendarThemeColor, calendarDocRef);
   const userRef = doc(db, 'Users', userEmail);
   await updateDoc(userRef, {
     calendars: arrayUnion(calendarDocRef.id),

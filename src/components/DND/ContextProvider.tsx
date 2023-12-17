@@ -32,6 +32,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { DraggableItem } from '.';
 import { useAuthStore } from '../../store/authStore';
+import { CalendarViewCategory, useViewStore } from '../../store/viewStore';
 import { db } from '../../utils/firebase';
 import { themeColors } from '../../utils/theme';
 import { Event } from '../../utils/types';
@@ -41,6 +42,7 @@ type Props = {
 };
 
 export const ContextProvider: React.FC<Props> = ({ children }) => {
+  const { currentView } = useViewStore();
   const { currentCalendarId } = useAuthStore();
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
@@ -100,9 +102,9 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
         return;
       }
 
-      if (isSameDay(active.data.current?.startAt, overDate)) return;
-
       if (draggingEvent.isAllDay) {
+        if (isSameDay(draggingEvent.startAt, overDate)) return;
+
         const durationInDays = differenceInCalendarDays(
           draggingEvent.endAt,
           draggingEvent.startAt,
@@ -117,10 +119,14 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
         );
         const getNewStartDate = () => {
           let newStartDate = new Date(overDate);
-          newStartDate.setHours(getHours(draggingEvent.startAt || new Date()));
-          newStartDate.setMinutes(
-            getMinutes(draggingEvent.startAt || new Date()),
-          );
+          if (currentView === CalendarViewCategory.Monthly) {
+            newStartDate.setHours(
+              getHours(draggingEvent.startAt || new Date()),
+            );
+            newStartDate.setMinutes(
+              getMinutes(draggingEvent.startAt || new Date()),
+            );
+          }
           return newStartDate;
         };
 
@@ -157,11 +163,13 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
             key={`${selectedItem.eventId}`}
             id={`${selectedItem.eventId}`}
             className={clsx(
-              'flex truncate items-center z-30 basis-0 rounded indent-1.5 hover:cursor-pointer hover:-translate-y-px hover:shadow-md',
+              'flex truncate z-30 basis-0 rounded indent-1.5 hover:cursor-pointer hover:-translate-y-px hover:shadow-md',
               !selectedItem.isAllDay &&
                 isSameDay(selectedItem.startAt, selectedItem.endAt)
                 ? `${lightBackground} text-slate-500`
-                : `${normalBackground} text-white`,
+                : currentView === CalendarViewCategory.Monthly
+                  ? `${normalBackground} text-white`
+                  : `${lightBackground} text-slate-500`,
             )}
             event={selectedItem}
             isOverlay

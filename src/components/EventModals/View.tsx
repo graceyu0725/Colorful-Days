@@ -168,7 +168,12 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
 
   const renderComments = () => {
     return (
-      <div className='h-52 flex flex-col gap-2 overflow-y-auto px-1 min-h-[180px]'>
+      <div
+        className={clsx(
+          'h-52 flex flex-col gap-2 overflow-y-auto px-1 min-h-[160px]',
+          selectedEvent.messages ? 'h-52' : 'h-48',
+        )}
+      >
         {selectedEvent.messages.map((message, index) => (
           <div
             key={index}
@@ -176,11 +181,7 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
               'pl-10': currentUser.userId === message.arthur.userId,
             })}
           >
-            <div
-              className={clsx('flex gap-2 grow', {
-                // 'justify-end': currentUser.userId === message.arthur.userId,
-              })}
-            >
+            <div className={clsx('flex gap-2 grow', {})}>
               {currentUser.userId === message.arthur.userId ? (
                 <>
                   <div className='flex flex-col items-end grow gap-0.5'>
