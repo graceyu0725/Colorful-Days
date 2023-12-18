@@ -3,11 +3,10 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import BxBxsQuoteAltLeft from '~icons/bx/bxs-quote-alt-left';
 import BxBxsQuoteAltRight from '~icons/bx/bxs-quote-alt-right';
-import PhArrowBendLeftUpBold from '~icons/ph/arrow-bend-left-up-bold';
+import MaterialSymbolsLineStartArrowRounded from '~icons/material-symbols/line-start-arrow-rounded';
 import InfoModal from './InfoModal';
 import backgroundImage from './img/background.png';
 import specialBackgroundImage from './img/special-background.png';
-import MaterialSymbolsLineStartArrowRounded from '~icons/material-symbols/line-start-arrow-rounded'
 
 export default function AdventCalendar() {
   const createSpecialArray = () => {
@@ -77,7 +76,9 @@ export default function AdventCalendar() {
         {!isGuided && (
           <div className='z-10 flex items-center gap-2 animate-bounce animate-infinite self-start mt-20 ml-96'>
             <MaterialSymbolsLineStartArrowRounded className='text-xl text-white' />
-            <div className='text-white w-40'>Flip the small cards to explore features of Colorful Days</div>
+            <div className='text-white w-40'>
+              Flip the small cards to explore features of Colorful Days
+            </div>
           </div>
         )}
 

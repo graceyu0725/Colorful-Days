@@ -35,7 +35,7 @@ export const addEventToCalendar = async (
   await setDoc(eventDocRef, { placeholder: true });
 };
 
-export const addCalendar = async (
+const addCalendar = async (
   userId: string,
   calendarName: string,
   selectedThemeColor: string,
@@ -251,11 +251,14 @@ export const createNewCalendar = async (
   });
   resetAllEvents();
 
-  updateCalendarContent(
-    calendarDocRef.id,
-    setCurrentCalendarId,
-    setCurrentCalendarContent,
-  );
+  setCurrentCalendarId(calendarDocRef.id);
+  setCurrentCalendarContent({
+    members: [userId],
+    name: calendarName,
+    tags: defaultTags,
+    themeColor: calendarThemeColor,
+    calendarId: calendarDocRef.id,
+  });
 };
 
 // 根據 calendarId & memberIds 刪除 calendar
