@@ -175,7 +175,7 @@ const WeeklyView: React.FC = () => {
               {timeStyles.map((_, index) => (
                 <React.Fragment key={index}>
                   <DroppableArea
-                    id={`weekly-row-1-${weekdayIndex}-${index}`}
+                    id={`droppable-weekly-row-1-${weekdayIndex}-${index}`}
                     date={getStartTime(weekDates, weekdayIndex, index, 0)}
                     className='border-b border-dashed hover:bg-slate-100'
                   >
@@ -195,7 +195,7 @@ const WeeklyView: React.FC = () => {
                     />
                   </DroppableArea>
                   <DroppableArea
-                    id={`weekly-row-2-${weekdayIndex}-${index}`}
+                    id={`droppable-weekly-row-2-${weekdayIndex}-${index}`}
                     date={getStartTime(weekDates, weekdayIndex, index, 30)}
                     className='border-b hover:bg-slate-100'
                   >

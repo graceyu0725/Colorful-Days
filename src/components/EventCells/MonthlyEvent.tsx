@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { isSameDay } from 'date-fns';
 import { Event } from '../../utils/types';
 import { DraggableItem } from '../DND';
 
@@ -25,13 +26,15 @@ const MonthlyEvent: React.FC<Props> = ({
 }) => {
   const content = isAllDay ? (
     <div>{event.title}</div>
-  ) : (
+  ) : isSameDay(event.startAt || new Date(), event.endAt || new Date()) ? (
     <div className='flex items-center justify-between'>
       <div className='truncate'>{event.title}</div>
       <div className='truncate mr-1 text-xs text-slate-500 mt-1 min-w-fit'>
         {formattedTime}
       </div>
     </div>
+  ) : (
+    <div>{event.title}</div>
   );
 
   return (
@@ -41,7 +44,15 @@ const MonthlyEvent: React.FC<Props> = ({
       event={event}
       className={clsx(
         'truncate basis-0 rounded indent-1.5 hover:cursor-pointer hover:-translate-y-px hover:shadow-md',
-        { ['text-white']: event.isAllDay },
+        {
+          ['text-white']:
+            event.isAllDay ||
+            (!event.isAllDay &&
+              !isSameDay(
+                event.startAt || new Date(),
+                event.endAt || new Date(),
+              )),
+        },
         backgroundColor,
       )}
       style={{

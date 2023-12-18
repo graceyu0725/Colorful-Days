@@ -399,7 +399,14 @@ export const renderWeeklyOneDayEvent = (
   event: Event,
   setIsEditModalOpen: (isOpen: boolean, event: Event) => void,
 ) => {
-  if (!event.title || event.isMemo || isMidnight(event.endAt)) return;
+  if (
+    !event.title ||
+    event.isMemo ||
+    (!isSameDay(event.startAt || new Date(), event.endAt || new Date()) &&
+      isSameDay(event.endAt || new Date(), columnDate) &&
+      isMidnight(event.endAt))
+  )
+    return;
 
   const handleClick = (event: React.MouseEvent, e: Event) => {
     event.stopPropagation();

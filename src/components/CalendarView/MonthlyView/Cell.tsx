@@ -33,8 +33,8 @@ const Cell: React.FC<Props> = ({
           [header
             ? 'h-10 px-2 justify-center'
             : dayCounts > 35
-              ? 'h-[104px] px-2 py-1 hover:bg-slate-100 active:bg-gray-200'
-              : 'h-28 px-2 py-1 hover:bg-slate-100 active:bg-gray-200']: true,
+              ? 'h-[104px] px-2 py-1 hover:bg-slate-100 active:bg-slate-200'
+              : 'h-28 px-2 py-1 hover:bg-slate-100 active:bg-slate-200']: true,
         },
         className,
       )}
