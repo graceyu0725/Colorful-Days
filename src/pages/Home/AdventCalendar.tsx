@@ -75,7 +75,7 @@ export default function AdventCalendar() {
         }}
       >
         {!isGuided && (
-          <div className='z-10 absolute right-8 xl:right-20 top-20 flex items-center gap-2 animate-bounce animate-infinite'>
+          <div className='z-10 flex items-center gap-2 animate-bounce animate-infinite self-start mt-20 ml-96'>
             <MaterialSymbolsLineStartArrowRounded className='text-xl text-white' />
             <div className='text-white w-40'>Flip the small cards to explore features of Colorful Days</div>
           </div>

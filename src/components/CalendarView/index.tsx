@@ -2,11 +2,11 @@ import { useState } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { CalendarViewCategory, useViewStore } from '../../store/viewStore';
 import { ContextProvider } from '../DND';
-import SideNavigation from '../SideNavigation';
 import Loading from './Loading';
 import MonthlyView from './MonthlyView';
-import Navigation from './Navigation';
 import SideBar from './SideBar';
+import SideNavigation from './SideNavigation';
+import TopNavigation from './TopNavigation';
 import WeeklyView from './WeeklyView';
 
 function CalendarView() {
@@ -18,7 +18,7 @@ function CalendarView() {
   return (
     <ContextProvider>
       <div className='grow flex flex-col'>
-        <Navigation
+        <TopNavigation
           setIsSideBarOpen={setIsSideBarOpen}
           setIsSideNavigationOpen={setIsSideNavigationOpen}
         />

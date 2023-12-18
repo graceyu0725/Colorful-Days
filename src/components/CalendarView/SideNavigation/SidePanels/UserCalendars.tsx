@@ -12,15 +12,15 @@ import toast from 'react-hot-toast';
 import MaterialSymbolsAddBoxOutlineRounded from '~icons/material-symbols/add-box-outline-rounded';
 import PhDotsThreeVerticalBold from '~icons/ph/dots-three-vertical-bold';
 import UilSchedule from '~icons/uil/schedule';
-import { useAuthStore } from '../../../store/authStore';
-import { useEventsStore } from '../../../store/eventsStore';
-import { useModalStore } from '../../../store/modalStore';
+import { useAuthStore } from '../../../../store/authStore';
+import { useEventsStore } from '../../../../store/eventsStore';
+import { useModalStore } from '../../../../store/modalStore';
 import {
   deleteCalendar,
   updateCalendarContent,
   updateCurrentUser,
-} from '../../../utils/handleUserAndCalendar';
-import { CalendarContent } from '../../../utils/types';
+} from '../../../../utils/handleUserAndCalendar';
+import { CalendarContent } from '../../../../utils/types';
 
 type Props = {
   currentCalendarId: string;

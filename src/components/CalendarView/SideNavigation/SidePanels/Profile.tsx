@@ -6,10 +6,10 @@ import { ChangeEvent, useState } from 'react';
 import toast from 'react-hot-toast';
 import EosIconsLoading from '~icons/eos-icons/loading';
 import MaterialSymbolsEditOutlineRounded from '~icons/material-symbols/edit-outline-rounded';
-import { app, db } from '../../../utils/firebase';
-import { themeColors } from '../../../utils/theme';
-import { CalendarContent, User } from '../../../utils/types';
-import AvatarImage from '../avatar.png';
+import { app, db } from '../../../../utils/firebase';
+import { themeColors } from '../../../../utils/theme';
+import { CalendarContent, User } from '../../../../utils/types';
+import AvatarImage from '../img/avatar.png';
 
 type Props = {
   isProfileModalOpen: boolean;

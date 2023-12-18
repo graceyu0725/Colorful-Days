@@ -18,14 +18,14 @@ import IcSharpPersonSearch from '~icons/ic/sharp-person-search';
 import MaterialSymbolsLightPersonAddRounded from '~icons/material-symbols-light/person-add-rounded';
 import MaterialSymbolsPersonRemoveRounded from '~icons/material-symbols/person-remove-rounded';
 import OcticonPeople16 from '~icons/octicon/people-16';
-import { useAuthStore } from '../../../store/authStore';
+import { useAuthStore } from '../../../../store/authStore';
 import {
   addMemberToCalendar,
   getMemberSearchResults,
   removeMember,
-} from '../../../utils/handleUserAndCalendar';
-import { User } from '../../../utils/types';
-import AvatarImage from '../avatar.png';
+} from '../../../../utils/handleUserAndCalendar';
+import { User } from '../../../../utils/types';
+import AvatarImage from '../img/avatar.png';
 
 type Props = {
   memberDetails: User[];

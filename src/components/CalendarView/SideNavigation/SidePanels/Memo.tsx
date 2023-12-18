@@ -16,12 +16,12 @@ import toast from 'react-hot-toast';
 import MaterialSymbolsNoteStackAddRounded from '~icons/material-symbols/note-stack-add-rounded';
 import MaterialSymbolsStickyNote2OutlineRounded from '~icons/material-symbols/sticky-note-2-outline-rounded';
 import MdiTag from '~icons/mdi/tag';
-import { useAuthStore } from '../../../store/authStore';
-import { useModalStore } from '../../../store/modalStore';
-import { addNewMemo } from '../../../utils/handleUserAndCalendar';
-import { themeColors } from '../../../utils/theme';
-import { CalendarContent, Event } from '../../../utils/types';
-import { DraggableItem } from '../../DND';
+import { useAuthStore } from '../../../../store/authStore';
+import { useModalStore } from '../../../../store/modalStore';
+import { addNewMemo } from '../../../../utils/handleUserAndCalendar';
+import { themeColors } from '../../../../utils/theme';
+import { CalendarContent, Event } from '../../../../utils/types';
+import { DraggableItem } from '../../../DND';
 
 type Props = {
   memoEvents: Event[];

@@ -72,7 +72,7 @@ export const updateUserInput = (
     }
 
     if (updatedInput.startAt && updatedInput.endAt) {
-      if (label === 'endAt' && value <= addMinutes(updatedInput.startAt, 15)) {
+      if (label === 'endAt' && value < addMinutes(updatedInput.startAt, 15)) {
         updatedInput.endAt = addMinutes(updatedInput.startAt, 15);
         toast.error('End time cannot be earlier than start time!');
       }

@@ -1,10 +1,9 @@
 import { Button, ButtonGroup, Tooltip } from '@nextui-org/react';
+import clsx from 'clsx';
 import { addDays, addMonths, subDays, subMonths } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 import CodiconFilter from '~icons/codicon/filter';
 import LucideAlignJustify from '~icons/lucide/align-justify';
-// import MaterialSymbolsStickyNote2OutlineRounded from '~icons/material-symbols/sticky-note-2-outline-rounded';
-import clsx from 'clsx';
-import { useNavigate } from 'react-router-dom';
 import TdesignAdd from '~icons/tdesign/add';
 import { useAuthStore } from '../../store/authStore';
 import { useModalStore } from '../../store/modalStore';
@@ -107,7 +106,7 @@ const Navigation: React.FC<Props> = ({
 
           <Button
             variant='bordered'
-            className={clsx("hidden md:block",styles.borderButton)}
+            className={clsx('hidden md:block', styles.borderButton)}
             onClick={() => {
               setCurrentDate(new Date());
             }}
@@ -137,29 +136,6 @@ const Navigation: React.FC<Props> = ({
           <span className={styles.title}>{formateDate}</span>
         </div>
       </div>
-
-      {/* <div className='border rounded-md p-1 flex gap-1'>
-        <Button
-          className={
-            currentView === CalendarViewCategory.Monthly
-              ? styles.activeButton
-              : styles.viewButton
-          }
-          onClick={() => setCurrentView(CalendarViewCategory.Monthly)}
-        >
-          Monthly
-        </Button>
-        <Button
-          className={
-            currentView === CalendarViewCategory.Weekly
-              ? styles.activeButton
-              : styles.viewButton
-          }
-          onClick={() => setCurrentView(CalendarViewCategory.Weekly)}
-        >
-          Weekly
-        </Button>
-      </div> */}
 
       <div className='flex items-center gap-1'>
         <div className='border rounded-md p-1 gap-1 hidden sm:flex'>
@@ -196,18 +172,6 @@ const Navigation: React.FC<Props> = ({
             <TdesignAdd className='text-xl text-slate-700 hover:cursor-pointer' />
           </Button>
         </Tooltip>
-
-        {/* <Tooltip showArrow={true} placement='bottom' content='Memo'>
-          <Button
-            variant='bordered'
-            className={styles.addButton}
-            onClick={() =>
-              setIsCreateModalOpen(true, new Date(), new Date(), false)
-            }
-          >
-            <MaterialSymbolsStickyNote2OutlineRounded className='text-xl text-[#5a3a1b] hover:cursor-pointer' />
-          </Button>
-        </Tooltip> */}
 
         <Tooltip showArrow={true} placement='bottom' content='Filter'>
           <Button

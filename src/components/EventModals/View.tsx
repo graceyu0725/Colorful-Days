@@ -26,7 +26,7 @@ import { db } from '../../utils/firebase';
 import { addNewComment } from '../../utils/handleUserAndCalendar';
 import { themeColors } from '../../utils/theme';
 import { defaultTags } from '../../utils/types';
-import avatarImage from '../SideNavigation/avatar.png';
+import avatarImage from '../CalendarView/SideNavigation/img/avatar.png';
 
 interface Props {
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
@@ -170,7 +170,7 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     return (
       <div
         className={clsx(
-          'h-52 flex flex-col gap-2 overflow-y-auto px-1 min-h-[160px]',
+          'h-52 flex flex-col gap-2 overflow-y-auto px-1 min-h-[140px]',
           selectedEvent.messages ? 'h-52' : 'h-48',
         )}
       >

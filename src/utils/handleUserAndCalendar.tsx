@@ -122,8 +122,7 @@ export const isUserExists = async (userEmail: string) => {
 // 更新 calendar 狀態
 const getCalendarContent = async (calendarId: string) => {
   try {
-    const calendarsCollection = collection(db, 'Calendars');
-    const docRef = doc(calendarsCollection, calendarId);
+    const docRef = doc(db, 'Calendars', calendarId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {

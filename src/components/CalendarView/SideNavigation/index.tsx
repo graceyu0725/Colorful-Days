@@ -13,19 +13,19 @@ import MaterialSymbolsExitToAppRounded from '~icons/material-symbols/exit-to-app
 import MaterialSymbolsStickyNote2OutlineRounded from '~icons/material-symbols/sticky-note-2-outline-rounded';
 import OcticonPeople16 from '~icons/octicon/people-16';
 import UilSchedule from '~icons/uil/schedule';
-import { useAuthStore } from '../../store/authStore';
-import { useEventsStore } from '../../store/eventsStore';
-import { firebase } from '../../utils/firebase';
+import { useAuthStore } from '../../../store/authStore';
+import { useEventsStore } from '../../../store/eventsStore';
+import { firebase } from '../../../utils/firebase';
 import {
   getAllCalendarDetail,
   getAllMemberDetail,
-} from '../../utils/handleUserAndCalendar';
-import { CalendarContent, Event, User } from '../../utils/types';
+} from '../../../utils/handleUserAndCalendar';
+import { CalendarContent, Event, User } from '../../../utils/types';
 import Members from './SidePanels/Members';
 import Memo from './SidePanels/Memo';
 import Profile from './SidePanels/Profile';
 import UserCalendars from './SidePanels/UserCalendars';
-import AvatarImage from './avatar.png';
+import AvatarImage from './img/avatar.png';
 
 type Props = {
   isSideNavigationOpen: boolean;
@@ -133,14 +133,9 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
       />
 
       <div
-        className={clsx(
-          'w-16 pl-1 pt-3 h-full flex flex-col border-r',
-          { 'w-0 hidden': !isSideNavigationOpen },
-          // {
-          //   ['hidden']: !isSideNavigationOpen,
-          // },
-          // , backgroundColor
-        )}
+        className={clsx('w-16 pl-1 pt-3 h-full flex flex-col border-r', {
+          'w-0 hidden': !isSideNavigationOpen,
+        })}
       >
         <div className='flex items-center flex-col gap-4 overflow-hidden h-full'>
           <Popover placement='bottom-start'>

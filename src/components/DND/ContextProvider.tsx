@@ -21,6 +21,8 @@ import {
   getHours,
   getMinutes,
   isSameDay,
+  isSameHour,
+  isSameMinute,
 } from 'date-fns';
 import {
   collection,
@@ -113,6 +115,15 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
         newStartDate = overDate;
         newEndDate = addDays(overDate, durationInDays);
       } else {
+        if (isSameDay(draggingEvent.startAt, overDate)) {
+          if (currentView === CalendarViewCategory.Monthly) return;
+          if (
+            isSameHour(draggingEvent.startAt, overDate) &&
+            isSameMinute(draggingEvent.startAt, overDate)
+          )
+            return;
+        }
+
         const durationInSeconds = differenceInSeconds(
           draggingEvent.endAt,
           draggingEvent.startAt,
