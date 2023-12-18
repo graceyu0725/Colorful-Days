@@ -85,15 +85,15 @@ const Navigation: React.FC<Props> = ({
     <div className={styles.container}>
       <div className='flex items-center'>
         <LucideAlignJustify
-          className='mr-4 text-xl text-slate-700 hover:cursor-pointer'
+          className='hidden md:block mr-4 text-xl text-slate-700 hover:cursor-pointer'
           onClick={() => setIsSideNavigationOpen((prev) => !prev)}
         />
 
         <div className='flex items-center justify-center'>
-          <div className='items-end hidden md:flex'>
+          <div className='items-end flex'>
             <img
               src='/assets/logo.png'
-              className='hover:cursor-pointer w-9 ml-6 mr-2 lg:mr-0'
+              className='hover:cursor-pointer w-9 md:ml-6 md:mr-2 lg:mr-0'
               onClick={() => navigate('/calendar')}
             />
             <h1
@@ -176,7 +176,7 @@ const Navigation: React.FC<Props> = ({
         <Tooltip showArrow={true} placement='bottom' content='Filter'>
           <Button
             variant='bordered'
-            className={styles.addButton}
+            className={clsx("hidden lg:flex",styles.addButton)}
             onClick={() => setIsSideBarOpen((prev) => !prev)}
           >
             <CodiconFilter className='text-xl text-slate-700 hover:cursor-pointer' />

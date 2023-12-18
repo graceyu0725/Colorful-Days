@@ -117,7 +117,7 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
   return (
     <div
       className={clsx(
-        'flex transition-all duration-300 ease-in-out',
+        'hidden md:flex transition-all duration-300 ease-in-out',
         isSideNavigationOpen
           ? currentPanel
             ? 'w-72'
