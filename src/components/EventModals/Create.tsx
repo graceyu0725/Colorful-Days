@@ -29,6 +29,7 @@ export default function Create() {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isTitleEmpty, setIsTitleEmpty] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     setUserInput((prev) => ({
@@ -61,6 +62,7 @@ export default function Create() {
       return;
     }
 
+    setIsSaving(true);
     const currentTime = serverTimestamp();
     const eventsCollection = collection(
       db,
@@ -81,6 +83,7 @@ export default function Create() {
     await addEvent(eventUUID, data);
     setUserInput(initialEvent);
     setIsCreateModalOpen(false, new Date(), new Date(), false);
+    setIsSaving(false);
   };
 
   const handleCancel = () => {
@@ -124,6 +127,7 @@ export default function Create() {
             isTitleEmpty,
             handleCancel,
             handleSubmit,
+            isSaving,
             true,
           )}
         </ModalContent>

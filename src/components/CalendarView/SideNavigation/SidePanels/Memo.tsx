@@ -35,6 +35,7 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
   const [memoInput, setMemoInput] = useState('');
   const [isComposing, setIsComposing] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCompositionStart = () => {
     setIsComposing(true);
@@ -54,6 +55,7 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
       return;
     }
 
+    setIsSubmitting(true);
     await addNewMemo(
       selectedTag,
       memoInput.trim(),
@@ -61,7 +63,7 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
     );
     setMemoInput('');
     setSelectedTag('0');
-
+    setIsSubmitting(false);
     toast.success('Memo added successfully');
   };
 
@@ -149,6 +151,7 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
               />
             </div>
             <Button
+              isLoading={isSubmitting}
               className={clsx(
                 'w-full h-6 rounded-lg',
                 currentThemeColor.lightBackground,

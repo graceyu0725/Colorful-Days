@@ -25,7 +25,7 @@ const MonthlyEvent: React.FC<Props> = ({
   formattedTime,
 }) => {
   const content = isAllDay ? (
-    <div>{event.title}</div>
+    <div className='truncate'>{event.title}</div>
   ) : isSameDay(event.startAt || new Date(), event.endAt || new Date()) ? (
     <div className='flex items-center justify-between'>
       <div className='truncate'>{event.title}</div>
@@ -34,7 +34,7 @@ const MonthlyEvent: React.FC<Props> = ({
       </div>
     </div>
   ) : (
-    <div>{event.title}</div>
+    <div className='truncate'>{event.title}</div>
   );
 
   return (

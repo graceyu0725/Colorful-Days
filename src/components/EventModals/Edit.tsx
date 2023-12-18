@@ -23,6 +23,7 @@ export default function Edit() {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isTitleEmpty, setIsTitleEmpty] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     setUserInput({
@@ -53,6 +54,7 @@ export default function Edit() {
       return;
     }
 
+    setIsSaving(true);
     const currentTime = serverTimestamp();
     const data = {
       ...userInput,
@@ -61,7 +63,7 @@ export default function Edit() {
     await updateEvent(data);
     setIsEditModalOpen(false, userInput);
     setIsEditing(false);
-
+    setIsSaving(false);
     toast.success('Event updated successfully');
   };
 
@@ -109,6 +111,7 @@ export default function Edit() {
               isTitleEmpty,
               handleCancel,
               handleSubmit,
+              isSaving,
               isEditing,
             )
           )}

@@ -112,8 +112,8 @@ const WeeklyView: React.FC = () => {
         <div className='col-start-1 row-start-2 border-r -mr-px z-10' />
         {weekDates.map((weekDate, index) => (
           <DroppableArea
-            key={`droppable-weekly-${index}`}
-            id={`droppable-weekly-${index}`}
+            key={`droppable-weeklyAllDay-${index}`}
+            id={`droppable-weeklyAllDay-${index}`}
             date={weekDate}
             className={dateStyles[index]}
           >
@@ -175,7 +175,7 @@ const WeeklyView: React.FC = () => {
               {timeStyles.map((_, index) => (
                 <React.Fragment key={index}>
                   <DroppableArea
-                    id={`droppable-weekly-row-1-${weekdayIndex}-${index}`}
+                    id={`droppable-weeklyOneDay-row-1-${weekdayIndex}-${index}`}
                     date={getStartTime(weekDates, weekdayIndex, index, 0)}
                     className='border-b border-dashed hover:bg-slate-100'
                   >
@@ -188,14 +188,11 @@ const WeeklyView: React.FC = () => {
                           getStartTime(weekDates, weekdayIndex, index + 1, 0),
                           false,
                         );
-                        console.log(
-                          getStartTime(weekDates, weekdayIndex, index, 0),
-                        );
                       }}
                     />
                   </DroppableArea>
                   <DroppableArea
-                    id={`droppable-weekly-row-2-${weekdayIndex}-${index}`}
+                    id={`droppable-weeklyOneDay-row-2-${weekdayIndex}-${index}`}
                     date={getStartTime(weekDates, weekdayIndex, index, 30)}
                     className='border-b hover:bg-slate-100'
                   >

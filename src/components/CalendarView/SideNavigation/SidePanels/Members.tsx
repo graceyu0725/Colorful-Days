@@ -44,6 +44,8 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isMemberExist, setIsMemberExist] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
+  const [isInviting, setIsInviting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleCompositionStart = () => {
     setIsComposing(true);
@@ -77,6 +79,7 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
   };
 
   const handleAddMember = async (result: User) => {
+    setIsInviting(true);
     const isSuccess = await addMemberToCalendar(
       currentCalendarId,
       result.userId,
@@ -86,6 +89,7 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
       setSearchInput('');
       setSearchResult(null);
       setIsMemberExist(false);
+      setIsInviting(false);
       toast.success('Member added successfully');
     } else {
       toast.error('Failed to add member!');
@@ -93,8 +97,9 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
   };
 
   const handleRemoveMember = async (calendarId: string, userId: string) => {
+    setIsDeleting(true);
     await removeMember(calendarId, userId);
-
+    setIsDeleting(false);
     toast.success('Member removed successfully');
   };
 
@@ -117,6 +122,7 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
     result,
   }) => (
     <Button
+      isLoading={isInviting}
       disabled={isMemberExist}
       className={clsx(
         'mt-2 h-6 w-full px-2 rounded-md bg-slate-200 flex gap-1 items-center justify-center',
@@ -157,6 +163,7 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
                   </PopoverTrigger>
                   <PopoverContent className='p-0 rounded-lg'>
                     <Button
+                      isLoading={isDeleting}
                       color='danger'
                       variant='bordered'
                       className='p-0 border-0'

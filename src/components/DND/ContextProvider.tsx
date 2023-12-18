@@ -88,12 +88,15 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
       let newStartDate = overDate;
       let newEndDate = overDate;
 
+      const isWeeklyOneDay = over?.id.toString().includes('weeklyOneDay');
+      const isWeeklyAllDay = over?.id.toString().includes('weeklyAllDay');
+
       if (draggingEvent.isMemo) {
         const currentTime = serverTimestamp();
         const updatedEvent = {
           ...draggingEvent,
           isMemo: false,
-          isAllDay: true,
+          isAllDay: isWeeklyOneDay ? false : true,
           startAt: newStartDate,
           endAt: addMinutes(newEndDate, 15),
           updatedAt: currentTime,
@@ -105,7 +108,13 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
       }
 
       if (draggingEvent.isAllDay) {
-        if (isSameDay(draggingEvent.startAt, overDate)) return;
+        if (
+          (isSameDay(draggingEvent.startAt, overDate) &&
+            currentView === CalendarViewCategory.Monthly) ||
+          (isSameDay(draggingEvent.startAt, overDate) && isWeeklyAllDay) ||
+          isWeeklyOneDay
+        )
+          return;
 
         const durationInDays = differenceInCalendarDays(
           draggingEvent.endAt,
@@ -115,6 +124,7 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
         newStartDate = overDate;
         newEndDate = addDays(overDate, durationInDays);
       } else {
+        if (isWeeklyAllDay) return;
         if (isSameDay(draggingEvent.startAt, overDate)) {
           if (currentView === CalendarViewCategory.Monthly) return;
           if (
@@ -175,12 +185,13 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
             id={`${selectedItem.eventId}`}
             className={clsx(
               'flex truncate z-30 basis-0 rounded indent-1.5 hover:cursor-pointer hover:-translate-y-px hover:shadow-md',
-              !selectedItem.isAllDay &&
-                isSameDay(selectedItem.startAt, selectedItem.endAt)
-                ? `${lightBackground} text-slate-500`
-                : currentView === CalendarViewCategory.Monthly
-                  ? `${normalBackground} text-white`
-                  : `${lightBackground} text-slate-500`,
+              selectedItem.isAllDay
+                ? `${normalBackground} text-white`
+                : isSameDay(selectedItem.startAt, selectedItem.endAt)
+                  ? `${lightBackground} text-slate-500`
+                  : currentView === CalendarViewCategory.Monthly
+                    ? `${normalBackground} text-white`
+                    : `${lightBackground} text-slate-500`,
             )}
             event={selectedItem}
             isOverlay

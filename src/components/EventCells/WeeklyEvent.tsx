@@ -28,7 +28,7 @@ const WeeklyEvent: React.FC<Props> = ({
   formattedTime,
 }) => {
   const content = isAllDay ? (
-    <div>{event.title}</div>
+    <div className='truncate'>{event.title}</div>
   ) : (
     <div className='flex items-center justify-between'>
       <div className='truncate'>{event.title}</div>

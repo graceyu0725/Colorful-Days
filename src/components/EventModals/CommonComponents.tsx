@@ -266,6 +266,7 @@ export const renderModalContent = (
   isTitleEmpty: boolean,
   handleCancel: () => void,
   handleSubmit: () => Promise<void>,
+  isSaving: boolean,
   isEditing?: boolean,
 ) => {
   const handleCompositionStart = () => {
@@ -392,6 +393,7 @@ export const renderModalContent = (
             Cancel
           </Button>
           <Button
+            isLoading={isSaving}
             color='primary'
             onPress={handleSubmit}
             className={clsx(
