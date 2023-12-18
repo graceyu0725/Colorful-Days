@@ -28,7 +28,7 @@ export default function AdventCalendar() {
   };
 
   const datesArray = createSpecialArray();
-  const specialDates = [1, 7, 14, 18, 25];
+  const specialDates = [1, 5, 7, 14, 18, 25];
   const [isFlipped, setIsFlipped] = useState(false);
   const [isGuided, setIsGuided] = useState(false);
 

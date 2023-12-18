@@ -48,7 +48,6 @@ export default function Create() {
     const calendarRef = doc(db, 'Calendars', currentCalendarId);
     const eventRef = doc(calendarRef, 'events', id);
     await setDoc(eventRef, data);
-    toast.success('Event added successfully');
   };
 
   const handleSubmit = async () => {
@@ -81,9 +80,14 @@ export default function Create() {
       eventId: eventUUID,
     };
     await addEvent(eventUUID, data);
+    document.documentElement.style.setProperty(
+      '--main-bg-color',
+      datePickerColors[0],
+    );
     setUserInput(initialEvent);
     setIsCreateModalOpen(false, new Date(), new Date(), false);
     setIsSaving(false);
+    toast.success('Event added successfully');
   };
 
   const handleCancel = () => {

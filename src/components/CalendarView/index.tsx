@@ -10,7 +10,7 @@ import TopNavigation from './TopNavigation';
 import WeeklyView from './WeeklyView';
 
 function CalendarView() {
-  const { currentUser } = useAuthStore();
+  const { currentUser, currentCalendarId } = useAuthStore();
   const { currentView } = useViewStore();
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [isSideNavigationOpen, setIsSideNavigationOpen] = useState(true);
@@ -25,7 +25,7 @@ function CalendarView() {
         <div className='flex w-full' style={{ height: 'calc(100vh - 64px)' }}>
           <SideNavigation isSideNavigationOpen={isSideNavigationOpen} />
           <div className='px-6 py-4 flex grow overflow-auto'>
-            {currentUser.email ? (
+            {currentCalendarId ? (
               <>
                 {currentView === CalendarViewCategory.Monthly && (
                   <MonthlyView />
