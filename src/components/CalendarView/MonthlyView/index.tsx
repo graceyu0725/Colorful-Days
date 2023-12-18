@@ -25,36 +25,12 @@ const MonthlyView: React.FC = () => {
   // 生成當前月份的日期陣列 []
   const monthDates: Date[] = generateMonthDates(currentYear, currentMonth);
   const splitEvents = getSplitEvents(monthDates, allEvents);
+  const weeks = splitDatesIntoWeeks(monthDates);
 
-  // 用 Wrapper 包住日曆格子＆事件格子
-  interface WrapperProps {
-    children: React.ReactNode;
-    id: string;
-  }
-
-  interface CalendarViewProps {
-    monthDates: Date[];
-  }
-
-  const WeekWrapper: React.FC<WrapperProps> = ({ children }) => (
-    <div className='flex-auto relative px-px' id='weekWrapper'>
-      {children}
-    </div>
-  );
-
-  const DayCellsWrapper: React.FC<WrapperProps> = ({ children }) => (
-    <div className='flex w-ull' id='dayCellsWrapper'>
-      {children}
-    </div>
-  );
-
-  // 生成日曆格子，每一週用 DayCellWrapper 包住 DayCells
-  const CalendarView: React.FC<CalendarViewProps> = ({ monthDates }) => {
-    const weeks = splitDatesIntoWeeks(monthDates);
-
-    return (
+  return (
+    <div className='mt-1 w-full border-t'>
       <div className='flex flex-col border-x'>
-        <DayCellsWrapper id='dayCellsWrapper'>
+        <div id='dayCellsWrapper-weekday' className='flex w-ull'>
           {weekdays.map((weekday, index) => (
             <Cell
               key={index}
@@ -66,16 +42,23 @@ const MonthlyView: React.FC = () => {
               {weekday}
             </Cell>
           ))}
-        </DayCellsWrapper>
+        </div>
 
         {weeks.map((week, index) => (
-          <WeekWrapper id='weekWrapper' key={`week-${index}`}>
-            <DayCellsWrapper id='dayCellsWrapper'>
+          <div
+            key={`week-${index}`}
+            id='weekWrapper'
+            className='flex-auto relative px-px'
+          >
+            <div id='dayCellsWrapper-weekDates' className='flex w-ull'>
               {week.map((cellDate, idx) => {
                 return (
-                  <DroppableArea id={cellDate.toDateString()} date={cellDate}>
+                  <DroppableArea
+                    key={`droppable-${index}-${idx}`}
+                    id={`droppable-${index}-${idx}`}
+                    date={cellDate}
+                  >
                     <Cell
-                      key={`${index}-${idx}`}
                       className={clsx('grow', {
                         ['text-gray-400']: !isSameMonth(cellDate, currentDate),
                       })}
@@ -94,21 +77,17 @@ const MonthlyView: React.FC = () => {
                   </DroppableArea>
                 );
               })}
-            </DayCellsWrapper>
+            </div>
 
             <EventCells
               splitEvents={splitEvents}
               weekIndex={index}
               week={week}
             />
-          </WeekWrapper>
+          </div>
         ))}
       </div>
-    );
-  };
-
-  return (
-    <div className='mt-1 w-full border-t'>{CalendarView({ monthDates })}</div>
+    </div>
   );
 };
 

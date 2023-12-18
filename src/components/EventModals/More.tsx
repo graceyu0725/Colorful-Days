@@ -26,19 +26,19 @@ export default function More() {
       size='xs'
       scrollBehavior='inside'
     >
-      <ModalContent>
+      <ModalContent className='max-h-[calc(100vh_-_130px)]'>
         <ModalHeader className='py-3'>
           {eventsToRender.length} Events
         </ModalHeader>
         <Divider />
-        <ModalBody className='gap-2 py-4'>
+        <ModalBody className='gap-2 py-4 overflow-y-auto'>
           {eventsToRender.map(
             (event, index) =>
               event && (
                 <div
                   key={index}
                   className={clsx(
-                    'flex items-center justify-between shrink-0 truncate px-2 h-6 rounded hover:cursor-pointer',
+                    'flex items-center justify-between shrink-0 truncate px-2 h-6 rounded hover:cursor-pointer hover:-translate-y-px hover:shadow-md',
                     event.isAllDay
                       ? `${
                           themeColors[Number(event.tag)].darkBackground
@@ -57,7 +57,7 @@ export default function More() {
                       <div className='flex w-3/4 h-full items-center gap-2'>
                         <div
                           className={clsx(
-                            'w-1 h-2/3 rounded',
+                            'w-1 h-2/3 shrink-0 rounded',
                             themeColors[Number(event.tag)].darkBackground,
                           )}
                         />

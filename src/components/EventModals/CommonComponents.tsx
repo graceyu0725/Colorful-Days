@@ -16,6 +16,7 @@ import {
 import clsx from 'clsx';
 import { addMinutes } from 'date-fns';
 import DatePicker from 'react-datepicker';
+import toast from 'react-hot-toast';
 import FluentNotepad28Filled from '~icons/fluent/notepad-28-filled';
 import MaterialSymbolsNestClockFarsightAnalog from '~icons/material-symbols/nest-clock-farsight-analog';
 import MdiTag from '~icons/mdi/tag';
@@ -71,8 +72,9 @@ export const updateUserInput = (
     }
 
     if (updatedInput.startAt && updatedInput.endAt) {
-      if (label === 'endAt' && value <= addMinutes(updatedInput.startAt, 15)) {
+      if (label === 'endAt' && value < addMinutes(updatedInput.startAt, 15)) {
         updatedInput.endAt = addMinutes(updatedInput.startAt, 15);
+        toast.error('End time cannot be earlier than start time!');
       }
     }
 
@@ -264,6 +266,7 @@ export const renderModalContent = (
   isTitleEmpty: boolean,
   handleCancel: () => void,
   handleSubmit: () => Promise<void>,
+  isSaving: boolean,
   isEditing?: boolean,
 ) => {
   const handleCompositionStart = () => {
@@ -278,7 +281,7 @@ export const renderModalContent = (
     <>
       <ModalHeader className='py-3'>{header}</ModalHeader>
       <Divider />
-      <ModalBody>
+      <ModalBody className='overflow-y-auto'>
         <Input
           isReadOnly={!isEditing}
           aria-label='title'
@@ -301,6 +304,7 @@ export const renderModalContent = (
           }}
           onCompositionStart={handleCompositionStart}
           onCompositionEnd={handleCompositionEnd}
+          className=''
         />
         {userInput.isAllDay &&
           !userInput.isMemo &&
@@ -389,12 +393,14 @@ export const renderModalContent = (
             Cancel
           </Button>
           <Button
+            isLoading={isSaving}
             color='primary'
             onPress={handleSubmit}
             className={clsx(
               'w-1/2',
               themeColors[Number(userInput.tag)].darkBackground,
             )}
+            disabled={!userInput.title}
           >
             Save
           </Button>

@@ -8,7 +8,6 @@ import {
 } from 'firebase/firestore';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import EosIconsLoading from '~icons/eos-icons/loading';
 import AddCalendarModal from '../../components/CalendarModals/AddCalendar';
 import CalendarView from '../../components/CalendarView';
 import CreateEventModal from '../../components/EventModals/Create';
@@ -92,7 +91,7 @@ function Calendar() {
 
         document.title = `${docSnapshot.data().name} - Colorful Days`;
       } else {
-        console.log('Calendar not found');
+        console.error('Calendar not found');
       }
     });
 
@@ -150,7 +149,7 @@ function Calendar() {
   }, []);
 
   useEffect(() => {
-    if (!selectedEvent || !selectedEvent.eventId) {
+    if (!selectedEvent || !selectedEvent.eventId || !currentCalendarId) {
       return;
     }
 
@@ -191,17 +190,11 @@ function Calendar() {
 
   return (
     <div className='flex w-screen'>
-      {localStorage.getItem('uid') ? (
-        <>
-          <CalendarView />
-          <CreateEventModal />
-          <EditEventModal />
-          <MoreEventModal />
-          <AddCalendarModal />
-        </>
-      ) : (
-        <EosIconsLoading />
-      )}
+      <CalendarView />
+      <CreateEventModal />
+      <EditEventModal />
+      <MoreEventModal />
+      <AddCalendarModal />
     </div>
   );
 }

@@ -8,7 +8,7 @@ function Login() {
   const [isFlipped, setIsFlipped] = useState(false);
 
   return (
-    <div className='flex items-center justify-center h-screen bg-theme-1-200'>
+    <div className='flex items-center justify-center h-screen bg-theme-1-200 overflow-y-auto'>
       <div className='w-11/12 h-5/6 flex overflow-hidden height-auto text-foreground box-border bg-content1 outline-none data-[focus-visible=true]:z-10 data-[focus-visible=true]:outline-2 data-[focus-visible=true]:outline-focus data-[focus-visible=true]:outline-offset-2 shadow-medium transition-transform-background motion-reduce:transition-none p-0 rounded-2xl z-10'>
         <motion.div
           className='mx-6 h-full relative flex flex-1 flex-col justify-center lg:flex-none lg:w-5/12 xl:w-4/12'

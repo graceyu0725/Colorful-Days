@@ -3,10 +3,11 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import BxBxsQuoteAltLeft from '~icons/bx/bxs-quote-alt-left';
 import BxBxsQuoteAltRight from '~icons/bx/bxs-quote-alt-right';
-import MajesticonsHandPointer2Line from '~icons/majesticons/hand-pointer-2-line';
+import PhArrowBendLeftUpBold from '~icons/ph/arrow-bend-left-up-bold';
 import InfoModal from './InfoModal';
 import backgroundImage from './img/background.png';
 import specialBackgroundImage from './img/special-background.png';
+import MaterialSymbolsLineStartArrowRounded from '~icons/material-symbols/line-start-arrow-rounded'
 
 export default function AdventCalendar() {
   const createSpecialArray = () => {
@@ -27,7 +28,7 @@ export default function AdventCalendar() {
   };
 
   const datesArray = createSpecialArray();
-  const specialDates = [1, 7, 14, 18, 25];
+  const specialDates = [1, 5, 7, 14, 18, 25];
   const [isFlipped, setIsFlipped] = useState(false);
   const [isGuided, setIsGuided] = useState(false);
 
@@ -43,7 +44,7 @@ export default function AdventCalendar() {
   return (
     <div
       id='adventCalendar'
-      className='w-1/2 h-[calc(100vh_-_64px)] mt-16 flex relative overflow-hidden'
+      className='hidden lg:flex w-1/2 h-[calc(100vh_-_64px)] mt-16 relative overflow-hidden'
     >
       <InfoModal
         isInfoModalOpen={isInfoModalOpen}
@@ -61,11 +62,6 @@ export default function AdventCalendar() {
           transformStyle: 'preserve-3d',
           perspective: '2800px',
         }}
-        // whileHover={{
-        //   rotateY: isFlipped ? 0 : 20,
-        //   rotateZ: isFlipped ? 0 : -0.5,
-        //   rotateX: isFlipped ? 0 : -0.5,
-        // }}
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ rotate: 0, scale: 1, opacity: 1 }}
         transition={{
@@ -79,13 +75,16 @@ export default function AdventCalendar() {
         }}
       >
         {!isGuided && (
-          <MajesticonsHandPointer2Line className='absolute right-40 bottom-20 text-6xl text-white z-10 animate-bounce animate-infinite' />
+          <div className='z-10 flex items-center gap-2 animate-bounce animate-infinite self-start mt-20 ml-96'>
+            <MaterialSymbolsLineStartArrowRounded className='text-xl text-white' />
+            <div className='text-white w-40'>Flip the small cards to explore features of Colorful Days</div>
+          </div>
         )}
 
         <motion.div
           className='min-h-content absolute top-10 bottom-10 right-20 shadow-xl flex flex-col justify-center gap-4 px-10 rounded-3xl bg-theme-1-300 hover:cursor-pointer'
           style={{ backfaceVisibility: 'hidden' }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.7 }}
           initial={false}
           animate={{ rotateY: isFlipped ? 0 : -180 }}
         >
@@ -103,7 +102,7 @@ export default function AdventCalendar() {
         <motion.div
           className='min-h-content absolute top-10 bottom-10 shadow-xl flex flex-col justify-center gap-4 px-10 rounded-3xl bg-theme-1-300 hover:cursor-pointer overflow-hidden'
           style={{ backfaceVisibility: 'hidden' }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.7 }}
           initial={false}
           animate={{ rotateY: isFlipped ? 180 : 0 }}
         >
@@ -119,10 +118,6 @@ export default function AdventCalendar() {
                         'hover:scale-110 transition':
                           specialDates.includes(date),
                       },
-                      // {
-                      //   'animate-rotate-y animate-thrice':
-                      //     isFlipped === true && specialDates.includes(date),
-                      // },
                       {
                         'animate-rotate-y animate-once': selectedCell === date,
                       },
@@ -139,6 +134,7 @@ export default function AdventCalendar() {
                     }}
                     onClick={(e) => {
                       if (specialDates.includes(date)) {
+                        if (!isGuided) setIsGuided(true);
                         handleClickCell(e, date);
                       }
                     }}

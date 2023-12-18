@@ -1,49 +1,56 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Image } from '@nextui-org/react';
+import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 import EosIconsLoading from '~icons/eos-icons/loading';
 import LogosGoogleIcon from '~icons/logos/google-icon';
 import { firebase } from '../../utils/firebase';
 import { googleAuth } from '../../utils/googleAuth';
-import { UserSignIn } from '../../utils/types';
 
+const validationSchema = z.object({
+  email: z.string().min(1, { message: 'Email is required' }).email({
+    message: 'Must be a valid email',
+  }),
+  password: z
+    .string()
+    .min(1, { message: 'Password is required' })
+    .min(6, { message: 'Password must be at least 6 characters' }),
+});
+
+type ValidationSchema = z.infer<typeof validationSchema>;
 type Props = {
   isFlipped: boolean;
   setIsFlipped: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ValidationSchema>({
+    resolver: zodResolver(validationSchema),
+    mode: 'onBlur',
+  });
   const navigate = useNavigate();
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
+  const onSubmit: SubmitHandler<ValidationSchema> = async (data) => {
+    setIsButtonLoading(true);
+    await firebase.signIn(data, navigate);
+    setIsButtonLoading(false);
+  };
 
   useEffect(() => {
     if (localStorage.getItem('uid')) {
       navigate('/calendar');
     }
   }, []);
-
-  const [userInput, setUserInput] = useState<UserSignIn>({
-    email: '',
-    password: '',
-  });
-
-  // Update userInput when typing
-  const updateUserInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setUserInput((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const [isButtonLoading, setIsButtonLoading] = useState(false);
-  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-
-  const handleSignin = async () => {
-    setIsButtonLoading(true);
-    await firebase.signIn(userInput, navigate);
-    setIsButtonLoading(false);
-  };
 
   return (
     <motion.div
@@ -67,7 +74,7 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
         </div>
       </div>
 
-      <h2 className='mt-2 mb-4 text-3xl font-bold tracking-tight'>
+      <h2 className='mt-2 mb-2 text-3xl font-bold tracking-tight'>
         Sign in to your account
       </h2>
 
@@ -88,7 +95,7 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
           <div className='font-medium'>Sign in with Google</div>
         </div>
 
-        <div className='relative mt-6'>
+        <div className='relative mt-4'>
           <div
             className='absolute inset-0 flex items-center'
             aria-hidden='true'
@@ -100,8 +107,8 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
           </div>
         </div>
 
-        <div className='mt-6'>
-          <form action='#' method='POST' className='space-y-6'>
+        <div className='mt-2'>
+          <form className='space-y-6' onSubmit={handleSubmit(onSubmit)}>
             <div className='flex flex-col gap-1'>
               <label
                 htmlFor='email'
@@ -111,15 +118,16 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
               </label>
               <input
                 id='signinEmail'
-                name='email'
-                type='email'
                 autoComplete='email'
-                required
                 placeholder='email@example.com'
-                value={userInput.email}
-                onChange={updateUserInput}
                 className='placeholder:h-11 placeholder:text-sm leading-[44px] h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
+                {...register('email')}
               />
+              {errors.email && (
+                <p className='text-sm text-red-500 mt-px -mb-2'>
+                  {errors.email?.message}
+                </p>
+              )}
             </div>
 
             <div className='flex flex-col gap-1'>
@@ -131,24 +139,22 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
               </label>
               <input
                 id='signinPassword'
-                name='password'
                 type='password'
                 autoComplete='current-password'
-                required
                 placeholder='At least 6 characters'
-                value={userInput.password}
-                onChange={updateUserInput}
                 className='placeholder:h-11 placeholder:tracking-normal placeholder:text-sm tracking-widest h-11 block w-full appearance-none rounded-lg border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-theme-1-200 focus:outline-theme-1-200'
                 onKeyDown={(e) => {
-                  if (
-                    e.key === 'Enter' &&
-                    userInput.email &&
-                    userInput.password
-                  ) {
-                    handleSignin();
+                  if (e.key === 'Enter') {
+                    handleSubmit(onSubmit);
                   }
                 }}
+                {...register('password')}
               />
+              {errors.password && (
+                <p className='text-sm text-red-500 mt-px -mb-2'>
+                  {errors.password?.message}
+                </p>
+              )}
             </div>
 
             <div className='flex items-center text-sm'>
@@ -164,10 +170,10 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
             <div>
               <Button
                 isLoading={isButtonLoading}
-                type='button'
-                disabled={!userInput.email || !userInput.password}
-                onClick={handleSignin}
-                className='h-11 w-full text-base rounded-lg bg-theme-1-300 text-white'
+                type='submit'
+                className={clsx(
+                  'h-11 w-full text-base rounded-lg bg-theme-1-300 text-white',
+                )}
               >
                 Sign in
               </Button>

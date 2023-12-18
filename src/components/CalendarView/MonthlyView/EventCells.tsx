@@ -1,6 +1,6 @@
 import { getDay } from 'date-fns';
 import { useModalStore } from '../../../store/modalStore';
-import { renderEvent } from '../../../utils/handleDatesAndEvents';
+import { renderMonthlyEvents } from '../../../utils/handleDatesAndEvents';
 import { Event } from '../../../utils/types';
 
 type Props = {
@@ -12,38 +12,18 @@ type Props = {
 const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
   const { setIsMoreModalOpen, setIsEditModalOpen } = useModalStore();
 
-  // ================================================================
-  // Handle rendering
-  // ================================================================
-  interface WrapperProps {
-    children: React.ReactNode;
-    id: string;
-  }
-
-  const EventCellsWrapper: React.FC<WrapperProps> = ({ children }) => (
+  return (
     <div
+      id='eventCellsWrapper'
       className='absolute flex flex-col w-full top-7 gap-y-1'
       style={{ pointerEvents: 'none' }}
-      id='eventCellsWrapper'
     >
-      {children}
-    </div>
-  );
-
-  const EventRow: React.FC<WrapperProps> = ({ children }) => (
-    <div className='grid gap-0.5 grid-cols-7 auto-rows-auto' id='eventRow'>
-      {children}
-    </div>
-  );
-
-  return (
-    <EventCellsWrapper id='eventCellsWrapper'>
-      <EventRow id='eventRow'>
+      <div id='eventRow' className='grid gap-0.5 grid-cols-7 auto-rows-auto'>
         {splitEvents[weekIndex].map((events, eventsIndex) =>
           events.map((event, eventIndex) =>
             eventIndex < 2 ? (
               event ? (
-                renderEvent(
+                renderMonthlyEvents(
                   event,
                   week[eventsIndex],
                   eventIndex,
@@ -52,6 +32,7 @@ const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
               ) : null
             ) : eventIndex === 2 && !event.isMemo ? (
               <div
+                key={event.eventId}
                 className='truncate border-2 border-slate-200 text-xs text-center w-10 rounded hover:cursor-pointer'
                 style={{
                   gridColumnStart: getDay(week[eventsIndex]) + 1,
@@ -64,8 +45,8 @@ const EventCells: React.FC<Props> = ({ splitEvents, weekIndex, week }) => {
             ) : null,
           ),
         )}
-      </EventRow>
-    </EventCellsWrapper>
+      </div>
+    </div>
   );
 };
 

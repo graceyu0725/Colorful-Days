@@ -29,6 +29,7 @@ export default function Create() {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isTitleEmpty, setIsTitleEmpty] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     setUserInput((prev) => ({
@@ -47,7 +48,6 @@ export default function Create() {
     const calendarRef = doc(db, 'Calendars', currentCalendarId);
     const eventRef = doc(calendarRef, 'events', id);
     await setDoc(eventRef, data);
-    toast.success('Event added successfully!');
   };
 
   const handleSubmit = async () => {
@@ -56,6 +56,12 @@ export default function Create() {
       return;
     }
 
+    if (userInput.title.replace(/\s+/g, '').length === 0) {
+      setIsTitleEmpty(true);
+      return;
+    }
+
+    setIsSaving(true);
     const currentTime = serverTimestamp();
     const eventsCollection = collection(
       db,
@@ -68,13 +74,20 @@ export default function Create() {
 
     const data = {
       ...userInput,
+      title: userInput.title.trim(),
       createdAt: currentTime,
       updatedAt: currentTime,
       eventId: eventUUID,
     };
     await addEvent(eventUUID, data);
+    document.documentElement.style.setProperty(
+      '--main-bg-color',
+      datePickerColors[0],
+    );
     setUserInput(initialEvent);
     setIsCreateModalOpen(false, new Date(), new Date(), false);
+    setIsSaving(false);
+    toast.success('Event added successfully');
   };
 
   const handleCancel = () => {
@@ -104,7 +117,7 @@ export default function Create() {
         }}
         size='lg'
       >
-        <ModalContent>
+        <ModalContent className='max-h-[calc(100vh_-_130px)]'>
           {renderModalContent(
             isComposing,
             setIsComposing,
@@ -118,6 +131,7 @@ export default function Create() {
             isTitleEmpty,
             handleCancel,
             handleSubmit,
+            isSaving,
             true,
           )}
         </ModalContent>

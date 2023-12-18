@@ -13,6 +13,7 @@ import { NavigateFunction } from 'react-router-dom';
 // import { updateCalendarContent } from '../store/authStore';
 import { arrayUnion, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { DocumentData, DocumentReference } from 'firebase/firestore/lite';
+import toast from 'react-hot-toast';
 import {
   CalendarContent,
   CalendarInfo,
@@ -121,10 +122,7 @@ export const isUserExists = async (userEmail: string) => {
 // 更新 calendar 狀態
 const getCalendarContent = async (calendarId: string) => {
   try {
-    console.log('4. 取得日曆內容');
-
-    const calendarsCollection = collection(db, 'Calendars');
-    const docRef = doc(calendarsCollection, calendarId);
+    const docRef = doc(db, 'Calendars', calendarId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -149,11 +147,8 @@ export const updateCalendarContent = async (
   setCurrentCalendarContent: (currentCalendarContent: CalendarContent) => void,
   setCalendarAllEvents?: (event: Event[]) => void,
 ) => {
-  console.log('3. 更新日曆內容');
   const calendarContent = await getCalendarContent(calendarId);
-  // const { setCurrentCalendarId, setCurrentCalendarContent } = useAuthStore();
   if (calendarContent) {
-    console.log('5. 設定日曆內容');
     setCurrentCalendarId(calendarId);
     setCurrentCalendarContent(calendarContent);
   }
@@ -184,12 +179,7 @@ export const updateCurrentUser = async (
   setCurrentCalendarId: (currentCalendarId: string) => void,
   setCurrentCalendarContent: (currentCalendarContent: CalendarContent) => void,
 ) => {
-  console.log('1. updateCurrentUser');
-  // const { setCurrentUser, setCurrentCalendarId } = useAuthStore();
-
-  console.log('2. 新增用戶');
   const q = query(collection(db, 'Users'), where('userId', '==', uid));
-
   const querySnapshot = await getDocs(q);
 
   if (!querySnapshot.empty) {
@@ -245,9 +235,16 @@ export const createNewCalendar = async (
   setCurrentCalendarContent: (currentCalendarContent: CalendarContent) => void,
   resetAllEvents: () => void,
 ) => {
+  if (!userEmail || !userId || !calendarName || !calendarThemeColor) {
+    toast.error(
+      'There is an error when creating new calendar. Please try again!',
+    );
+    return;
+  }
+
   const calendarsCollection = collection(db, 'Calendars');
   const calendarDocRef = doc(calendarsCollection);
-  addCalendar(userId, calendarName, calendarThemeColor, calendarDocRef);
+  await addCalendar(userId, calendarName, calendarThemeColor, calendarDocRef);
   const userRef = doc(db, 'Users', userEmail);
   await updateDoc(userRef, {
     calendars: arrayUnion(calendarDocRef.id),
@@ -378,9 +375,6 @@ export const removeMember = async (calendarId: string, userId: string) => {
       await updateDoc(userDocRef, {
         calendars: arrayRemove(calendarId),
       });
-      console.log(`Removed calendarId ${calendarId} from user ${userId}`);
-    } else {
-      console.log(`No user found with userId ${userId}`);
     }
   } catch (error) {
     console.error('Error getting documents: ', error);

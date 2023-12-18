@@ -1,10 +1,11 @@
 import clsx from 'clsx';
 import { isFirstDayOfMonth, isSameDay, startOfToday } from 'date-fns';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuthStore } from '../../../store/authStore';
 import { useModalStore } from '../../../store/modalStore';
 import { useViewStore } from '../../../store/viewStore';
 import { generateWeekDates } from '../../../utils/handleDatesAndEvents';
+import { DroppableArea } from '../../DND';
 import AllDayEventCells from './AllDayEventCells';
 import OneDayEventCells from './OneDayEventCells';
 
@@ -41,7 +42,7 @@ const timeStyles = [
   },
 ];
 const commonDateStyles =
-  'row-start-2 row-span-2 border-t pl-2 pt-1 -mr-px text-sm hover:bg-slate-100';
+  'row-start-2 row-span-2 border-t pl-1 pt-1 -mr-px text-sm hover:bg-slate-100';
 const dateStyles = [
   clsx('col-start-2 border-r', commonDateStyles),
   clsx('col-start-3 border-r', commonDateStyles),
@@ -110,22 +111,30 @@ const WeeklyView: React.FC = () => {
 
         <div className='col-start-1 row-start-2 border-r -mr-px z-10' />
         {weekDates.map((weekDate, index) => (
-          <div
-            key={index}
+          <DroppableArea
+            key={`droppable-weeklyAllDay-${index}`}
+            id={`droppable-weeklyAllDay-${index}`}
+            date={weekDate}
             className={dateStyles[index]}
-            onClick={() => setIsCreateModalOpen(true, weekDate, weekDate, true)}
           >
             <div
-              className={clsx('w-5 h-5 text-center', {
-                [`${currentThemeColor.darkBackground} rounded-full text-white w-5 text-center`]:
-                  isSameDay(weekDate, new Date()),
-              })}
+              className='w-full h-full'
+              onClick={() =>
+                setIsCreateModalOpen(true, weekDate, weekDate, true)
+              }
             >
-              {isFirstDayOfMonth(weekDate)
-                ? `${weekDate.getMonth() + 1}/${weekDate.getDate()}`
-                : weekDate.getDate()}
+              <div
+                className={clsx('w-5 h-5 text-center', {
+                  [`${currentThemeColor.darkBackground} rounded-full text-white w-5 text-center`]:
+                    isSameDay(weekDate, new Date()),
+                })}
+              >
+                {isFirstDayOfMonth(weekDate)
+                  ? `${weekDate.getMonth() + 1}/${weekDate.getDate()}`
+                  : weekDate.getDate()}
+              </div>
             </div>
-          </div>
+          </DroppableArea>
         ))}
 
         <div className='col-start-1 row-start-3 border-b border-r pl-4 text-sm pt-2 -mr-px'>
@@ -147,7 +156,7 @@ const WeeklyView: React.FC = () => {
             currentThemeColor.border,
           )}
           style={{ width: 'calc(100% - 80px)', top: `${topPosition}px` }}
-        ></div>
+        />
 
         {/* 左邊時間列 */}
         {timeStyles.map((timeStyle, index) => (
@@ -157,58 +166,59 @@ const WeeklyView: React.FC = () => {
         ))}
 
         {weekdays.map((weekday, weekdayIndex) => (
-          <>
+          <React.Fragment key={weekdayIndex}>
             <div
-              key={weekdayIndex}
               id={`column-${weekday}`}
               className='relative border-l column-start-2 row-start-1 row-span-full column-span-1 grid grid-rows-weeklyTimeTable z-10'
             >
               {/* 用來放空白格子，點擊可新增事件 */}
-              {timeStyles.map((timeStyle, index) => (
-                <>
-                  <div
-                    key={`row-1-${timeStyle}-${index}`}
+              {timeStyles.map((_, index) => (
+                <React.Fragment key={index}>
+                  <DroppableArea
+                    id={`droppable-weeklyOneDay-row-1-${weekdayIndex}-${index}`}
+                    date={getStartTime(weekDates, weekdayIndex, index, 0)}
                     className='border-b border-dashed hover:bg-slate-100'
-                    onClick={() =>
-                      setIsCreateModalOpen(
-                        true,
-                        getStartTime(weekDates, weekdayIndex, index, 0),
-                        getStartTime(weekDates, weekdayIndex, index + 1, 0),
-                        false,
-                      )
-                    }
-                  ></div>
-                  <div
-                    key={`row-2-${index}`}
+                  >
+                    <div
+                      className='w-full h-full'
+                      onClick={() => {
+                        setIsCreateModalOpen(
+                          true,
+                          getStartTime(weekDates, weekdayIndex, index, 0),
+                          getStartTime(weekDates, weekdayIndex, index + 1, 0),
+                          false,
+                        );
+                      }}
+                    />
+                  </DroppableArea>
+                  <DroppableArea
+                    id={`droppable-weeklyOneDay-row-2-${weekdayIndex}-${index}`}
+                    date={getStartTime(weekDates, weekdayIndex, index, 30)}
                     className='border-b hover:bg-slate-100'
-                    onClick={() =>
-                      setIsCreateModalOpen(
-                        true,
-                        getStartTime(weekDates, weekdayIndex, index, 30),
-                        getStartTime(weekDates, weekdayIndex, index + 1, 30),
-                        false,
-                      )
-                    }
-                  ></div>
-                </>
+                  >
+                    <div
+                      className='w-full h-full'
+                      onClick={() =>
+                        setIsCreateModalOpen(
+                          true,
+                          getStartTime(weekDates, weekdayIndex, index, 30),
+                          getStartTime(weekDates, weekdayIndex, index + 1, 30),
+                          false,
+                        )
+                      }
+                    />
+                  </DroppableArea>
+                </React.Fragment>
               ))}
 
               {/* 用來放事件格子 */}
-              {/* div內用來渲染每一天的事件 */}
-              {/* <div
-                key={weekdayIndex}
-                id={`column-${weekday}`}
-                className='absolute left-0 w-11/12 bg-red-50/50 column-start-2 row-start-1 row-span-full column-span-1 grid grid-rows-weeklyTimeTable z-10'
-              > */}
               <OneDayEventCells
                 weekDates={weekDates}
                 weekdayIndex={weekdayIndex}
               />
-              {/* </div> */}
             </div>
-          </>
+          </React.Fragment>
         ))}
-        {/* Time Table Grid - 7 columns */}
       </div>
     </div>
   );

@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import {
   addDays,
   differenceInCalendarDays,
@@ -10,7 +9,8 @@ import {
   startOfDay,
   startOfWeek,
 } from 'date-fns';
-import { DraggableItem } from '../components/DND';
+import MonthlyEvent from '../components/EventCells/MonthlyEvent';
+import WeeklyEvent from '../components/EventCells/WeeklyEvent';
 import { themeColors } from './theme';
 import { Event } from './types';
 
@@ -43,7 +43,7 @@ export const updateAllEvents = (
   setCalendarAllEvents(newEvents);
 };
 
-export function splitDatesIntoWeeks(monthDates: Date[]) {
+export const splitDatesIntoWeeks = (monthDates: Date[]) => {
   let weeks: Array<Array<Date>> = [];
   let week: Date[] = [];
 
@@ -57,9 +57,9 @@ export function splitDatesIntoWeeks(monthDates: Date[]) {
   });
 
   return weeks;
-}
+};
 
-function splitEventsIntoWeeks(mappedEvents: Event[][]) {
+const splitEventsIntoWeeks = (mappedEvents: Event[][]) => {
   let weeks: Event[][][] = [];
   let week: Event[][] = [];
 
@@ -73,7 +73,7 @@ function splitEventsIntoWeeks(mappedEvents: Event[][]) {
   });
 
   return weeks;
-}
+};
 
 // ================================================================
 // Deal with logic of generating dates
@@ -124,26 +124,6 @@ export const generateWeekDates = (date: Date) => {
 
 // 將所有事件按照當月日期分好（開始日或日期區間落在當格日期，就會成為當格事件）
 const mapEventsToMonthDates = (monthDates: Date[], events: Event[]) => {
-  // const mappedEvents: Event[][] = new Array(monthDates.length)
-  //   .fill(null)
-  //   .map(() => []);
-
-  // monthDates.forEach((date, index) => {
-  //   events.forEach((event) => {
-  //     const startDate = event.startAt || new Date();
-  //     const endDate = event.endAt || new Date();
-  //     const isInInterval = isWithinInterval(date, {
-  //       start: startDate,
-  //       end: endDate,
-  //     });
-
-  //     if (isSameDay(startDate, date) || isInInterval) {
-  //       mappedEvents[index].push(event);
-  //     }
-  //   });
-
-  // });
-
   const mappedEvents: Event[][] = monthDates.map(() => []);
   const eventIndices = new Map();
 
@@ -223,171 +203,69 @@ export const getSplitEvents = (monthDates: Date[], allEvents: Event[]) => {
 // Render monthly events
 // ================================================================
 
-export const renderEvent = (
+export const renderMonthlyEvents = (
   event: any,
   cellDate: Date,
   eventIndex: number,
   setIsEditModalOpen: (isOpen: boolean, event: Event) => void,
 ) => {
-  const handleClick = (e: React.MouseEvent, event: Event) => {
-    e.stopPropagation(); // 阻止事件冒泡
-    setIsEditModalOpen(true, event);
-  };
-
-  // 如果是 memo，則不顯示在畫面上
   if (event.isMemo || !event) return;
 
   const startDate = event.startAt || new Date();
   const endDate = event.endAt || new Date();
-
+  const lastDays = differenceInCalendarDays(endDate, startDate) + 1;
   const normalBackground = themeColors[Number(event.tag)].darkBackground;
   const lightBackground = themeColors[Number(event.tag)].lightBackground;
 
+  const handleClick = (e: React.MouseEvent, event: Event) => {
+    e.stopPropagation();
+    setIsEditModalOpen(true, event);
+  };
+
   // 若事件起始日 = 該格日期，在該格顯示事件標題
+  // 起始＆結束為同一天，根據 isAllDay 決定背景透明度
+  // 起始＆結束為不同天，根據 事件日期長度 決定要佔的格子數
+  // 若 事件日期長度 超過當週可佔據的格子數，則需要斷行
   if (isSameDay(startDate, cellDate)) {
-    // 起始＆結束為同一天，根據 isAllDay 決定背景透明度
-    if (isSameDay(startDate, endDate)) {
-      // ALL-DAY
-      if (event.isAllDay) {
-        return (
-          <DraggableItem
-            id={event.eventId}
-            className={clsx(
-              'flex truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
-              normalBackground,
-            )}
-            style={{
-              gridColumnStart: getDay(startDate) + 1,
-              gridRowStart: eventIndex + 1,
-              pointerEvents: 'auto',
-            }}
-            onClick={(e) => handleClick(e, event)}
-            event={event}
-          >
-            {event.title}
-          </DraggableItem>
-        );
-      }
-
-      // SAME-DAY
-      const formattedTime = format(startDate, 'HH:mm');
-      return (
-        <DraggableItem
-          id={event.eventId}
-          className={clsx(
-            'truncate basis-0 rounded indent-1.5 hover:cursor-pointer hover:-translate-y-px hover:shadow-md',
-            lightBackground,
-          )}
-          style={{
-            gridColumnStart: getDay(startDate) + 1,
-            gridRowStart: eventIndex + 1,
-            pointerEvents: 'auto',
-          }}
-          onClick={(e) => handleClick(e, event)}
-          event={event}
-        >
-          <div className='flex items-center justify-between'>
-            <div className='truncate'>{event.title}</div>
-            <div className='truncate mr-1 text-xs text-slate-500 mt-1 min-w-fit'>
-              {formattedTime}
-            </div>
-          </div>
-        </DraggableItem>
-      );
-    }
-    const lastDays = differenceInCalendarDays(endDate, startDate) + 1;
-
-    // 起始＆結束為不同天，根據 事件日期長度 決定要佔的格子數
-    // 若 事件日期長度 超過當週可佔據的格子數，則需要斷行
-    if (getDay(startDate) + lastDays > 7) {
-      return (
-        <DraggableItem
-          id={event.eventId}
-          className={clsx(
-            'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
-            normalBackground,
-          )}
-          // style={{ flexGrow: 7 - getDay(startDate) }}
-          style={{
-            gridColumnStart: getDay(startDate) + 1,
-            gridColumnEnd: 8,
-            gridRowStart: eventIndex + 1,
-            pointerEvents: 'auto',
-          }}
-          onClick={(e) => handleClick(e, event)}
-          event={event}
-        >
-          {event.title}
-        </DraggableItem>
-      );
-    }
     return (
-      <DraggableItem
-        id={event.eventId}
-        className={clsx(
-          'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
-          normalBackground,
-        )}
-        // style={{ flexGrow: lastDays }}
-        style={{
-          gridColumnStart: getDay(startDate) + 1,
-          gridColumnEnd: getDay(startDate) + 1 + lastDays,
-          gridRowStart: eventIndex + 1,
-          pointerEvents: 'auto',
-        }}
-        onClick={(e) => handleClick(e, event)}
+      <MonthlyEvent
+        key={event.eventId}
         event={event}
-      >
-        {event.title}
-      </DraggableItem>
+        backgroundColor={
+          event.isAllDay
+            ? normalBackground
+            : isSameDay(startDate, endDate)
+              ? lightBackground
+              : normalBackground
+        }
+        onClick={(e) => handleClick(e, event)}
+        gridColumnStart={getDay(startDate) + 1}
+        gridColumnEnd={
+          getDay(startDate) + lastDays > 7
+            ? 8
+            : getDay(startDate) + 1 + lastDays
+        }
+        gridRowStart={eventIndex + 1}
+        isAllDay={event.isAllDay}
+        formattedTime={event.isAllDay ? undefined : format(startDate, 'HH:mm')}
+      />
     );
   }
 
   // 若為當週第一天，且事件起始日 != 該格日期，需判斷該格是否有需要接續的事件
   if (getDay(cellDate) === 0) {
-    const lastDays = differenceInCalendarDays(endDate, startDate) + 1;
     const lastDaysThisWeek =
       lastDays - differenceInCalendarDays(cellDate, startDate);
-    if (lastDaysThisWeek <= 7) {
-      return (
-        <DraggableItem
-          id={event.eventId}
-          className={clsx(
-            'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
-            normalBackground,
-          )}
-          // style={{ flexGrow: lastDaysThisWeek }}
-          style={{
-            gridColumnStart: 1,
-            gridColumnEnd: lastDaysThisWeek + 1,
-            gridRowStart: eventIndex + 1,
-            pointerEvents: 'auto',
-          }}
-          onClick={(e) => handleClick(e, event)}
-          event={event}
-        >
-          {event.title}
-        </DraggableItem>
-      );
-    }
     return (
-      <DraggableItem
-        id={event.eventId}
-        className={clsx(
-          'truncate basis-0 rounded indent-1.5 hover:cursor-pointer text-white hover:-translate-y-px hover:shadow-md',
-          normalBackground,
-        )}
-        style={{
-          gridColumnStart: 1,
-          gridColumnEnd: 8,
-          gridRowStart: eventIndex + 1,
-          pointerEvents: 'auto',
-        }}
-        onClick={(e) => handleClick(e, event)}
+      <MonthlyEvent
+        key={event.eventId}
         event={event}
-      >
-        {event.title}
-      </DraggableItem>
+        backgroundColor={normalBackground}
+        onClick={(e) => handleClick(e, event)}
+        gridColumnStart={1}
+        gridColumnEnd={lastDaysThisWeek <= 7 ? lastDaysThisWeek + 1 : 8}
+        gridRowStart={eventIndex + 1}
+      />
     );
   }
 };
@@ -397,13 +275,13 @@ export const renderEvent = (
 // ================================================================
 
 const eventCellStyles = [
-  'col-start-1 px-2 truncate max-h-5 hover:cursor-pointer text-white',
-  'col-start-2 px-2 truncate max-h-5 hover:cursor-pointer text-white',
-  'col-start-3 px-2 truncate max-h-5 hover:cursor-pointer text-white',
-  'col-start-4 px-2 truncate max-h-5 hover:cursor-pointer text-white',
-  'col-start-5 px-2 truncate max-h-5 hover:cursor-pointer text-white',
-  'col-start-6 px-2 truncate max-h-5 hover:cursor-pointer text-white',
-  'col-start-7 px-2 truncate max-h-5 hover:cursor-pointer text-white',
+  'col-start-1 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
+  'col-start-2 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
+  'col-start-3 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
+  'col-start-4 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
+  'col-start-5 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
+  'col-start-6 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
+  'col-start-7 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
 ];
 
 // 傳入的事件已經篩選過，皆為 all-day 事件
@@ -415,16 +293,12 @@ export const renderWeeklyAllDayEvent = (
   setIsEditModalOpen: (isOpen: boolean, event: Event) => void,
 ) => {
   const handleClick = (event: React.MouseEvent, e: Event) => {
-    event.stopPropagation(); // 阻止事件冒泡
+    event.stopPropagation();
     setIsEditModalOpen(true, e);
   };
 
   return events.map((event, eventIndex) => {
     if (!event || event.isMemo || eventIndex > 2) return;
-
-    const startDate = event.startAt || new Date();
-    const endDate = event.endAt || new Date();
-
     if (eventIndex === 2) {
       return (
         <div
@@ -441,129 +315,51 @@ export const renderWeeklyAllDayEvent = (
       );
     }
 
+    const startDate = event.startAt || new Date();
+    const endDate = event.endAt || new Date();
+    const lastDays = differenceInCalendarDays(endDate, startDate) + 1;
     const normalBackground = themeColors[Number(event.tag)].darkBackground;
 
     // 事件起始日 = 該格日期
+    // 起始日與結束日不同天，代表是多日事件
+    // 事件長度超過當週可 render 長度，僅能 render 到當週最後一天
+    // 事件長度若沒有超過當週可 render 長度，就 render 事件實際持續天數
     if (isSameDay(startDate, weekDates[index])) {
-      // 起始日與結束日不同天，代表是多日事件
-      if (!isSameDay(startDate, endDate)) {
-        const lastDays = differenceInCalendarDays(endDate, startDate) + 1;
-        // 事件長度超過當週可 render 長度，僅能 render 到當週最後一天
-        if (getDay(startDate) + lastDays > 7) {
-          return (
-            <div
-              className={clsx(
-                'hover:-translate-y-px hover:shadow-md',
-                eventCellStyles[index],
-                {
-                  ['rounded']: event.title,
-                  [normalBackground]: event.title,
-                },
-              )}
-              style={{
-                gridColumnStart: getDay(startDate) + 1,
-                gridColumnEnd: 8,
-                gridRowStart: eventIndex + 1,
-                pointerEvents: 'auto',
-              }}
-              onClick={(e) => handleClick(e, event)}
-            >
-              {event.title}
-            </div>
-          );
-        }
-        // 事件長度若沒有超過當週可 render 長度，就 render 事件實際持續天數
-        return (
-          <div
-            className={clsx(
-              'hover:-translate-y-px hover:shadow-md',
-              eventCellStyles[index],
-              {
-                ['rounded']: event.title,
-                [normalBackground]: event.title,
-              },
-            )}
-            style={{
-              gridColumnStart: getDay(startDate) + 1,
-              gridColumnEnd: getDay(startDate) + 1 + lastDays,
-              gridRowStart: eventIndex + 1,
-              pointerEvents: 'auto',
-            }}
-            onClick={(e) => handleClick(e, event)}
-          >
-            {event?.title}
-          </div>
-        );
-      }
       return (
-        <div
-          className={clsx(
-            'hover:-translate-y-px hover:shadow-md',
-            eventCellStyles[index],
-            {
-              ['rounded']: event.title,
-              [normalBackground]: event.title,
-            },
-          )}
-          style={{
-            pointerEvents: 'auto',
-            gridRowStart: eventIndex + 1,
-          }}
+        <WeeklyEvent
+          key={event.eventId}
+          event={event}
+          backgroundColor={normalBackground}
+          eventCellStyle={eventCellStyles[index]}
           onClick={(e) => handleClick(e, event)}
-        >
-          {event.title}
-        </div>
+          gridColumnStart={getDay(startDate) + 1}
+          gridColumnEnd={
+            getDay(startDate) + lastDays > 7
+              ? 8
+              : getDay(startDate) + 1 + lastDays
+          }
+          gridRowStart={eventIndex + 1}
+          isAllDay
+        />
       );
     }
 
     // 若為當週第一天，且事件起始日 != 該格日期，需判斷該格是否有需要接續的事件
     if (getDay(weekDates[index]) === 0) {
-      const lastDays = differenceInCalendarDays(endDate, startDate) + 1;
       const lastDayThisWeek =
         lastDays - differenceInCalendarDays(weekDates[index], startDate);
-      if (lastDayThisWeek <= 7) {
-        return (
-          <div
-            className={clsx(
-              'hover:-translate-y-px hover:shadow-md',
-              eventCellStyles[index],
-              {
-                ['rounded']: event.title,
-                [normalBackground]: event.title,
-              },
-            )}
-            style={{
-              gridColumnStart: 1,
-              gridColumnEnd: lastDayThisWeek + 1,
-              gridRowStart: eventIndex + 1,
-              pointerEvents: 'auto',
-            }}
-            onClick={(e) => handleClick(e, event)}
-          >
-            {event?.title}
-          </div>
-        );
-      }
       return (
-        <div
-          className={clsx(
-            'hover:-translate-y-px hover:shadow-md',
-            eventCellStyles[index],
-            {
-              ['rounded']: event.title,
-              [normalBackground]: event.title,
-            },
-          )}
-          style={{
-            gridColumnStart: 1,
-            gridColumnEnd: 8,
-            gridRowStart: eventIndex + 1,
-            pointerEvents: 'auto',
-          }}
+        <WeeklyEvent
+          key={event.eventId}
+          event={event}
+          backgroundColor={normalBackground}
+          eventCellStyle={eventCellStyles[index]}
           onClick={(e) => handleClick(e, event)}
-        >
-          {event?.title}
-        </div>
+          gridColumnStart={1}
+          gridColumnEnd={lastDayThisWeek <= 7 ? lastDayThisWeek + 1 : 8}
+          gridRowStart={eventIndex + 1}
+          isAllDay
+        />
       );
     }
   });
@@ -571,120 +367,68 @@ export const renderWeeklyAllDayEvent = (
 
 // ----------------------------------------------------------------
 // 傳入的事件已經篩選過，皆為 one-day 事件
+const calculateGridRows = (
+  startDate: Date,
+  endDate: Date,
+  columnDate: Date,
+) => {
+  const MAX_GRID_ROWS = 97;
+  const startDiffMinutes =
+    Math.abs(startDate.getTime() - startOfDay(columnDate).getTime()) / 60000;
+  const endDiffMinutes = isSameDay(startDate, columnDate)
+    ? Math.abs(startDate.getTime() - endDate.getTime()) / 60000
+    : Math.abs(endDate.getTime() - startOfDay(columnDate).getTime()) / 60000;
+  const startRowIndex = 1 + Math.ceil(startDiffMinutes / 15);
+  const rowSpanNumber = Math.ceil(endDiffMinutes / 15);
+
+  return {
+    start: isSameDay(startDate, columnDate) ? startRowIndex : 1,
+    end: isSameDay(startDate, endDate)
+      ? startRowIndex + rowSpanNumber
+      : isSameDay(endDate, columnDate)
+        ? 1 + rowSpanNumber
+        : MAX_GRID_ROWS,
+  };
+};
+
+const isMidnight = (date: Date | null) =>
+  date?.getHours() === 0 && date.getMinutes() === 0;
 
 export const renderWeeklyOneDayEvent = (
   columnDate: Date,
   event: Event,
   setIsEditModalOpen: (isOpen: boolean, event: Event) => void,
 ) => {
-  // 沒有事件
-  if (!event.title || event.isMemo) return;
+  if (
+    !event.title ||
+    event.isMemo ||
+    (!isSameDay(event.startAt || new Date(), event.endAt || new Date()) &&
+      isSameDay(event.endAt || new Date(), columnDate) &&
+      isMidnight(event.endAt))
+  )
+    return;
 
   const handleClick = (event: React.MouseEvent, e: Event) => {
-    event.stopPropagation(); // 阻止事件冒泡
+    event.stopPropagation();
     setIsEditModalOpen(true, e);
   };
 
-  const startDate = event.startAt || new Date();
-  const endDate = event.endAt || new Date();
-  const borderColor = themeColors[Number(event.tag)].border;
-  const lightBackground = themeColors[Number(event.tag)].lightBackground;
-
-  // 起始日 = 該格日期下
-  // 若起始日 = 結束日，按事件時間 render， 若起始日 ！= 結束日，起始日當天 render 所有格子
-  if (isSameDay(startDate, columnDate)) {
-    const startRowIndex =
-      1 +
-      Math.ceil(
-        Math.abs(startDate.getTime() - startOfDay(columnDate).getTime()) /
-          60000 /
-          15,
-      );
-    const rowSpanNumber = Math.ceil(
-      Math.abs(startDate.getTime() - endDate.getTime()) / 60000 / 15,
-    );
-
-    if (isSameDay(startDate, endDate)) {
-      return (
-        <div
-          className={clsx(
-            'border-l-2 pl-1 truncate hover:cursor-pointer hover:-translate-y-px hover:shadow-md',
-            borderColor,
-            lightBackground,
-          )}
-          style={{
-            gridRowStart: startRowIndex,
-            gridRowEnd: startRowIndex + rowSpanNumber,
-            pointerEvents: 'auto',
-          }}
-          onClick={(e) => handleClick(e, event)}
-        >
-          {event.title}
-        </div>
-      );
-    }
-    return (
-      <div
-        className={clsx(
-          'border-l-2 pl-1 truncate hover:cursor-pointer hover:-translate-y-px hover:shadow-md',
-          borderColor,
-          lightBackground,
-        )}
-        style={{
-          gridRowStart: startRowIndex,
-          gridRowEnd: 97,
-          pointerEvents: 'auto',
-        }}
-        onClick={(e) => handleClick(e, event)}
-      >
-        {event.title}
-      </div>
-    );
-  }
-
-  if (isSameDay(endDate, columnDate)) {
-    const isMidnight = endDate.getHours() === 0 && endDate.getMinutes() === 0;
-    if (isMidnight) return;
-
-    const rowSpanNumber = Math.ceil(
-      Math.abs(endDate.getTime() - startOfDay(columnDate).getTime()) /
-        60000 /
-        15,
-    );
-    return (
-      <div
-        className={clsx(
-          'border-l-2 pl-1 truncate hover:cursor-pointer hover:-translate-y-px hover:shadow-md',
-          borderColor,
-          lightBackground,
-        )}
-        style={{
-          gridRowStart: 1,
-          gridRowEnd: 1 + rowSpanNumber,
-          pointerEvents: 'auto',
-        }}
-        onClick={(e) => handleClick(e, event)}
-      >
-        {event.title}
-      </div>
-    );
-  }
+  const { lightBackground, border } = themeColors[Number(event.tag)];
+  const { start, end } = calculateGridRows(
+    event.startAt || new Date(),
+    event.endAt || new Date(),
+    columnDate,
+  );
 
   return (
-    <div
-      className={clsx(
-        'border-l-2 pl-1 truncate hover:cursor-pointer hover:-translate-y-px hover:shadow-md',
-        borderColor,
-        lightBackground,
-      )}
-      style={{
-        gridRowStart: 1,
-        gridRowEnd: 97,
-        pointerEvents: 'auto',
-      }}
+    <WeeklyEvent
+      key={event.eventId}
+      event={event}
+      backgroundColor={lightBackground}
+      eventCellStyle={border}
       onClick={(e) => handleClick(e, event)}
-    >
-      {event.title}
-    </div>
+      gridRowStart={start}
+      gridRowEnd={end}
+    />
   );
 };

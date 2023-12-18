@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
+import toast from 'react-hot-toast';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { firebase } from '../../utils/firebase';
 import { addUserForGoogle } from '../../utils/handleUserAndCalendar';
@@ -19,6 +20,7 @@ export default function SelectTheme() {
     name: `${state.userInfo.name}'s Calendar`,
     themeColor: '',
   });
+  const [isNameValid, setIsNameValid] = useState(true);
 
   // Update userInput when typing
   const updateCalendarInfo = (
@@ -26,7 +28,8 @@ export default function SelectTheme() {
       | React.ChangeEvent<HTMLInputElement>
       | React.MouseEvent<HTMLButtonElement>,
   ) => {
-    let name: string, value: string;
+    let name: string = '';
+    let value: string = '';
 
     if (event.target instanceof HTMLInputElement) {
       name = event.target.name;
@@ -34,6 +37,14 @@ export default function SelectTheme() {
     } else if (event.target instanceof HTMLButtonElement) {
       name = event.currentTarget.name;
       value = event.currentTarget.value;
+    }
+
+    if (name === 'name' && value.length > 30) {
+      setIsNameValid(false);
+      return;
+    }
+    if (name === 'name' && value.length <= 30) {
+      setIsNameValid(true);
     }
 
     setCalendarInfo((prevData) => ({
@@ -59,9 +70,21 @@ export default function SelectTheme() {
 
   const handleSubmit = async () => {
     setIsButtonLoading(true);
+
+    if (calendarInfo.name.replace(/\s+/g, '').length === 0) {
+      toast.error('Calendar name can not be empty!');
+      setIsButtonLoading(false);
+      return;
+    }
+
+    const validCalendarInfo = {
+      ...calendarInfo,
+      name: calendarInfo.name.trim(),
+    };
+
     state.isNativeSignup
-      ? await firebase.signUp(state.userInfo, navigate, calendarInfo)
-      : await addUserForGoogle(state.userInfo, navigate, calendarInfo);
+      ? await firebase.signUp(state.userInfo, navigate, validCalendarInfo)
+      : await addUserForGoogle(state.userInfo, navigate, validCalendarInfo);
     setIsButtonLoading(false);
   };
 
@@ -93,13 +116,13 @@ export default function SelectTheme() {
             damping: 15,
           }}
         >
-          <Card className='w-full h-full p-0 rounded-2xl flex flex-col items-center justify-center gap-10 z-10'>
-            <div className='flex flex-col items-center gap-5'>
+          <Card className='w-full h-full p-0 rounded-2xl flex flex-col items-center justify-center gap-10 z-10 overflow-visible'>
+            <div className='flex flex-col items-center gap-5 min-h-fit w-full'>
               <div className='text-2xl font-bold'>Name Your Calendar</div>
               <input
                 name='name'
                 className={clsx(
-                  'leading-[64px] border-2 w-72 h-16 rounded-lg px-5 text-lg focus:outline-none',
+                  'leading-[64px] border-2 w-80 sm:w-96 h-16 rounded-lg px-5 text-lg focus:outline-none',
                   borderColor,
                 )}
                 value={calendarInfo.name}
@@ -117,15 +140,20 @@ export default function SelectTheme() {
                 onCompositionStart={handleCompositionStart}
                 onCompositionEnd={handleCompositionEnd}
               />
+              {!isNameValid && (
+                <div className='text-sm text-red-500 -mt-3 -mb-7'>
+                  Maximum length of calendar name is 30 characters.
+                </div>
+              )}
             </div>
-            <div className='flex flex-col items-center gap-5'>
+            <div className='flex flex-col items-center gap-5 h-1/3 w-full'>
               <div className='text-2xl font-bold'>Choose a Theme Color</div>
-              <div className='flex gap-4'>
+              <div className='flex justify-center gap-2.5 md:gap-4 h-full w-full'>
                 {themeColors.map((color, index) => (
                   <button
                     key={index}
                     className={clsx(
-                      '-skew-x-12 bg-slate-200 w-12 h-48 rounded',
+                      '-skew-x-6 md:-skew-x-12 bg-slate-200 w-8 sm:w-12 h-full min-h-[80px] max-h-[192px] rounded',
                       color.background,
                       {
                         ['outline outline-3 outline-offset-2 outline-slate-300']:
@@ -152,8 +180,12 @@ export default function SelectTheme() {
               isLoading={isButtonLoading}
               color='default'
               className={clsx(
-                'w-32 text-slate-700 text-base transition-colors',
+                'w-32 text-slate-700 text-base transition-colors min-h-[40px]',
                 backgroundColor,
+                {
+                  ['pointer-events-none']:
+                    !calendarInfo.name || !calendarInfo.themeColor,
+                },
               )}
               disabled={!calendarInfo.name || !calendarInfo.themeColor}
               onClick={handleSubmit}
