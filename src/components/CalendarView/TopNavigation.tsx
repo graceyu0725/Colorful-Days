@@ -41,7 +41,7 @@ const Navigation: React.FC<Props> = ({
       currentThemeColor.hover,
     ),
     wrapper: 'flex items-center',
-    title: 'font-bold mx-2 text-xl w-44 text-center',
+    title: 'font-bold mx-2 text-lg xs:text-xl w-44 text-center',
     viewButton: clsx(
       'h-8 text-base border-0 bg-white text-slate-700 hover:text-slate-500 hover:cursor-pointer rounded-md',
       currentThemeColor.hover,
@@ -93,7 +93,7 @@ const Navigation: React.FC<Props> = ({
           <div className='items-end flex'>
             <img
               src='/assets/logo.png'
-              className='hover:cursor-pointer w-9 md:ml-6 md:mr-2 lg:mr-0'
+              className='hover:cursor-pointer w-9 min-w-[36px] md:ml-6 md:mr-2 lg:mr-0'
               onClick={() => navigate('/calendar')}
             />
             <h1
@@ -176,7 +176,7 @@ const Navigation: React.FC<Props> = ({
         <Tooltip showArrow={true} placement='bottom' content='Filter'>
           <Button
             variant='bordered'
-            className={clsx("hidden lg:flex",styles.addButton)}
+            className={clsx('hidden lg:flex', styles.addButton)}
             onClick={() => setIsSideBarOpen((prev) => !prev)}
           >
             <CodiconFilter className='text-xl text-slate-700 hover:cursor-pointer' />

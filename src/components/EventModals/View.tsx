@@ -170,7 +170,7 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     return (
       <div
         className={clsx(
-          'h-52 flex flex-col gap-2 overflow-y-auto px-1 min-h-[140px]',
+          'h-40 xs:h-52 flex flex-col gap-2 overflow-y-auto px-1 min-h-[100px] xs:min-h-[140px]',
           selectedEvent.messages ? 'h-52' : 'h-48',
         )}
       >

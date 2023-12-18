@@ -115,7 +115,9 @@ export const renderTags = (
                 themeColors[Number(userInput.tag)].darkBackground,
               )}
             />
-            <div>{currentCalendarContent.tags[Number(userInput.tag)].name}</div>
+            <div className='text-sm xs:text-base'>
+              {currentCalendarContent.tags[Number(userInput.tag)].name}
+            </div>
           </div>
         </PopoverTrigger>
         <PopoverContent className='rounded-lg p-4 z-10'>
@@ -141,7 +143,7 @@ export const renderTags = (
                       themeColors[Number(tag.colorCode)].darkBackground,
                     )}
                   />
-                  <div className='text-base'>{tag.name}</div>
+                  <div className='text-sm xs:text-base'>{tag.name}</div>
                 </div>
               </Radio>
             ))}
@@ -163,7 +165,7 @@ export const renderDatePicker = (
       <div className='flex items-center gap-2'>
         <MaterialSymbolsNestClockFarsightAnalog
           className={clsx(
-            'text-xl transition-colors',
+            'min-w-[20px] text-xl transition-colors',
             themeColors[Number(userInput.tag)].text,
           )}
         />
@@ -174,7 +176,7 @@ export const renderDatePicker = (
             selectsStart
             dateFormat='MMM dd, yyyy'
             className={clsx(
-              'border rounded-md h-8 w-48 text-center text-base focus:outline-2',
+              'border rounded-md h-8 w-36 xs:w-40 sm:w-48 text-center text-sm sm:text-base focus:outline-2',
               themeColors[Number(userInput.tag)].outline,
             )}
             onChange={(e) =>
@@ -189,7 +191,7 @@ export const renderDatePicker = (
             minDate={userInput.startAt}
             dateFormat='MMM dd, yyyy'
             className={clsx(
-              'border rounded-md h-8 w-48 text-center text-base focus:outline-2',
+              'border rounded-md h-8 w-36 xs:w-40 sm:w-48 text-center text-sm sm:text-base focus:outline-2',
               themeColors[Number(userInput.tag)].outline,
             )}
             onChange={(e) =>
@@ -207,7 +209,7 @@ export const renderDatePicker = (
     <div className='flex items-center gap-2'>
       <MaterialSymbolsNestClockFarsightAnalog
         className={clsx(
-          'text-xl transition-colors',
+          'min-w-[20px] text-xl transition-colors',
           themeColors[Number(userInput.tag)].text,
         )}
       />
@@ -222,7 +224,7 @@ export const renderDatePicker = (
           timeCaption='Time'
           dateFormat='MMM dd, yyyy HH:mm'
           className={clsx(
-            'border rounded-md h-8 w-48 text-center text-base focus:outline-2',
+            'border rounded-md h-8 w-36 xs:w-40 sm:w-48 text-center text-sm sm:text-base focus:outline-2',
             themeColors[Number(userInput.tag)].outline,
           )}
           onChange={(e) =>
@@ -241,7 +243,7 @@ export const renderDatePicker = (
           timeCaption='Time'
           dateFormat='MMM dd, yyyy HH:mm'
           className={clsx(
-            'border rounded-md h-8 w-48 text-center text-base focus:outline-2',
+            'border rounded-md h-8 w-36 xs:w-40 sm:w-48 text-center text-sm sm:text-base focus:outline-2',
             themeColors[Number(userInput.tag)].outline,
           )}
           onChange={(e) =>
