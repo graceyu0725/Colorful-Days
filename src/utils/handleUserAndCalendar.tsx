@@ -231,9 +231,6 @@ export const createNewCalendar = async (
   userId: string,
   calendarName: string,
   calendarThemeColor: string,
-  setCurrentCalendarId: (currentCalendarId: string) => void,
-  setCurrentCalendarContent: (currentCalendarContent: CalendarContent) => void,
-  resetAllEvents: () => void,
 ) => {
   if (!userEmail || !userId || !calendarName || !calendarThemeColor) {
     toast.error(
@@ -248,16 +245,6 @@ export const createNewCalendar = async (
   const userRef = doc(db, 'Users', userEmail);
   await updateDoc(userRef, {
     calendars: arrayUnion(calendarDocRef.id),
-  });
-  resetAllEvents();
-
-  setCurrentCalendarId(calendarDocRef.id);
-  setCurrentCalendarContent({
-    members: [userId],
-    name: calendarName,
-    tags: defaultTags,
-    themeColor: calendarThemeColor,
-    calendarId: calendarDocRef.id,
   });
 };
 

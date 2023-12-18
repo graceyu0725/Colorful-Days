@@ -48,22 +48,24 @@ const UserCalendars: React.FC<Props> = ({
 
   const handleDeleteCalendar = async (calendarDetail: CalendarContent) => {
     setIsLoading(true);
-    await deleteCalendar(calendarDetail);
-    // updateCalendarContent(
-    //   previousCalendarId,
-    //   setCurrentCalendarId,
-    //   setCurrentCalendarContent,
-    //   setCalendarAllEvents,
-    // );
-    updateCurrentUser(
-      currentUser.userId,
-      setCurrentUser,
-      setCurrentCalendarId,
-      setCurrentCalendarContent,
-    );
-    setIsLoading(false);
 
-    toast.success('Calendar removed successfully');
+    // 只有管理員可以刪除該行事曆
+    if (currentUser.userId === calendarDetail.members[0]) {
+      await deleteCalendar(calendarDetail);
+      updateCurrentUser(
+        currentUser.userId,
+        setCurrentUser,
+        setCurrentCalendarId,
+        setCurrentCalendarContent,
+      );
+      setIsLoading(false);
+
+      toast.success('Calendar removed successfully');
+      return;
+    }
+
+    setIsLoading(false);
+    toast.error('You are not allowed to delete this calendar!');
   };
 
   return (

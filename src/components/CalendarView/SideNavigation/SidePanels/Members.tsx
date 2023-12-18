@@ -142,6 +142,19 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
   );
 
   const renderSearchResult = (result: User, index: number, type: string) => {
+    // 管理員可以移除他人但不能移除自己，成員僅能移除自己
+    const shouldShowRemoveButton = () => {
+      if (type === 'list') {
+        if (currentUser.userId === currentCalendarContent.members[0]) {
+          return result.userId === currentUser.userId ? false : true;
+        } else {
+          return result.userId === currentUser.userId ? true : false;
+        }
+      }
+      return false;
+    };
+    const showRemoveButton = shouldShowRemoveButton();
+
     return (
       <div
         key={index}
@@ -154,7 +167,8 @@ const UserCalendars: React.FC<Props> = ({ memberDetails }) => {
           <div className='flex flex-col truncate'>
             <div className='flex items-center justify-between'>
               <div className='w-36 truncate'>{result.name}</div>
-              {type !== 'invite' && result.userId !== currentUser.userId && (
+
+              {showRemoveButton && (
                 <Popover placement='bottom'>
                   <PopoverTrigger>
                     <button>

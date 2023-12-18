@@ -179,7 +179,9 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
       {children}
 
       <DragOverlay dropAnimation={null} modifiers={[restrictToWindowEdges]}>
-        {selectedItem ? (
+        {selectedItem &&
+        differenceInCalendarDays(selectedItem.endAt, selectedItem.startAt) <=
+          7 ? (
           <DraggableItem
             key={`${selectedItem.eventId}`}
             id={`${selectedItem.eventId}`}

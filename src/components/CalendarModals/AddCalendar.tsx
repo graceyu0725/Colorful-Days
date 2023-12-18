@@ -4,16 +4,13 @@ import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../../store/authStore';
-import { useEventsStore } from '../../store/eventsStore';
 import { useModalStore } from '../../store/modalStore';
 import { createNewCalendar } from '../../utils/handleUserAndCalendar';
 import { themeColors } from '../../utils/theme';
 import { CalendarInfo } from '../../utils/types';
 
 export default function AddCalendar() {
-  const { currentUser, setCurrentCalendarId, setCurrentCalendarContent } =
-    useAuthStore();
-  const { resetAllEvents } = useEventsStore();
+  const { currentUser } = useAuthStore();
   const { isAddCalendarModalOpen, setIsAddCalendarModalOpen } = useModalStore();
   const [calendarInfo, setCalendarInfo] = useState<CalendarInfo>({
     name: ``,
@@ -98,9 +95,6 @@ export default function AddCalendar() {
       currentUser.userId,
       calendarInfo.name.trim(),
       calendarInfo.themeColor,
-      setCurrentCalendarId,
-      setCurrentCalendarContent,
-      resetAllEvents,
     );
     setIsAddCalendarModalOpen(false);
     resetInfo();
@@ -138,12 +132,7 @@ export default function AddCalendar() {
               value={calendarInfo.name}
               onChange={updateCalendarInfo}
               onKeyDown={(e) => {
-                if (
-                  e.key === 'Enter' &&
-                  !isComposing &&
-                  calendarInfo.name &&
-                  calendarInfo.themeColor
-                ) {
+                if (e.key === 'Enter' && !isComposing) {
                   handleSubmit();
                 }
               }}
