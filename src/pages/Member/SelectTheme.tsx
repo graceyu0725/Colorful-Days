@@ -122,7 +122,7 @@ export default function SelectTheme() {
               <input
                 name='name'
                 className={clsx(
-                  'leading-[64px] border-2 w-80 sm:w-96 h-16 rounded-lg px-5 text-lg focus:outline-none',
+                  'leading-[64px] border-2 w-72 xs:w-80 sm:w-96 h-16 rounded-lg px-5 text-lg focus:outline-none',
                   borderColor,
                 )}
                 value={calendarInfo.name}
@@ -148,12 +148,12 @@ export default function SelectTheme() {
             </div>
             <div className='flex flex-col items-center gap-5 h-1/3 w-full'>
               <div className='text-2xl font-bold'>Choose a Theme Color</div>
-              <div className='flex justify-center gap-2.5 md:gap-4 h-full w-full'>
+              <div className='flex justify-center gap-2 xs:gap-2.5 md:gap-4 h-full w-full'>
                 {themeColors.map((color, index) => (
                   <button
                     key={index}
                     className={clsx(
-                      '-skew-x-6 md:-skew-x-12 bg-slate-200 w-8 sm:w-12 h-full min-h-[80px] max-h-[192px] rounded',
+                      '-skew-x-6 md:-skew-x-12 bg-slate-200 w-7 xs:w-8 sm:w-12 h-full min-h-[80px] max-h-[192px] rounded',
                       color.background,
                       {
                         ['outline outline-3 outline-offset-2 outline-slate-300']:

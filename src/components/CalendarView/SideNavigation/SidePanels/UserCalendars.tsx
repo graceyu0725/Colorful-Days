@@ -185,20 +185,14 @@ const UserCalendars: React.FC<Props> = ({
             </div>
 
             {hoveredCalendar &&
-              // (
               hoveredCalendar.calendarId === calendarDetail.calendarId &&
-              // ||
-              // currentCalendarId === calendarDetail.calendarId) &&
               calendarDetails.length > 1 && (
                 <Popover
                   placement='bottom'
                   isOpen={isPopoverOpen}
                   onOpenChange={() => setIsPopoverOpen((isOpen) => !isOpen)}
                 >
-                  <PopoverTrigger
-                    className='border-none outline-none'
-                    // onClick={() => setIsPopoverOpen((isOpen) => !isOpen)}
-                  >
+                  <PopoverTrigger className='border-none outline-none'>
                     <button>
                       <PhDotsThreeVerticalBold className='w-4 h-4 p-0' />
                     </button>
