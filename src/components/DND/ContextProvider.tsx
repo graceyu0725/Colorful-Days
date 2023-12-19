@@ -23,6 +23,7 @@ import {
   isSameDay,
   isSameHour,
   isSameMinute,
+  isSameWeek,
 } from 'date-fns';
 import {
   collection,
@@ -180,8 +181,7 @@ export const ContextProvider: React.FC<Props> = ({ children }) => {
 
       <DragOverlay dropAnimation={null} modifiers={[restrictToWindowEdges]}>
         {selectedItem &&
-        differenceInCalendarDays(selectedItem.endAt, selectedItem.startAt) <=
-          7 ? (
+        isSameWeek(selectedItem.endAt, selectedItem.startAt) ? (
           <DraggableItem
             key={`${selectedItem.eventId}`}
             id={`${selectedItem.eventId}`}

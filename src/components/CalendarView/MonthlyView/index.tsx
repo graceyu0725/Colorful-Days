@@ -29,14 +29,13 @@ const MonthlyView: React.FC = () => {
 
   return (
     <div className='mt-1 w-full border-t'>
-      <div className='flex flex-col border-x'>
-        <div id='dayCellsWrapper-weekday' className='flex w-ull'>
+      <div className='flex flex-col border-x h-full'>
+        <div id='dayCellsWrapper-weekday' className='flex h-10'>
           {weekdays.map((weekday, index) => (
             <Cell
               key={index}
               className='font-bold uppercase grow'
               cellDate={new Date()}
-              dayCounts={monthDates.length}
               header
             >
               {weekday}
@@ -48,9 +47,12 @@ const MonthlyView: React.FC = () => {
           <div
             key={`week-${index}`}
             id='weekWrapper'
-            className='flex-auto relative px-px'
+            className='flex-auto relative px-px h-full'
           >
-            <div id='dayCellsWrapper-weekDates' className='flex w-ull'>
+            <div
+              id='dayCellsWrapper-weekDates'
+              className={clsx('flex h-full min-h-[80px]')}
+            >
               {week.map((cellDate, idx) => {
                 return (
                   <DroppableArea
@@ -63,7 +65,6 @@ const MonthlyView: React.FC = () => {
                         ['text-gray-400']: !isSameMonth(cellDate, currentDate),
                       })}
                       cellDate={cellDate}
-                      dayCounts={monthDates.length}
                     >
                       <div
                         className={clsx('w-5 h-5 text-center', {
@@ -83,6 +84,7 @@ const MonthlyView: React.FC = () => {
               splitEvents={splitEvents}
               weekIndex={index}
               week={week}
+              dayCounts={monthDates.length}
             />
           </div>
         ))}
