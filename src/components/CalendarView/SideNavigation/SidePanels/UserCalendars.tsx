@@ -63,11 +63,13 @@ const UserCalendars: React.FC<Props> = ({
   const [isSelected, setIsSelected] = useState(Array(8).fill(false));
   const [isNameValid, setIsNameValid] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const handleEditCalendar = () => {
     // 只有管理員可以刪除該行事曆
     if (currentUser.userId === hoveredCalendar.members[0]) {
       setIsEditCalendarModalOpen(true);
+      setIsPopoverOpen(false);
       return;
     }
     toast.error('You are not allowed to edit this calendar!');
@@ -114,6 +116,8 @@ const UserCalendars: React.FC<Props> = ({
 
     setIsLoading(false);
     toast.error('You are not allowed to delete this calendar!');
+
+    setIsPopoverOpen(false);
   };
 
   useEffect(() => {
@@ -152,7 +156,9 @@ const UserCalendars: React.FC<Props> = ({
           onMouseEnter={() => {
             setHoveredCalendar(calendarDetail);
           }}
-          onMouseLeave={() => {}}
+          onMouseLeave={() => {
+            setIsPopoverOpen(false);
+          }}
         >
           <div
             className='flex items-center justify-between gap-2 w-full h-full p-3'
@@ -179,11 +185,20 @@ const UserCalendars: React.FC<Props> = ({
             </div>
 
             {hoveredCalendar &&
-              (hoveredCalendar.calendarId === calendarDetail.calendarId ||
-                currentCalendarId === calendarDetail.calendarId) &&
+              // (
+              hoveredCalendar.calendarId === calendarDetail.calendarId &&
+              // ||
+              // currentCalendarId === calendarDetail.calendarId) &&
               calendarDetails.length > 1 && (
-                <Popover placement='bottom'>
-                  <PopoverTrigger className='border-none outline-none'>
+                <Popover
+                  placement='bottom'
+                  isOpen={isPopoverOpen}
+                  onOpenChange={() => setIsPopoverOpen((isOpen) => !isOpen)}
+                >
+                  <PopoverTrigger
+                    className='border-none outline-none'
+                    // onClick={() => setIsPopoverOpen((isOpen) => !isOpen)}
+                  >
                     <button>
                       <PhDotsThreeVerticalBold className='w-4 h-4 p-0' />
                     </button>
