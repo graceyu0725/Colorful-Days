@@ -1,4 +1,12 @@
-import { Button, ButtonGroup, Tooltip } from '@nextui-org/react';
+import {
+  Avatar,
+  Button,
+  ButtonGroup,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+} from '@nextui-org/react';
 import clsx from 'clsx';
 import { addDays, addMonths, subDays, subMonths } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +19,7 @@ import { useEventsStore } from '../../store/eventsStore';
 import { useModalStore } from '../../store/modalStore';
 import { CalendarViewCategory, useViewStore } from '../../store/viewStore';
 import { firebase } from '../../utils/firebase';
+import AvatarImage from './SideNavigation/img/avatar.png';
 
 type Props = {
   value?: Date;
@@ -30,7 +39,7 @@ const Navigation: React.FC<Props> = ({
     setCurrentDate,
     formateDate,
   } = useViewStore();
-  const { currentThemeColor, resetUser } = useAuthStore();
+  const { currentThemeColor, resetUser, currentUser } = useAuthStore();
   const { resetAllEvents } = useEventsStore();
   const navigate = useNavigate();
 
@@ -100,7 +109,7 @@ const Navigation: React.FC<Props> = ({
         />
 
         <div className='flex items-center justify-center'>
-          <div className='items-end flex'>
+          <div className='items-end hidden xs:flex'>
             <img
               src='/assets/logo.png'
               className='hover:cursor-pointer w-9 min-w-[36px] md:ml-6 md:mr-2 lg:mr-0'
@@ -193,15 +202,40 @@ const Navigation: React.FC<Props> = ({
           </Button>
         </Tooltip>
 
-        <Tooltip showArrow={true} placement='bottom' content='Logout'>
-          <Button
-            variant='bordered'
-            className={clsx('flex border-none xs:hidden', styles.addButton)}
-            onClick={handleLogout}
-          >
-            <MaterialSymbolsExitToAppRounded className='text-xl text-slate-700 hover:cursor-pointer' />
-          </Button>
-        </Tooltip>
+        <div className='flex border-none xs:hidden'>
+          <Popover placement='bottom-start'>
+            <PopoverTrigger>
+              <button className='outline-none mt-1 w-full flex justify-center mr-px'>
+                {currentUser.avatar ? (
+                  <Avatar
+                    className={clsx(
+                      'w-9 h-9 p-0 border-2 object-cover object-center',
+                      currentThemeColor.border,
+                    )}
+                    src={currentUser.avatar}
+                  />
+                ) : (
+                  <img
+                    className={clsx(
+                      'w-9 h-9 p-0 border-2 rounded-full object-cover object-center',
+                      currentThemeColor.border,
+                    )}
+                    src={AvatarImage}
+                  />
+                )}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className='p-1 flex flex-col'>
+              <Button
+                startContent={<MaterialSymbolsExitToAppRounded />}
+                className='bg-white hover:bg-slate-100'
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
     </div>
   );
