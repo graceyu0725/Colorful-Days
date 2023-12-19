@@ -114,7 +114,7 @@ export const initialCalendarContent = {
       name: '',
     },
   ],
-  themeColor: '',
+  themeColor: '0',
   calendarId: '',
 };
 

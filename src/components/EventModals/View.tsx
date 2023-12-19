@@ -255,9 +255,9 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
 
         <div className='flex items-center justify-center px-2 gap-1 text-sm'>
           <MdiTag
-            className={clsx(themeColors[Number(selectedEvent.tag)].text)}
+            className={clsx("min-w-[16px] shrink-0",themeColors[Number(selectedEvent.tag)].text)}
           />
-          <div className='leading-4'>
+          <div className='leading-4 truncate'>
             {calendarTags[Number(selectedEvent.tag)].name}
           </div>
         </div>
