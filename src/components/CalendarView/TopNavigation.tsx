@@ -4,10 +4,13 @@ import { addDays, addMonths, subDays, subMonths } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import CodiconFilter from '~icons/codicon/filter';
 import LucideAlignJustify from '~icons/lucide/align-justify';
+import MaterialSymbolsExitToAppRounded from '~icons/material-symbols/exit-to-app-rounded';
 import TdesignAdd from '~icons/tdesign/add';
 import { useAuthStore } from '../../store/authStore';
+import { useEventsStore } from '../../store/eventsStore';
 import { useModalStore } from '../../store/modalStore';
 import { CalendarViewCategory, useViewStore } from '../../store/viewStore';
+import { firebase } from '../../utils/firebase';
 
 type Props = {
   value?: Date;
@@ -27,7 +30,8 @@ const Navigation: React.FC<Props> = ({
     setCurrentDate,
     formateDate,
   } = useViewStore();
-  const { currentThemeColor } = useAuthStore();
+  const { currentThemeColor, resetUser } = useAuthStore();
+  const { resetAllEvents } = useEventsStore();
   const navigate = useNavigate();
 
   const styles = {
@@ -79,6 +83,12 @@ const Navigation: React.FC<Props> = ({
           : setCurrentDate(addDays(currentDate, 7));
         break;
     }
+  };
+
+  const handleLogout = () => {
+    firebase.logOut();
+    resetUser();
+    resetAllEvents();
   };
 
   return (
@@ -164,7 +174,7 @@ const Navigation: React.FC<Props> = ({
         <Tooltip showArrow={true} placement='bottom' content='Create an event'>
           <Button
             variant='bordered'
-            className={styles.addButton}
+            className={clsx('hidden xs:flex', styles.addButton)}
             onClick={() =>
               setIsCreateModalOpen(true, new Date(), new Date(), false)
             }
@@ -180,6 +190,16 @@ const Navigation: React.FC<Props> = ({
             onClick={() => setIsSideBarOpen((prev) => !prev)}
           >
             <CodiconFilter className='text-xl text-slate-700 hover:cursor-pointer' />
+          </Button>
+        </Tooltip>
+
+        <Tooltip showArrow={true} placement='bottom' content='Logout'>
+          <Button
+            variant='bordered'
+            className={clsx('flex border-none xs:hidden', styles.addButton)}
+            onClick={handleLogout}
+          >
+            <MaterialSymbolsExitToAppRounded className='text-xl text-slate-700 hover:cursor-pointer' />
           </Button>
         </Tooltip>
       </div>
