@@ -21,15 +21,19 @@ import {
   getAllMemberDetail,
 } from '../../../utils/handleUserAndCalendar';
 import { CalendarContent, Event, User } from '../../../utils/types';
-import Members from './SidePanels/Members';
-import Memo from './SidePanels/Memo';
-import Profile from './SidePanels/Profile';
-import UserCalendars from './SidePanels/UserCalendars';
+import { Members, Memo, Profile, UserCalendars } from './SidePanels';
 import AvatarImage from './img/avatar.png';
 
 type Props = {
   isSideNavigationOpen: boolean;
 };
+
+enum PanelType {
+  None = '',
+  Memos = 'Memos',
+  Calendars = 'Calendars',
+  Members = 'Members',
+}
 
 const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
   const {
@@ -40,8 +44,11 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
     currentThemeColor,
   } = useAuthStore();
   const { calendarAllEvents, resetAllEvents } = useEventsStore();
-
-  const userCalendars = currentUser.calendars || [''];
+  const [currentPanel, setCurrentPanel] = useState<PanelType>(PanelType.None);
+  const [calendarDetails, setCalendarDetails] = useState<CalendarContent[]>([]);
+  const [memberDetails, setMemberDetails] = useState<User[]>([]);
+  const [memoEvents, setMemoEvents] = useState<Event[]>([]);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const handleLogout = () => {
     firebase.logOut();
@@ -49,29 +56,18 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
     resetAllEvents();
   };
 
-  enum PanelType {
-    None = '',
-    Profile = 'Profile',
-    Memo = 'Memo',
-    Calendars = 'Calendars',
-    Members = 'Members',
-  }
-
-  // Handle data of props
-  const [currentPanel, setCurrentPanel] = useState<PanelType>(PanelType.None);
-  const [calendarDetails, setCalendarDetails] = useState<CalendarContent[]>([]);
-  const [memberDetails, setMemberDetails] = useState<User[]>([]);
-  const [memoEvents, setMemoEvents] = useState<Event[]>([]);
-  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
-
   const fetchDetails = async () => {
+    if (!currentUser.calendars || !currentCalendarId || !calendarAllEvents)
+      return;
+
     const filteredMemoEvents = calendarAllEvents.filter(
       (event) => event.isMemo,
     );
     setMemoEvents(filteredMemoEvents);
 
-    const detailsOfCalendar: CalendarContent[] =
-      await getAllCalendarDetail(userCalendars);
+    const detailsOfCalendar: CalendarContent[] = await getAllCalendarDetail(
+      currentUser.calendars,
+    );
     setCalendarDetails(detailsOfCalendar);
 
     const detailsOfMember = await getAllMemberDetail(
@@ -80,185 +76,149 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
     setMemberDetails(detailsOfMember);
   };
 
-  // 取得會員下所有日曆以及現日曆下所有成員
   useEffect(() => {
-    if (currentCalendarId && userCalendars && calendarAllEvents) {
-      fetchDetails();
-    }
+    fetchDetails();
   }, [
-    userCalendars,
+    currentUser.calendars,
     currentCalendarContent,
     currentCalendarId,
     calendarAllEvents,
   ]);
 
-  const PANEL_COMPONENTS = {
-    [PanelType.Profile]: <></>,
-    [PanelType.Memo]: (
-      <Memo
-        currentCalendarContent={currentCalendarContent}
-        memoEvents={memoEvents}
-      />
-    ),
-    [PanelType.Calendars]: (
-      <UserCalendars
-        currentCalendarId={currentCalendarId}
-        calendarDetails={calendarDetails}
-      />
-    ),
-    [PanelType.Members]: (
-      <Members
-        memberDetails={memberDetails}
-        setMemberDetails={setMemberDetails}
-      />
-    ),
+  const iconStyle = 'text-2xl text-slate-700 hover:cursor-pointer m-auto';
+  const updateCurrentPanel = (type: PanelType) => {
+    setCurrentPanel((prev) => (prev && prev === type ? PanelType.None : type));
+  };
+  const panelIcons = {
+    [PanelType.Memos]: {
+      type: PanelType.Memos,
+      icon: MaterialSymbolsStickyNote2OutlineRounded,
+      component: (
+        <Memo
+          currentCalendarContent={currentCalendarContent}
+          memoEvents={memoEvents}
+        />
+      ),
+    },
+    [PanelType.Calendars]: {
+      type: PanelType.Calendars,
+      icon: UilSchedule,
+      component: (
+        <UserCalendars
+          currentCalendarId={currentCalendarId}
+          calendarDetails={calendarDetails}
+        />
+      ),
+    },
+    [PanelType.Members]: {
+      type: PanelType.Members,
+      icon: OcticonPeople16,
+      component: (
+        <Members
+          memberDetails={memberDetails}
+          setMemberDetails={setMemberDetails}
+        />
+      ),
+    },
+  };
+
+  const renderProfileIcon = () => {
+    return (
+      <>
+        <Profile
+          isProfileModalOpen={isProfileModalOpen}
+          setIsProfileModalOpen={setIsProfileModalOpen}
+          currentUser={currentUser}
+          currentThemeColor={currentThemeColor}
+        />
+
+        <Popover placement='bottom-start'>
+          <PopoverTrigger>
+            <button className='outline-none mt-1 w-full flex justify-center mr-px'>
+              {currentUser.avatar ? (
+                <Avatar
+                  className={clsx(
+                    'w-9 h-9 p-0 border-2 object-cover object-center',
+                    currentThemeColor.border,
+                  )}
+                  src={currentUser.avatar}
+                />
+              ) : (
+                <img
+                  className={clsx(
+                    'w-9 h-9 p-0 border-2 rounded-full object-cover object-center',
+                    currentThemeColor.border,
+                  )}
+                  src={AvatarImage}
+                />
+              )}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className='p-1 flex flex-col'>
+            <Button
+              startContent={<MaterialSymbolsAccountCircleOutline />}
+              className='bg-white hover:bg-slate-100'
+              onClick={() => setIsProfileModalOpen(true)}
+            >
+              Profile
+            </Button>
+            <Button
+              startContent={<MaterialSymbolsExitToAppRounded />}
+              className='bg-white hover:bg-slate-100'
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </PopoverContent>
+        </Popover>
+      </>
+    );
+  };
+
+  const renderPanelIcons = () => {
+    return Object.values(panelIcons).map((panelIcon, index) => (
+      <Tooltip
+        key={index}
+        showArrow={true}
+        placement='right'
+        content={panelIcon.type}
+      >
+        <button
+          className={clsx(
+            'outline-none w-full',
+            currentPanel === panelIcon.type &&
+              `border-r-4 pl-1 ${currentThemeColor.lightBorder}`,
+          )}
+        >
+          <panelIcon.icon
+            className={iconStyle}
+            onClick={() => updateCurrentPanel(panelIcon.type)}
+          />
+        </button>
+      </Tooltip>
+    ));
   };
 
   return (
     <div
       className={clsx(
         'hidden md:flex transition-all duration-300 ease-in-out',
-        isSideNavigationOpen
-          ? currentPanel
-            ? 'w-72'
-            : 'opacity-100 w-16'
-          : 'opacity-0 w-0',
+        {
+          'w-72': isSideNavigationOpen && currentPanel,
+          'opacity-100 w-16': isSideNavigationOpen && !currentPanel,
+          'opacity-0 w-0': !isSideNavigationOpen,
+        },
       )}
     >
-      <Profile
-        isProfileModalOpen={isProfileModalOpen}
-        setIsProfileModalOpen={setIsProfileModalOpen}
-        currentUser={currentUser}
-        currentCalendarContent={currentCalendarContent}
-      />
-
       <div
-        className={clsx('w-16 pl-1 pt-3 h-full flex flex-col border-r', {
-          'w-0 hidden': !isSideNavigationOpen,
-        })}
+        className={clsx(
+          'pl-1 pt-3 h-full border-r',
+          isSideNavigationOpen ? 'w-16 flex flex-col' : 'w-0 hidden',
+        )}
       >
         <div className='flex items-center flex-col gap-4 overflow-hidden h-full'>
-          <Popover placement='bottom-start'>
-            <PopoverTrigger>
-              <button className='outline-none mt-1 w-full flex justify-center mr-px'>
-                {currentUser.avatar ? (
-                  <Avatar
-                    className={clsx(
-                      'w-9 h-9 p-0 border-2 object-cover object-center',
-                      currentThemeColor.border,
-                    )}
-                    src={currentUser.avatar}
-                  />
-                ) : (
-                  <img
-                    className={clsx(
-                      'w-9 h-9 p-0 border-2 rounded-full object-cover object-center',
-                      currentThemeColor.border,
-                    )}
-                    src={AvatarImage}
-                  />
-                )}
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className='p-1 flex flex-col'>
-              <Button
-                startContent={<MaterialSymbolsAccountCircleOutline />}
-                className='bg-white hover:bg-slate-100'
-                onClick={() => setIsProfileModalOpen(true)}
-              >
-                Profile
-              </Button>
-              <Button
-                startContent={<MaterialSymbolsExitToAppRounded />}
-                className='bg-white hover:bg-slate-100'
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
-            </PopoverContent>
-          </Popover>
-
-          <Tooltip showArrow={true} placement='right' content='Memos'>
-            <button
-              className={clsx(
-                'outline-none w-full',
-                {
-                  'border-r-4 pl-1': currentPanel === PanelType.Memo,
-                },
-                {
-                  [currentThemeColor.lightBorder]:
-                    currentPanel === PanelType.Memo,
-                },
-              )}
-            >
-              <MaterialSymbolsStickyNote2OutlineRounded
-                className='text-2xl text-slate-700 hover:cursor-pointer m-auto'
-                onClick={() =>
-                  setCurrentPanel((prev) =>
-                    prev
-                      ? prev === PanelType.Memo
-                        ? PanelType.None
-                        : PanelType.Memo
-                      : PanelType.Memo,
-                  )
-                }
-              />
-            </button>
-          </Tooltip>
-
-          <Tooltip showArrow={true} placement='right' content='Calendars'>
-            <button
-              className={clsx(
-                'outline-none w-full',
-                {
-                  'border-r-4 pl-1': currentPanel === PanelType.Calendars,
-                },
-                {
-                  [currentThemeColor.lightBorder]:
-                    currentPanel === PanelType.Calendars,
-                },
-              )}
-              onClick={() =>
-                setCurrentPanel((prev) =>
-                  prev
-                    ? prev === PanelType.Calendars
-                      ? PanelType.None
-                      : PanelType.Calendars
-                    : PanelType.Calendars,
-                )
-              }
-            >
-              <UilSchedule className='text-2xl text-slate-700 hover:cursor-pointer m-auto' />
-            </button>
-          </Tooltip>
-
-          <Tooltip showArrow={true} placement='right' content='Members'>
-            <button
-              className={clsx(
-                'outline-none w-full',
-                {
-                  'border-r-4 pl-1': currentPanel === PanelType.Members,
-                },
-                {
-                  [currentThemeColor.lightBorder]:
-                    currentPanel === PanelType.Members,
-                },
-              )}
-            >
-              <OcticonPeople16
-                className='text-2xl text-slate-700 hover:cursor-pointer m-auto'
-                onClick={() =>
-                  setCurrentPanel((prev) =>
-                    prev
-                      ? prev === PanelType.Members
-                        ? PanelType.None
-                        : PanelType.Members
-                      : PanelType.Members,
-                  )
-                }
-              />
-            </button>
-          </Tooltip>
+          {renderProfileIcon()}
+          {renderPanelIcons()}
         </div>
       </div>
 
@@ -267,7 +227,7 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
           'w-56 border-r': currentPanel,
         })}
       >
-        {currentPanel && PANEL_COMPONENTS[currentPanel]}
+        {currentPanel && panelIcons[currentPanel].component}
       </div>
     </div>
   );

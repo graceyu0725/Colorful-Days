@@ -51,11 +51,28 @@ export const initialUser = {
   calendars: [''],
 };
 
-// interface CalendarMember {
-//   email: string;
-//   name: string;
-//   id: string;
-// }
+export interface UserSignUp {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export interface UserSignIn {
+  email: string;
+  password: string;
+}
+
+export interface GoogleUserInfo {
+  uid: string;
+  name: string | null;
+  email: string | null;
+  photoURL: string | null;
+}
+
+export interface CalendarInfo {
+  name: string;
+  themeColor: string;
+}
 
 export interface CalendarTag {
   colorCode: string;
@@ -118,25 +135,13 @@ export const initialCalendarContent = {
   calendarId: '',
 };
 
-export interface UserSignUp {
-  name: string;
-  email: string;
-  password: string;
-}
-
-export interface UserSignIn {
-  email: string;
-  password: string;
-}
-
-export interface CalendarInfo {
-  name: string;
-  themeColor: string;
-}
-
-export interface GoogleUserInfo {
-  uid: string;
-  name: string | null;
-  email: string | null;
-  photoURL: string | null;
+export interface themeColor {
+  lightBackground: string;
+  background: string;
+  darkBackground: string;
+  lightBorder: string;
+  border: string;
+  text: string;
+  hover: string;
+  outline: string;
 }

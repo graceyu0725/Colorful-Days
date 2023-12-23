@@ -307,15 +307,25 @@ export const getAllMemberDetail = async (memberIds: string[]) => {
   return userCalendarsDetail as User[];
 };
 
+export type SearchState = {
+  status: 'initial' | 'found' | 'notFound';
+  data: User | null;
+};
+
 // 根據輸入的 email 搜尋該會員資料
-export const getMemberSearchResults = async (memberEmail: string) => {
+export const getMemberSearchResults = async (memberEmail?: string): Promise<SearchState> => {
+  if (!memberEmail) {
+    return { status: 'initial', data: null };
+  }
+  
   const usersCollection = collection(db, 'Users');
   const docRef = doc(usersCollection, memberEmail);
   const docSnap = await getDoc(docRef);
+
   if (docSnap.exists()) {
-    return docSnap.data() as User;
+    return { status: 'found', data: docSnap.data() as User };
   } else {
-    return 'nonexistent';
+    return { status: 'notFound', data: null };
   }
 };
 
@@ -376,7 +386,9 @@ export const addNewMemo = async (
   tag: string,
   memoTitle: string,
   currentCalendarId: string,
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
+  setIsLoading(true);
   const currentTime = serverTimestamp();
   const eventsCollection = collection(
     db,
@@ -403,6 +415,7 @@ export const addNewMemo = async (
   };
 
   await setDoc(newEventRef, data);
+  setIsLoading(false);
 };
 
 // For ViewEventModal - comments

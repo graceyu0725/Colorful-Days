@@ -5,5 +5,8 @@ import { defineConfig } from 'vite';
 export default defineConfig(() => {
   return {
     plugins: [react(), Icons({ compiler: 'jsx', jsx: 'react' })],
+    build: {
+      sourcemap: true,
+    },
   };
 });

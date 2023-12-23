@@ -98,6 +98,16 @@ export default function SelectTheme() {
     setIsComposing(false);
   };
 
+  const changeSelectedTheme = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    index: number,
+  ) => {
+    setIsSelected((prevState) => prevState.map((_, idx) => idx === index));
+    updateCalendarInfo(e);
+    setBackgroundColor(themeColors[index].background);
+    setBorderColor(themeColors[index].border);
+  };
+
   return (
     <>
       <div
@@ -162,16 +172,7 @@ export default function SelectTheme() {
                     )}
                     name='themeColor'
                     value={index}
-                    onClick={(e) => {
-                      setIsSelected((prevState) =>
-                        prevState.map((_, idx) =>
-                          idx === index ? true : false,
-                        ),
-                      );
-                      updateCalendarInfo(e);
-                      setBackgroundColor(themeColors[index].background);
-                      setBorderColor(themeColors[index].border);
-                    }}
+                    onClick={(e) => changeSelectedTheme(e, index)}
                   />
                 ))}
               </div>

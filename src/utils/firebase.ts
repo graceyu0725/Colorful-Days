@@ -5,11 +5,19 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getFirestore,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore';
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import toast from 'react-hot-toast';
 import { NavigateFunction } from 'react-router-dom';
 import { CalendarInfo, UserSignIn, UserSignUp } from '../utils/types';
 import { addUserForNative } from './handleUserAndCalendar';
+import { CalendarContent } from './types';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyCH0cKRNrKHtRVIqk6vyMJEwI8gcsSW_vk',
@@ -86,5 +94,48 @@ export const firebase = {
         console.error(error);
       });
     document.title = 'Colorful Days';
+  },
+  async updateUserAvatar(
+    userEmail: string,
+    imageFile: File | null,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  ) {
+    if (!imageFile) return;
+    setIsLoading(true);
+    const storage = getStorage(app);
+    const storageRef = ref(storage, userEmail);
+    await uploadBytes(storageRef, imageFile);
+    const downloadURL = await getDownloadURL(storageRef);
+
+    const usersCollection = collection(db, 'Users');
+    const userDocRef = doc(usersCollection, userEmail);
+
+    try {
+      await updateDoc(userDocRef, { avatar: downloadURL });
+      toast.success('Profile picture updated successfully');
+    } catch (error) {
+      toast.error(
+        'There is an error when updating profile picture. Please try again!',
+      );
+    }
+
+    setIsLoading(false);
+  },
+  async updateCalendarInfo(
+    calendarInfo: CalendarContent,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  ) {
+    setIsLoading(true);
+    try {
+      const calendarsCollection = collection(db, 'Calendars');
+      const calendarDocRef = doc(calendarsCollection, calendarInfo.calendarId);
+      await setDoc(calendarDocRef, calendarInfo);
+      toast.success('Calendar updated successfully');
+    } catch {
+      toast.error(
+        'There is an error when updating calendar. Please try it again!',
+      );
+    }
+    setIsLoading(false);
   },
 };
