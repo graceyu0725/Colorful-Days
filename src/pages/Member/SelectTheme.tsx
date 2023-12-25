@@ -8,7 +8,6 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { firebase } from '../../utils/firebase';
 import { addUserForGoogle } from '../../utils/handleUserAndCalendar';
 import { themeColors } from '../../utils/theme';
-import { CalendarInfo } from '../../utils/types';
 
 export default function SelectTheme() {
   const { state } = useLocation();
@@ -16,96 +15,71 @@ export default function SelectTheme() {
 
   if (!state) return <Navigate to='/signin' replace />;
 
-  const [calendarInfo, setCalendarInfo] = useState<CalendarInfo>({
-    name: `${state.userInfo.name}'s Calendar`,
-    themeColor: '',
-  });
-  const [isNameValid, setIsNameValid] = useState(true);
-
-  // Update userInput when typing
-  const updateCalendarInfo = (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    let name: string = '';
-    let value: string = '';
-
-    if (event.target instanceof HTMLInputElement) {
-      name = event.target.name;
-      value = event.target.value;
-    } else if (event.target instanceof HTMLButtonElement) {
-      name = event.currentTarget.name;
-      value = event.currentTarget.value;
-    }
-
-    if (name === 'name' && value.length > 30) {
-      setIsNameValid(false);
-      return;
-    }
-    if (name === 'name' && value.length <= 30) {
-      setIsNameValid(true);
-    }
-
-    setCalendarInfo((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const MAX_NAME_LENGTH = 30;
+  const getInitialUserSelection = () => {
+    return {
+      calendarName: `${state.userInfo.name}'s Calendar`,
+      calendarThemeColor: '',
+      borderColor: 'border-slate-200',
+      backgroundColor: 'bg-slate-200',
+      buttonIndex: 99,
+    };
   };
-
-  const [isSelected, setIsSelected] = useState([
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ]);
-  const [backgroundColor, setBackgroundColor] = useState('bg-slate-200');
-  const [borderColor, setBorderColor] = useState('border-slate-200');
-
+  const [userSelection, setUserSelection] = useState(getInitialUserSelection());
+  const [isComposing, setIsComposing] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
 
-  const handleSubmit = async () => {
-    setIsButtonLoading(true);
-
-    if (calendarInfo.name.replace(/\s+/g, '').length === 0) {
-      toast.error('Calendar name can not be empty!');
-      setIsButtonLoading(false);
-      return;
-    }
-
-    const validCalendarInfo = {
-      ...calendarInfo,
-      name: calendarInfo.name.trim(),
-    };
-
-    state.isNativeSignup
-      ? await firebase.signUp(state.userInfo, navigate, validCalendarInfo)
-      : await addUserForGoogle(state.userInfo, navigate, validCalendarInfo);
-    setIsButtonLoading(false);
-  };
-
-  const [isComposing, setIsComposing] = useState(false);
-
-  const handleCompositionStart = () => {
-    setIsComposing(true);
-  };
-
-  const handleCompositionEnd = () => {
-    setIsComposing(false);
+  const updateCalendarName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length > MAX_NAME_LENGTH) return;
+    setUserSelection((prev) => ({
+      ...prev,
+      calendarName: e.target.value,
+    }));
   };
 
   const changeSelectedTheme = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     index: number,
   ) => {
-    setIsSelected((prevState) => prevState.map((_, idx) => idx === index));
-    updateCalendarInfo(e);
-    setBackgroundColor(themeColors[index].background);
-    setBorderColor(themeColors[index].border);
+    const target = e.target as HTMLButtonElement;
+    setUserSelection((prev) => ({
+      ...prev,
+      calendarThemeColor: target.value,
+      borderColor: themeColors[index].border,
+      backgroundColor: themeColors[index].background,
+      buttonIndex: index,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    setIsButtonLoading(true);
+
+    const isNameInvalid =
+      !userSelection.calendarName ||
+      userSelection.calendarName.replace(/\s+/g, '').length === 0;
+
+    if (isNameInvalid) {
+      toast.error('Calendar name can not be empty!');
+      setIsButtonLoading(false);
+      return;
+    }
+
+    if (!userSelection.calendarThemeColor) {
+      toast.error('Please select a theme color!');
+      setIsButtonLoading(false);
+      return;
+    }
+
+    const validCalendarInfo = {
+      name: userSelection.calendarName.trim(),
+      themeColor: userSelection.calendarThemeColor,
+    };
+
+    state.isNativeSignup
+      ? await firebase.signUp(state.userInfo, navigate, validCalendarInfo)
+      : await addUserForGoogle(state.userInfo, navigate, validCalendarInfo);
+
+    setIsButtonLoading(false);
   };
 
   return (
@@ -113,7 +87,7 @@ export default function SelectTheme() {
       <div
         className={clsx(
           'flex items-center justify-center h-screen bg-cover bg-slate-200 transition-colors',
-          backgroundColor,
+          userSelection.backgroundColor,
         )}
       >
         <motion.div
@@ -133,28 +107,18 @@ export default function SelectTheme() {
                 name='name'
                 className={clsx(
                   'leading-[64px] border-2 w-72 xs:w-80 sm:w-96 h-16 rounded-lg px-5 text-lg focus:outline-none',
-                  borderColor,
+                  userSelection.borderColor,
                 )}
-                value={calendarInfo.name}
-                onChange={updateCalendarInfo}
+                value={userSelection.calendarName}
+                onChange={(e) => updateCalendarName(e)}
                 onKeyDown={(e) => {
-                  if (
-                    e.key === 'Enter' &&
-                    !isComposing &&
-                    calendarInfo.name &&
-                    calendarInfo.themeColor
-                  ) {
+                  if (e.key === 'Enter' && !isComposing) {
                     handleSubmit();
                   }
                 }}
-                onCompositionStart={handleCompositionStart}
-                onCompositionEnd={handleCompositionEnd}
+                onCompositionStart={() => setIsComposing(true)}
+                onCompositionEnd={() => setIsComposing(false)}
               />
-              {!isNameValid && (
-                <div className='text-sm text-red-500 -mt-3 -mb-7'>
-                  Maximum length of calendar name is 30 characters.
-                </div>
-              )}
             </div>
             <div className='flex flex-col items-center gap-5 h-1/3 w-full'>
               <div className='text-2xl font-bold'>Choose a Theme Color</div>
@@ -167,7 +131,7 @@ export default function SelectTheme() {
                       color.background,
                       {
                         ['outline outline-3 outline-offset-2 outline-slate-300']:
-                          isSelected[index],
+                          index === userSelection.buttonIndex,
                       },
                     )}
                     name='themeColor'
@@ -182,13 +146,8 @@ export default function SelectTheme() {
               color='default'
               className={clsx(
                 'w-32 text-slate-700 text-base transition-colors min-h-[40px]',
-                backgroundColor,
-                {
-                  ['pointer-events-none']:
-                    !calendarInfo.name || !calendarInfo.themeColor,
-                },
+                userSelection.backgroundColor,
               )}
-              disabled={!calendarInfo.name || !calendarInfo.themeColor}
               onClick={handleSubmit}
             >
               Submit

@@ -13,19 +13,17 @@ import {
   differenceInSeconds,
   format,
 } from 'date-fns';
-import { Timestamp, collection, deleteDoc, doc } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 import { useEffect, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
 import FluentNotepad28Filled from '~icons/fluent/notepad-28-filled';
 import MaterialSymbolsSubdirectoryArrowLeftRounded from '~icons/material-symbols/subdirectory-arrow-left-rounded';
 import MdiTag from '~icons/mdi/tag';
 import UisCommentDots from '~icons/uis/comment-dots';
 import { useAuthStore } from '../../store/authStore';
 import { useModalStore } from '../../store/modalStore';
-import { db } from '../../utils/firebase';
-import { addNewComment } from '../../utils/handleUserAndCalendar';
+import { firebase } from '../../utils/firebase';
 import { themeColors } from '../../utils/theme';
-import { defaultTags } from '../../utils/types';
+import { EventMessages, defaultTags } from '../../utils/types';
 import avatarImage from '../CalendarView/SideNavigation/img/avatar.png';
 
 interface Props {
@@ -44,100 +42,20 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     }
   }, [selectedEvent.messages]);
 
+  const calendarTags = currentCalendarContent.tags || defaultTags;
   const [isComposing, setIsComposing] = useState(false);
-
-  const handleCompositionStart = () => {
-    setIsComposing(true);
-  };
-
-  const handleCompositionEnd = () => {
-    setIsComposing(false);
-  };
-
-  const renderTime = () => {
-    const startDate = selectedEvent.startAt
-      ? selectedEvent.startAt
-      : new Date();
-    const endDate = selectedEvent.endAt ? selectedEvent.endAt : new Date();
-
-    if (selectedEvent.isMemo) {
-      return <div>Memo</div>;
-    }
-
-    if (selectedEvent.isAllDay) {
-      const startDateYear = format(startDate, 'LLL dd, yyyy');
-      const startTime = format(startDate, 'E');
-      const endDateYear = format(endDate, 'LLL dd, yyyy');
-      const endTime = format(endDate, 'E');
-
-      return (
-        <div className='flex gap-6 items-center justify-center'>
-          <div className='flex flex-col'>
-            <div className='text-base'>{startTime}</div>
-            <div className='text-xl'>{startDateYear}</div>
-          </div>
-          <div
-            className={clsx(
-              'w-5 h-5 border-t-5 border-r-5 rounded rotate-45',
-              themeColors[Number(selectedEvent.tag)].border,
-            )}
-          />
-          <div className='flex flex-col'>
-            <div className='text-base'>{endTime}</div>
-            <div className='text-xl'>{endDateYear}</div>
-          </div>
-        </div>
-      );
-    }
-
-    const startDay = format(startDate, 'E, LLL dd yyyy');
-    const startTime = format(startDate, 'HH:mm');
-    const endDay = format(endDate, 'E, LLL dd yyyy');
-    const endTime = format(endDate, 'HH:mm');
-
-    return (
-      <div className='flex gap-6 items-center justify-center'>
-        <div className='flex flex-col'>
-          <div className='text-base'>{startDay}</div>
-          <div className='text-xl'>{startTime}</div>
-        </div>
-        <div
-          className={clsx(
-            'w-5 h-5 border-t-5 border-r-5 rounded rotate-45',
-            themeColors[Number(selectedEvent.tag)].border,
-          )}
-        />
-        <div className='flex flex-col'>
-          <div className='text-base'>{endDay}</div>
-          <div className='text-xl'>{endTime}</div>
-        </div>
-      </div>
-    );
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
+  const [commentInput, setCommentInput] = useState('');
 
   const handleDelete = async () => {
-    const eventsCollection = collection(
-      db,
-      'Calendars',
+    await firebase.deleteEvent(
       currentCalendarId,
-      'events',
+      selectedEvent.eventId.toString(),
     );
-    const eventRef = doc(eventsCollection, selectedEvent.eventId.toString());
-    await deleteDoc(eventRef);
     setIsEditModalOpen(false, selectedEvent);
-
-    toast.success('Event deleted successfully');
   };
 
-  const calendarTags = currentCalendarContent.tags || defaultTags;
-
-  const [commentInput, setCommentInput] = useState('');
-  const handleAddComment = () => {
-    addNewComment(
+  const handleAddComment = async () => {
+    await firebase.addComment(
       currentCalendarId,
       selectedEvent.eventId.toString(),
       currentUser,
@@ -166,74 +84,161 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
     if (daysDiff >= 45) return format(originTime, 'LLL dd, yyyy');
   };
 
-  const renderComments = () => {
+  const renderTime = () => {
+    if (selectedEvent.isMemo) {
+      return <div>Memo</div>;
+    }
+
+    const startDate = selectedEvent.startAt
+      ? selectedEvent.startAt
+      : new Date();
+    const endDate = selectedEvent.endAt ? selectedEvent.endAt : new Date();
+    const isAllDay = selectedEvent.isAllDay;
+
+    const startDateYear = format(
+      startDate,
+      isAllDay ? 'LLL dd, yyyy' : 'E, LLL dd yyyy',
+    );
+    const startTime = format(startDate, isAllDay ? 'E' : 'HH:mm');
+    const endDateYear = format(
+      endDate,
+      isAllDay ? 'LLL dd, yyyy' : 'E, LLL dd yyyy',
+    );
+    const endTime = format(endDate, isAllDay ? 'E' : 'HH:mm');
+
     return (
-      <div
-        className={clsx(
-          'h-40 xs:h-52 flex flex-col gap-2 overflow-y-auto px-1 min-h-[100px] xs:min-h-[140px]',
-          selectedEvent.messages ? 'h-52' : 'h-48',
-        )}
-      >
-        {selectedEvent.messages.map((message, index) => (
-          <div
-            key={index}
-            className={clsx('flex gap-1', {
-              'pl-10': currentUser.userId === message.arthur.userId,
-            })}
-          >
-            <div className={clsx('flex gap-2 grow', {})}>
-              {currentUser.userId === message.arthur.userId ? (
-                <>
-                  <div className='flex flex-col items-end grow gap-0.5'>
-                    <div className='px-px text-xs text-slate-500 truncate text-right max-w-[300px]'>
-                      {message.arthur.name}
-                    </div>
-                    <div className='flex items-end gap-2 max-w-full'>
-                      <div className='text-xs text-slate-500 text-right min-w-fit'>
-                        {formatTime(message.createdAt)}
-                      </div>
-                      <div
-                        className={clsx(
-                          'text-sm px-2 py-1 break-words rounded-lg max-w-[280px]',
-                          themeColors[Number(selectedEvent.tag)]
-                            .lightBackground,
-                        )}
-                      >
-                        {message.content}
-                      </div>
-                    </div>
-                  </div>
-                  <img
-                    src={message.arthur.avatar || avatarImage}
-                    className='w-11 h-11 rounded-full object-cover object-center'
-                  />
-                </>
-              ) : (
-                <>
-                  <img
-                    src={message.arthur.avatar || avatarImage}
-                    className='w-11 h-11 rounded-full object-cover object-center'
-                  />
-                  <div className='flex flex-col items-start grow gap-0.5'>
-                    <div className='px-px text-xs text-slate-500 truncate'>
-                      {message.arthur.name}
-                    </div>
-                    <div className='flex items-end gap-2 max-w-full'>
-                      <div className='text-sm px-2 py-1 break-words max-w-[280px] bg-slate-100 rounded-lg'>
-                        {message.content}
-                      </div>
-                      <div className='text-xs w-24 text-slate-500'>
-                        {formatTime(message.createdAt)}
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
+      <div className='flex gap-6 items-center justify-center'>
+        <div className='flex flex-col'>
+          <div className='text-base'>
+            {isAllDay ? startTime : startDateYear}
+          </div>
+          <div className='text-xl'>{isAllDay ? startDateYear : startTime}</div>
+        </div>
+        <div
+          className={clsx(
+            'w-5 h-5 border-t-5 border-r-5 rounded rotate-45',
+            themeColors[Number(selectedEvent.tag)].border,
+          )}
+        />
+        <div className='flex flex-col'>
+          <div className='text-base'>{isAllDay ? endTime : endDateYear}</div>
+          <div className='text-xl'>{isAllDay ? endDateYear : endTime}</div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderMessageItems = (message: EventMessages) => {
+    const messageItems = {
+      avatar: (
+        <img
+          src={message.arthur.avatar || avatarImage}
+          className='w-11 h-11 rounded-full object-cover object-center'
+        />
+      ),
+      name: (
+        <div className='px-px text-xs text-slate-500 truncate text-right max-w-[300px]'>
+          {message.arthur.name}
+        </div>
+      ),
+      time: (
+        <div className='text-xs text-slate-500 text-right min-w-fit'>
+          {formatTime(message.createdAt)}
+        </div>
+      ),
+      content: (
+        <div
+          className={clsx(
+            'text-sm px-2 py-1 break-words rounded-lg max-w-[280px]',
+            currentUser.userId === message.arthur.userId
+              ? themeColors[Number(selectedEvent.tag)].lightBackground
+              : 'bg-slate-100',
+          )}
+        >
+          {message.content}
+        </div>
+      ),
+    };
+
+    if (currentUser.userId === message.arthur.userId) {
+      return (
+        <>
+          <div className='flex flex-col items-end grow gap-0.5'>
+            {messageItems.name}
+            <div className='flex items-end gap-2 max-w-full'>
+              {messageItems.time}
+              {messageItems.content}
             </div>
           </div>
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
+          {messageItems.avatar}
+        </>
+      );
+    }
+
+    return (
+      <>
+        {messageItems.avatar}
+        <div className='flex flex-col items-start grow gap-0.5'>
+          {messageItems.name}
+          <div className='flex items-end gap-2 max-w-full'>
+            {messageItems.content}
+            {messageItems.time}
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  const renderComments = () => {
+    return (
+      <>
+        <div
+          className={clsx(
+            'h-40 xs:h-52 flex flex-col gap-2 overflow-y-auto px-1 min-h-[100px] xs:min-h-[140px]',
+            selectedEvent.messages ? 'h-52' : 'h-48',
+          )}
+        >
+          {selectedEvent.messages.map((message, index) => (
+            <div
+              key={index}
+              className={clsx('flex gap-1', {
+                'pl-10': currentUser.userId === message.arthur.userId,
+              })}
+            >
+              <div className='flex gap-2 grow'>
+                {renderMessageItems(message)}
+              </div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className='flex items-center gap-2'>
+          <input
+            className={clsx(
+              'border rounded-lg text-sm h-10 leading-10 px-2 grow',
+              themeColors[Number(selectedEvent.tag)].outline,
+            )}
+            placeholder='Add a comment'
+            value={commentInput}
+            onChange={(e) => setCommentInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !isComposing) {
+                handleAddComment();
+              }
+            }}
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={() => setIsComposing(false)}
+          />
+          <MaterialSymbolsSubdirectoryArrowLeftRounded
+            className={clsx(
+              'w-5 h-5 hover:cursor-pointer',
+              themeColors[Number(selectedEvent.tag)].text,
+            )}
+            onClick={handleAddComment}
+          />
+        </div>
+      </>
     );
   };
 
@@ -255,7 +260,10 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
 
         <div className='flex items-center justify-center px-2 gap-1 text-sm'>
           <MdiTag
-            className={clsx("min-w-[16px] shrink-0",themeColors[Number(selectedEvent.tag)].text)}
+            className={clsx(
+              'min-w-[16px] shrink-0',
+              themeColors[Number(selectedEvent.tag)].text,
+            )}
           />
           <div className='leading-4 truncate'>
             {calendarTags[Number(selectedEvent.tag)].name}
@@ -296,31 +304,6 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
         </div>
         <Divider />
         {renderComments()}
-        <div className='flex items-center gap-2'>
-          <input
-            className={clsx(
-              'border rounded-lg text-sm h-10 leading-10 px-2 grow',
-              themeColors[Number(selectedEvent.tag)].outline,
-            )}
-            placeholder='Add a comment'
-            value={commentInput}
-            onChange={(e) => setCommentInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !isComposing) {
-                handleAddComment();
-              }
-            }}
-            onCompositionStart={handleCompositionStart}
-            onCompositionEnd={handleCompositionEnd}
-          />
-          <MaterialSymbolsSubdirectoryArrowLeftRounded
-            className={clsx(
-              'w-5 h-5 hover:cursor-pointer',
-              themeColors[Number(selectedEvent.tag)].text,
-            )}
-            onClick={handleAddComment}
-          />
-        </div>
         <Divider />
       </ModalBody>
 
@@ -335,7 +318,7 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
           </Button>
           <Button
             color='primary'
-            onPress={handleEdit}
+            onPress={() => setIsEditing(true)}
             className={clsx(
               'w-1/2',
               themeColors[Number(selectedEvent.tag)].darkBackground,

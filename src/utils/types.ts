@@ -35,6 +35,20 @@ export const initialEvent = {
   messages: [],
 };
 
+export interface CreateEvent {
+  tag: string;
+  eventId: number;
+  title: string;
+  startAt: Date;
+  endAt: Date;
+  isAllDay: boolean;
+  isMemo: boolean;
+  note: string;
+  createdAt: null;
+  updatedAt: null;
+  messages: never[];
+}
+
 export interface User {
   userId: string;
   name: string;

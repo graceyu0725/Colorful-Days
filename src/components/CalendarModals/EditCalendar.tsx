@@ -9,7 +9,7 @@ import {
   ModalHeader,
 } from '@nextui-org/react';
 import clsx from 'clsx';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { firebase } from '../../utils/firebase';
 import { themeColors } from '../../utils/theme';
 import { CalendarContent, defaultTags } from '../../utils/types';
@@ -27,23 +27,14 @@ const EditCalendar: React.FC<Props> = ({
   hoveredCalendar,
   setHoveredCalendar,
 }) => {
-  const [isNameValid, setIsNameValid] = useState(true);
+  const MAX_NAME_LENGTH = 30;
   const [isSaving, setIsSaving] = useState(false);
-  const [isSelected, setIsSelected] = useState(Array(8).fill(false));
-
-  useEffect(() => {
-    let initialSelection = Array(8).fill(false);
-    initialSelection.fill(
-      true,
-      Number(hoveredCalendar.themeColor),
-      Number(hoveredCalendar.themeColor) + 1,
-    );
-    setIsSelected(initialSelection);
-  }, [hoveredCalendar]);
 
   const handleSaveCalendar = async () => {
-    await firebase.updateCalendarInfo(hoveredCalendar, setIsSaving);
+    setIsSaving(true);
+    await firebase.updateCalendarInfo(hoveredCalendar);
     setIsEditCalendarModalOpen(false);
+    setIsSaving(false);
   };
 
   const renderName = () => {
@@ -58,22 +49,14 @@ const EditCalendar: React.FC<Props> = ({
           )}
           value={hoveredCalendar.name}
           onChange={(e) => {
-            if (e.target.value.length <= 30) {
-              setIsNameValid(true);
+            if (e.target.value.length <= MAX_NAME_LENGTH) {
               setHoveredCalendar({
                 ...hoveredCalendar,
                 name: e.target.value,
               });
-              return;
             }
-            setIsNameValid(false);
           }}
         />
-        {!isNameValid && (
-          <div className='text-sm text-red-500 -mt-1 -mb-6'>
-            Maximum length is 30 characters.
-          </div>
-        )}
       </div>
     );
   };
@@ -91,15 +74,11 @@ const EditCalendar: React.FC<Props> = ({
                 color.background,
                 {
                   ['outline outline-3 outline-offset-2 outline-slate-300']:
-                    isSelected[index],
+                    index === Number(hoveredCalendar.themeColor),
                 },
               )}
-              name='themeColor'
               value={index}
               onClick={() => {
-                setIsSelected((prevState) =>
-                  prevState.map((_, idx) => (idx === index ? true : false)),
-                );
                 setHoveredCalendar({
                   ...hoveredCalendar,
                   themeColor: index.toString(),
@@ -117,7 +96,7 @@ const EditCalendar: React.FC<Props> = ({
       e: React.ChangeEvent<HTMLInputElement>,
       index: number,
     ) => {
-      if (e.target.value.length > 30) return;
+      if (e.target.value.length > MAX_NAME_LENGTH) return;
       let newTags = [...hoveredCalendar.tags];
       newTags[index] = {
         ...newTags[index],

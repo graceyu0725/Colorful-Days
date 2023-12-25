@@ -21,7 +21,7 @@ import FluentNotepad28Filled from '~icons/fluent/notepad-28-filled';
 import MaterialSymbolsNestClockFarsightAnalog from '~icons/material-symbols/nest-clock-farsight-analog';
 import MdiTag from '~icons/mdi/tag';
 import { themeColors } from '../../utils/theme';
-import { CalendarContent, Event } from '../../utils/types';
+import { CalendarContent, CreateEvent, Event } from '../../utils/types';
 
 export const datePickerColors = [
   '#9879704D',
@@ -34,70 +34,44 @@ export const datePickerColors = [
   '#D984814D',
 ];
 
-export interface CreateEvent {
-  tag: string;
-  eventId: number;
-  title: string;
-  startAt: Date;
-  endAt: Date;
-  isAllDay: boolean;
-  isMemo: boolean;
-  note: string;
-  createdAt: null;
-  updatedAt: null;
-  messages: never[];
-}
-
-// ===================================================================
-// Handle input & button clicking
-// ===================================================================
-
-export const updateUserInput = (
+const updateEventDetail = (
   label: keyof Event,
   value: any,
-  setUserInput: (value: React.SetStateAction<CreateEvent | Event>) => void,
-  setIsTitleEmpty: (value: React.SetStateAction<boolean>) => void,
+  setEventDetail: (value: React.SetStateAction<CreateEvent | Event>) => void,
 ) => {
-  setUserInput((prev) => {
+  setEventDetail((prev) => {
     if (prev[label] === value) {
       return prev;
     }
-    const updatedInput = { ...prev, [label]: value };
+    const updatedDetail = { ...prev, [label]: value };
     if (
       label === 'startAt' &&
-      updatedInput.endAt &&
-      addMinutes(value, 15) >= updatedInput.endAt
+      updatedDetail.endAt &&
+      addMinutes(value, 15) >= updatedDetail.endAt
     ) {
-      updatedInput.endAt = addMinutes(value, 15);
+      updatedDetail.endAt = addMinutes(value, 15);
     }
 
-    if (updatedInput.startAt && updatedInput.endAt) {
-      if (label === 'endAt' && value < addMinutes(updatedInput.startAt, 15)) {
-        updatedInput.endAt = addMinutes(updatedInput.startAt, 15);
+    if (updatedDetail.startAt && updatedDetail.endAt) {
+      if (label === 'endAt' && value < addMinutes(updatedDetail.startAt, 15)) {
+        updatedDetail.endAt = addMinutes(updatedDetail.startAt, 15);
         toast.error('End time cannot be earlier than start time!');
       }
     }
 
     if (label === 'isAllDay' || label === 'isMemo') {
-      updatedInput[label] = !prev[label];
+      updatedDetail[label] = !prev[label];
     }
 
-    if (label === 'title') {
-      setIsTitleEmpty(false);
-    }
-    return updatedInput;
+    return updatedDetail;
   });
 };
 
-// ===================================================================
-// Handle rendering
-// ===================================================================
-
-export const renderTags = (
+const renderTags = (
   isPopoverOpen: boolean,
   setIsPopoverOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  userInput: CreateEvent | Event,
-  setUserInput: (value: React.SetStateAction<CreateEvent | Event>) => void,
+  eventDetail: CreateEvent | Event,
+  setEventDetail: (value: React.SetStateAction<CreateEvent | Event>) => void,
   currentCalendarContent: CalendarContent,
 ) => {
   return (
@@ -112,20 +86,20 @@ export const renderTags = (
             <div
               className={clsx(
                 'w-3 h-3 rounded-full',
-                themeColors[Number(userInput.tag)].darkBackground,
+                themeColors[Number(eventDetail.tag)].darkBackground,
               )}
             />
             <div className='text-sm xs:text-base'>
-              {currentCalendarContent.tags[Number(userInput.tag)].name}
+              {currentCalendarContent.tags[Number(eventDetail.tag)].name}
             </div>
           </div>
         </PopoverTrigger>
         <PopoverContent className='rounded-lg p-4 z-10'>
           <RadioGroup
             size='sm'
-            value={userInput.tag}
+            value={eventDetail.tag}
             onValueChange={(e) => {
-              setUserInput((prev) => ({ ...prev, tag: e }));
+              setEventDetail((prev) => ({ ...prev, tag: e }));
               setIsPopoverOpen(false);
               document.documentElement.style.setProperty(
                 '--main-bg-color',
@@ -156,99 +130,51 @@ export const renderTags = (
 
 export const renderDatePicker = (
   type: string,
-  userInput: CreateEvent | Event,
-  setUserInput: (value: React.SetStateAction<CreateEvent | Event>) => void,
-  setIsTitleEmpty: React.Dispatch<React.SetStateAction<boolean>>,
+  eventDetail: CreateEvent | Event,
+  setEventDetail: (value: React.SetStateAction<CreateEvent | Event>) => void,
 ) => {
-  if (type === 'allDay') {
-    return (
-      <div className='flex items-center gap-2'>
-        <MaterialSymbolsNestClockFarsightAnalog
-          className={clsx(
-            'min-w-[20px] text-xl transition-colors',
-            themeColors[Number(userInput.tag)].text,
-          )}
-        />
-        <div className='grow flex items-start justify-between'>
-          <DatePicker
-            aria-label='startDate'
-            selected={userInput.startAt}
-            selectsStart
-            dateFormat='MMM dd, yyyy'
-            className={clsx(
-              'border rounded-md h-8 w-36 xs:w-40 sm:w-48 text-center text-sm sm:text-base focus:outline-2',
-              themeColors[Number(userInput.tag)].outline,
-            )}
-            onChange={(e) =>
-              updateUserInput('startAt', e, setUserInput, setIsTitleEmpty)
-            }
-          />
-          <div className='w-5 h-8 leading-8'>－</div>
-          <DatePicker
-            aria-label='endDate'
-            selected={userInput.endAt}
-            selectsEnd
-            minDate={userInput.startAt}
-            dateFormat='MMM dd, yyyy'
-            className={clsx(
-              'border rounded-md h-8 w-36 xs:w-40 sm:w-48 text-center text-sm sm:text-base focus:outline-2',
-              themeColors[Number(userInput.tag)].outline,
-            )}
-            onChange={(e) =>
-              updateUserInput('endAt', e, setUserInput, setIsTitleEmpty)
-            }
-          />
-        </div>
-      </div>
-    );
-  } else if (type === 'memo') {
-    return <></>;
-  }
+  if (type === 'memo') return;
 
   return (
     <div className='flex items-center gap-2'>
       <MaterialSymbolsNestClockFarsightAnalog
         className={clsx(
           'min-w-[20px] text-xl transition-colors',
-          themeColors[Number(userInput.tag)].text,
+          themeColors[Number(eventDetail.tag)].text,
         )}
       />
       <div className='grow flex items-start justify-between'>
         <DatePicker
           aria-label='startDate'
-          selected={userInput.startAt}
+          selected={eventDetail.startAt}
           selectsStart
-          showTimeSelect
-          timeFormat='HH:mm'
-          timeIntervals={15}
+          showTimeSelect={type !== 'allDay'}
+          timeFormat={type === 'allDay' ? '' : 'HH:mm'}
+          timeIntervals={type === 'allDay' ? 0 : 15}
           timeCaption='Time'
-          dateFormat='MMM dd, yyyy HH:mm'
+          dateFormat={type === 'allDay' ? 'MMM dd, yyyy' : 'MMM dd, yyyy HH:mm'}
           className={clsx(
             'border rounded-md h-8 w-36 xs:w-40 sm:w-48 text-center text-sm sm:text-base focus:outline-2',
-            themeColors[Number(userInput.tag)].outline,
+            themeColors[Number(eventDetail.tag)].outline,
           )}
-          onChange={(e) =>
-            updateUserInput('startAt', e, setUserInput, setIsTitleEmpty)
-          }
+          onChange={(e) => updateEventDetail('startAt', e, setEventDetail)}
         />
         <div className='w-5 h-8 leading-8'>－</div>
         <DatePicker
           aria-label='endDate'
-          selected={userInput.endAt}
+          selected={eventDetail.endAt}
           selectsEnd
-          minDate={userInput.startAt}
-          showTimeSelect
-          timeFormat='HH:mm'
-          timeIntervals={15}
+          minDate={eventDetail.startAt}
+          showTimeSelect={type !== 'allDay'}
+          timeFormat={type === 'allDay' ? '' : 'HH:mm'}
+          timeIntervals={type === 'allDay' ? 0 : 15}
           timeCaption='Time'
-          dateFormat='MMM dd, yyyy HH:mm'
+          dateFormat={type === 'allDay' ? 'MMM dd, yyyy' : 'MMM dd, yyyy HH:mm'}
           className={clsx(
             'border rounded-md h-8 w-36 xs:w-40 sm:w-48 text-center text-sm sm:text-base focus:outline-2',
-            themeColors[Number(userInput.tag)].outline,
+            themeColors[Number(eventDetail.tag)].outline,
           )}
-          onChange={(e) =>
-            updateUserInput('endAt', e, setUserInput, setIsTitleEmpty)
-          }
+          onChange={(e) => updateEventDetail('endAt', e, setEventDetail)}
         />
       </div>
     </div>
@@ -259,25 +185,24 @@ export const renderModalContent = (
   isComposing: boolean,
   setIsComposing: React.Dispatch<React.SetStateAction<boolean>>,
   header: string,
-  userInput: CreateEvent | Event,
-  setUserInput: (value: React.SetStateAction<Event | CreateEvent>) => void,
-  setIsTitleEmpty: React.Dispatch<React.SetStateAction<boolean>>,
+  eventDetail: CreateEvent | Event,
+  setEventDetail: (value: React.SetStateAction<Event | CreateEvent>) => void,
   isPopoverOpen: boolean,
   setIsPopoverOpen: React.Dispatch<React.SetStateAction<boolean>>,
   currentCalendarContent: CalendarContent,
-  isTitleEmpty: boolean,
   handleCancel: () => void,
   handleSubmit: () => Promise<void>,
   isSaving: boolean,
   isEditing?: boolean,
 ) => {
-  const handleCompositionStart = () => {
-    setIsComposing(true);
-  };
-
-  const handleCompositionEnd = () => {
-    setIsComposing(false);
-  };
+  let datePickerType = '';
+  if (eventDetail.isAllDay && !eventDetail.isMemo) {
+    datePickerType = 'allDay';
+  } else if (eventDetail.isMemo) {
+    datePickerType = 'memo';
+  } else if (!eventDetail.isAllDay && !eventDetail.isMemo) {
+    datePickerType = 'normal';
+  }
 
   return (
     <>
@@ -290,43 +215,31 @@ export const renderModalContent = (
           type='text'
           variant='underlined'
           placeholder='Title'
-          value={userInput.title}
+          value={eventDetail.title}
           onChange={(e) =>
-            updateUserInput(
-              'title',
-              e.target.value,
-              setUserInput,
-              setIsTitleEmpty,
-            )
+            updateEventDetail('title', e.target.value, setEventDetail)
           }
           onKeyDown={(e) => {
             if (e.key === 'Enter' && !isComposing) {
               handleSubmit();
             }
           }}
-          onCompositionStart={handleCompositionStart}
-          onCompositionEnd={handleCompositionEnd}
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={() => setIsComposing(false)}
           className=''
         />
-        {userInput.isAllDay &&
-          !userInput.isMemo &&
-          renderDatePicker('allDay', userInput, setUserInput, setIsTitleEmpty)}
-        {userInput.isMemo &&
-          renderDatePicker('memo', userInput, setUserInput, setIsTitleEmpty)}
-        {!userInput.isAllDay &&
-          !userInput.isMemo &&
-          renderDatePicker('normal', userInput, setUserInput, setIsTitleEmpty)}
 
-        {!userInput.isMemo && (
+        {datePickerType &&
+          renderDatePicker(datePickerType, eventDetail, setEventDetail)}
+
+        {!eventDetail.isMemo && (
           <Switch
             color='default'
             size='sm'
             className='pl-8'
             aria-label='allDay'
-            isSelected={userInput.isAllDay}
-            onChange={(e) =>
-              updateUserInput('isAllDay', e, setUserInput, setIsTitleEmpty)
-            }
+            isSelected={eventDetail.isAllDay}
+            onChange={(e) => updateEventDetail('isAllDay', e, setEventDetail)}
           >
             All-day
           </Switch>
@@ -337,10 +250,8 @@ export const renderModalContent = (
           size='sm'
           className='pl-8'
           aria-label='saveAsMemo'
-          isSelected={userInput.isMemo}
-          onChange={(e) =>
-            updateUserInput('isMemo', e, setUserInput, setIsTitleEmpty)
-          }
+          isSelected={eventDetail.isMemo}
+          onChange={(e) => updateEventDetail('isMemo', e, setEventDetail)}
         >
           Save as memo
         </Switch>
@@ -349,14 +260,14 @@ export const renderModalContent = (
           <MdiTag
             className={clsx(
               'text-xl transition-colors',
-              themeColors[Number(userInput.tag)].text,
+              themeColors[Number(eventDetail.tag)].text,
             )}
           />
           {renderTags(
             isPopoverOpen,
             setIsPopoverOpen,
-            userInput,
-            setUserInput,
+            eventDetail,
+            setEventDetail,
             currentCalendarContent,
           )}
         </div>
@@ -365,31 +276,21 @@ export const renderModalContent = (
           <FluentNotepad28Filled
             className={clsx(
               'text-xl transition-colors',
-              themeColors[Number(userInput.tag)].text,
+              themeColors[Number(eventDetail.tag)].text,
             )}
           />
           <Textarea
-            value={userInput.note}
+            value={eventDetail.note}
             minRows={4}
             maxRows={4}
             onChange={(e) =>
-              updateUserInput(
-                'note',
-                e.target.value,
-                setUserInput,
-                setIsTitleEmpty,
-              )
+              updateEventDetail('note', e.target.value, setEventDetail)
             }
           />
         </div>
       </ModalBody>
 
       <ModalFooter className='flex items-center'>
-        {isTitleEmpty && (
-          <div className='text-sm text-red-500 text-end pr-1'>
-            Please enter title!
-          </div>
-        )}
         <div className='w-2/3 flex gap-2'>
           <Button variant='bordered' onPress={handleCancel} className='w-1/2'>
             Cancel
@@ -400,9 +301,8 @@ export const renderModalContent = (
             onPress={handleSubmit}
             className={clsx(
               'w-1/2',
-              themeColors[Number(userInput.tag)].darkBackground,
+              themeColors[Number(eventDetail.tag)].darkBackground,
             )}
-            disabled={!userInput.title}
           >
             Save
           </Button>

@@ -22,6 +22,16 @@ const Profile: React.FC<Props> = ({
 }) => {
   const [isUploading, setIsUploading] = useState(false);
 
+  const handleUpdateUserAvatar = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    if (!e.target.files) return;
+
+    setIsUploading(true);
+    await firebase.updateUserAvatar(currentUser.email, e.target.files[0]);
+    setIsUploading(false);
+  };
+
   return (
     <Modal
       isOpen={isProfileModalOpen}
@@ -48,14 +58,7 @@ const Profile: React.FC<Props> = ({
                 type='file'
                 accept='image/*'
                 className='hidden'
-                onChange={(e) =>
-                  e.target.files &&
-                  firebase.updateUserAvatar(
-                    currentUser.email,
-                    e.target.files[0],
-                    setIsUploading,
-                  )
-                }
+                onChange={async (e) => handleUpdateUserAvatar(e)}
               />
               {isUploading ? (
                 <EosIconsLoading className='text-white text-xs' />

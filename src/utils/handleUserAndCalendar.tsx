@@ -313,11 +313,13 @@ export type SearchState = {
 };
 
 // 根據輸入的 email 搜尋該會員資料
-export const getMemberSearchResults = async (memberEmail?: string): Promise<SearchState> => {
+export const getMemberSearchResults = async (
+  memberEmail?: string,
+): Promise<SearchState> => {
   if (!memberEmail) {
     return { status: 'initial', data: null };
   }
-  
+
   const usersCollection = collection(db, 'Users');
   const docRef = doc(usersCollection, memberEmail);
   const docSnap = await getDoc(docRef);
@@ -416,23 +418,4 @@ export const addNewMemo = async (
 
   await setDoc(newEventRef, data);
   setIsLoading(false);
-};
-
-// For ViewEventModal - comments
-export const addNewComment = async (
-  calendarId: string,
-  eventId: string,
-  userInfo: User,
-  comment: string,
-) => {
-  if (!comment) return;
-  const eventDoc = doc(db, 'Calendars', calendarId, 'events', eventId);
-  const newComment = {
-    arthur: userInfo,
-    content: comment,
-    createdAt: new Date(),
-  };
-  await updateDoc(eventDoc, {
-    messages: arrayUnion(newComment),
-  });
 };
