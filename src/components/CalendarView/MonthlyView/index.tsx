@@ -4,7 +4,7 @@ import { useAuthStore } from '../../../store/authStore';
 import { useEventsStore } from '../../../store/eventsStore';
 import { useViewStore } from '../../../store/viewStore';
 import {
-  generateMonthDates,
+  getMonthDates,
   getSplitEvents,
   splitDatesIntoWeeks,
 } from '../../../utils/handleDatesAndEvents';
@@ -23,7 +23,7 @@ const MonthlyView: React.FC = () => {
   const { allEvents } = useEventsStore();
 
   // 生成當前月份的日期陣列 []
-  const monthDates: Date[] = generateMonthDates(currentYear, currentMonth);
+  const monthDates: Date[] = getMonthDates(currentYear, currentMonth);
   const splitEvents = getSplitEvents(monthDates, allEvents);
   const weeks = splitDatesIntoWeeks(monthDates);
 

@@ -9,7 +9,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '../../../store/authStore';
 import { useModalStore } from '../../../store/modalStore';
 import { useViewStore } from '../../../store/viewStore';
-import { generateWeekDates } from '../../../utils/handleDatesAndEvents';
+import {
+  getCellStartTime,
+  getWeekDates,
+} from '../../../utils/handleDatesAndEvents';
 import { DroppableArea } from '../../DND';
 import AllDayEventCells from './AllDayEventCells';
 import OneDayEventCells from './OneDayEventCells';
@@ -30,29 +33,13 @@ const dateStyles = [
   'col-start-8 ml-px',
 ];
 
-const getStartTime = (
-  date: Date[],
-  weekdayIndex: number,
-  timeIndex: number,
-  minute: number,
-) => {
-  const startTime = new Date(
-    date[weekdayIndex].getFullYear(),
-    date[weekdayIndex].getMonth(),
-    date[weekdayIndex].getDate(),
-    timeIndex,
-    minute,
-  );
-  return startTime;
-};
-
 const WeeklyView: React.FC = () => {
   const { currentThemeColor } = useAuthStore();
   const { currentDate } = useViewStore();
   const { setIsCreateModalOpen } = useModalStore();
 
   const weekDates = useMemo(() => {
-    return generateWeekDates(currentDate);
+    return getWeekDates(currentDate);
   }, [currentDate]);
 
   const startTimeList = useMemo(
@@ -61,7 +48,7 @@ const WeeklyView: React.FC = () => {
         Array.from({ length: HOURS_PER_DAY * 2 }).map((_, timeIndex) => {
           const hour = Math.floor(timeIndex / 2);
           const minute = timeIndex % 2 === 0 ? 0 : 30;
-          return getStartTime(weekDates, weekdayIndex, hour, minute);
+          return getCellStartTime(weekDates, weekdayIndex, hour, minute);
         }),
       ),
     [weekDates],

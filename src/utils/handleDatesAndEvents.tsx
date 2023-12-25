@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
   addDays,
   differenceInCalendarDays,
@@ -14,9 +15,6 @@ import WeeklyEvent from '../components/EventCells/WeeklyEvent';
 import { themeColors } from './theme';
 import { Event } from './types';
 
-// ================================================================
-// Common functions
-// ================================================================
 export const updateAllEvents = (
   snapshot: any,
   setCalendarAllEvents: (event: Event[]) => void,
@@ -43,62 +41,42 @@ export const updateAllEvents = (
   setCalendarAllEvents(newEvents);
 };
 
+function splitIntoChunks<T>(array: T[], chunkSize: number): T[][] {
+  let chunks: T[][] = [];
+  let currentChunk: T[] = [];
+
+  array.forEach((item, index) => {
+    currentChunk.push(item);
+
+    if (currentChunk.length === chunkSize || index === array.length - 1) {
+      chunks.push(currentChunk);
+      currentChunk = [];
+    }
+  });
+
+  return chunks;
+}
+
 export const splitDatesIntoWeeks = (monthDates: Date[]) => {
-  let weeks: Array<Array<Date>> = [];
-  let week: Date[] = [];
-
-  monthDates.forEach((date, index) => {
-    week.push(date);
-
-    if (week.length === 7 || index === monthDates.length - 1) {
-      weeks.push(week);
-      week = [];
-    }
-  });
-
-  return weeks;
+  return splitIntoChunks(monthDates, 7);
 };
 
-const splitEventsIntoWeeks = (mappedEvents: Event[][]) => {
-  let weeks: Event[][][] = [];
-  let week: Event[][] = [];
-
-  mappedEvents.forEach((event, index) => {
-    week.push(event);
-
-    if (week.length === 7 || index === mappedEvents.length - 1) {
-      weeks.push(week);
-      week = [];
-    }
-  });
-
-  return weeks;
-};
-
-// ================================================================
-// Deal with logic of generating dates
-// ================================================================
-
-// 把當月所有日期存在一個陣列中，用來渲染日曆格子
-export const generateMonthDates = (year: number, month: number) => {
+export const getMonthDates = (year: number, month: number) => {
   const firstDayOfMonth = new Date(year, month, 1).getDay();
   const lastDateOfMonth = new Date(year, month + 1, 0).getDate();
   const lastDateOfLastMonth = new Date(year, month, 0).getDate();
   const dates = [];
 
-  // 前一個月的最後幾天
   for (let i = 0; i < firstDayOfMonth; i++) {
     dates.push(
       new Date(year, month - 1, lastDateOfLastMonth - firstDayOfMonth + i + 1),
     );
   }
 
-  // 當前月份的所有日期
   for (let i = 1; i <= lastDateOfMonth; i++) {
     dates.push(new Date(year, month, i));
   }
 
-  // 下個月的開始幾天
   const daysInLastRow = 7 - (dates.length % 7);
   if (daysInLastRow < 7) {
     for (let i = 1; i <= daysInLastRow; i++) {
@@ -109,7 +87,7 @@ export const generateMonthDates = (year: number, month: number) => {
   return dates;
 };
 
-export const generateWeekDates = (date: Date) => {
+export const getWeekDates = (date: Date) => {
   const firstDateOfWeek = startOfWeek(date);
   const dates = [];
   for (let i = 0; i < 7; i++) {
@@ -118,90 +96,110 @@ export const generateWeekDates = (date: Date) => {
   return dates;
 };
 
-// ================================================================
-// Deal with logic of displaying events
-// ================================================================
+export const getCellStartTime = (
+  date: Date[],
+  weekdayIndex: number,
+  timeIndex: number,
+  minute: number,
+) => {
+  const startTime = new Date(
+    date[weekdayIndex].getFullYear(),
+    date[weekdayIndex].getMonth(),
+    date[weekdayIndex].getDate(),
+    timeIndex,
+    minute,
+  );
+  return startTime;
+};
 
-// 將所有事件按照當月日期分好（開始日或日期區間落在當格日期，就會成為當格事件）
+const filterEventsForDay = (events: Event[], date: Date): Event[] => {
+  return events.filter((event) => {
+    const startDate = event.startAt || new Date();
+    const endDate = event.endAt || new Date();
+    return (
+      isWithinInterval(date, {
+        start: startOfDay(startDate),
+        end: endOfDay(endDate),
+      }) && !event.isMemo
+    );
+  });
+};
+
+const sortEventsByStartDateAndDuration = (events: Event[]): Event[] => {
+  return events.sort((a, b) => {
+    if (!a.startAt || !b.startAt) {
+      return !a.startAt ? 1 : -1;
+    }
+
+    const startComparison = a.startAt.getTime() - b.startAt.getTime();
+    if (startComparison !== 0) {
+      return startComparison;
+    }
+
+    if (!a.endAt || !b.endAt) {
+      return !a.endAt ? 1 : -1;
+    }
+
+    const durationA = a.endAt.getTime() - a.startAt.getTime();
+    const durationB = b.endAt.getTime() - b.startAt.getTime();
+    return durationB - durationA;
+  });
+};
+
+const mapEventsForDay = (
+  eventsOfTheDay: Event[],
+  dayIndex: number,
+  mappedEvents: Event[][],
+  eventIndices: Map<string, number>,
+) => {
+  eventsOfTheDay.forEach((event) => {
+    if (!event.eventId) return;
+
+    if (eventIndices.has(event.eventId.toString())) {
+      const eventIndex = eventIndices.get(event.eventId.toString());
+
+      if (eventIndex && !mappedEvents[dayIndex][eventIndex]) {
+        mappedEvents[dayIndex][eventIndex] = event;
+      } else {
+        mappedEvents[dayIndex].push(event);
+        eventIndices.set(
+          event.eventId.toString(),
+          mappedEvents[dayIndex].length - 1,
+        );
+      }
+    } else {
+      const emptyIndex = mappedEvents[dayIndex].findIndex((e) => !e);
+      if (emptyIndex !== -1) {
+        mappedEvents[dayIndex][emptyIndex] = event;
+      } else {
+        mappedEvents[dayIndex].push(event);
+      }
+      eventIndices.set(
+        event.eventId.toString(),
+        emptyIndex >= 0 ? emptyIndex : mappedEvents[dayIndex].length - 1,
+      );
+    }
+  });
+};
+
 const mapEventsToMonthDates = (monthDates: Date[], events: Event[]) => {
   const mappedEvents: Event[][] = monthDates.map(() => []);
   const eventIndices = new Map();
 
   monthDates.forEach((date, index) => {
-    const eventsOfTheDay = events.filter((event) => {
-      const startDate = event.startAt || new Date();
-      const endDate = event.endAt || new Date();
-      const isInInterval = isWithinInterval(date, {
-        start: startOfDay(startDate),
-        end: endOfDay(endDate),
-      });
-      return isInInterval && !event.isMemo;
-    });
-
-    // 先按照開始日期排序，再按照持續時間排
-    eventsOfTheDay.sort((a, b) => {
-      if (!a.startAt || !b.startAt) {
-        return !a.startAt ? 1 : -1;
-      }
-
-      const startComparison = a.startAt.getTime() - b.startAt.getTime();
-      if (startComparison !== 0) {
-        return startComparison;
-      }
-
-      if (!a.endAt || !b.endAt) {
-        return !a.endAt ? 1 : -1;
-      }
-
-      const durationA = a.endAt.getTime() - a.startAt.getTime();
-      const durationB = b.endAt.getTime() - b.startAt.getTime();
-      return durationB - durationA;
-    });
-
-    mappedEvents[index] = mappedEvents[index] || [];
-
-    eventsOfTheDay.forEach((event) => {
-      if (!event.eventId) return;
-
-      if (eventIndices.has(event.eventId)) {
-        // If the event already appeared, use the same index
-        const eventIndex = eventIndices.get(event.eventId);
-
-        if (!mappedEvents[index][eventIndex]) {
-          mappedEvents[index][eventIndex] = event;
-        } else {
-          // 若該位置已被佔用，加到 array 尾
-          mappedEvents[index].push(event);
-          eventIndices.set(event.eventId, mappedEvents[index].length - 1);
-        }
-      } else {
-        const emptyIndex = mappedEvents[index].findIndex((e) => !e);
-        if (emptyIndex !== -1) {
-          mappedEvents[index][emptyIndex] = event;
-        } else {
-          mappedEvents[index].push(event);
-        }
-        eventIndices.set(
-          event.eventId,
-          emptyIndex >= 0 ? emptyIndex : mappedEvents[index].length - 1,
-        );
-      }
-    });
+    const eventsOfTheDay = filterEventsForDay(events, date);
+    const sortedEvents = sortEventsByStartDateAndDuration(eventsOfTheDay);
+    mapEventsForDay(sortedEvents, index, mappedEvents, eventIndices);
   });
 
   return mappedEvents;
 };
 
-// 輸出整理過後的事件
 export const getSplitEvents = (monthDates: Date[], allEvents: Event[]) => {
   const mappedEvents = mapEventsToMonthDates(monthDates, allEvents);
-  const splitEvents = splitEventsIntoWeeks(mappedEvents);
+  const splitEvents = splitIntoChunks(mappedEvents, 7);
   return splitEvents;
 };
-
-// ================================================================
-// Render monthly events
-// ================================================================
 
 export const renderMonthlyEvents = (
   event: any,
@@ -217,74 +215,61 @@ export const renderMonthlyEvents = (
   const normalBackground = themeColors[Number(event.tag)].darkBackground;
   const lightBackground = themeColors[Number(event.tag)].lightBackground;
 
-  const handleClick = (e: React.MouseEvent, event: Event) => {
+  const isEventStartDay = isSameDay(startDate, cellDate);
+  const isStartOfWeek = getDay(cellDate) === 0;
+
+  const backgroundColor = event.isAllDay
+    ? normalBackground
+    : isSameDay(startDate, endDate)
+      ? lightBackground
+      : normalBackground;
+
+  const getGridColumnEnd = () => {
+    if (isEventStartDay) {
+      return getDay(startDate) + lastDays > 7
+        ? 8
+        : getDay(startDate) + 1 + lastDays;
+    }
+
+    const lastDaysThisWeek =
+      lastDays - differenceInCalendarDays(cellDate, startDate);
+    return lastDaysThisWeek <= 7 ? lastDaysThisWeek + 1 : 8;
+  };
+
+  const handleOpenEditModal = (e: React.MouseEvent, event: Event) => {
     e.stopPropagation();
     setIsEditModalOpen(true, event);
   };
 
-  // 若事件起始日 = 該格日期，在該格顯示事件標題
-  // 起始＆結束為同一天，根據 isAllDay 決定背景透明度
-  // 起始＆結束為不同天，根據 事件日期長度 決定要佔的格子數
-  // 若 事件日期長度 超過當週可佔據的格子數，則需要斷行
-  if (isSameDay(startDate, cellDate)) {
+  if (isEventStartDay || isStartOfWeek) {
     return (
       <MonthlyEvent
         key={event.eventId}
         event={event}
-        backgroundColor={
-          event.isAllDay
-            ? normalBackground
-            : isSameDay(startDate, endDate)
-              ? lightBackground
-              : normalBackground
-        }
-        onClick={(e) => handleClick(e, event)}
-        gridColumnStart={getDay(startDate) + 1}
-        gridColumnEnd={
-          getDay(startDate) + lastDays > 7
-            ? 8
-            : getDay(startDate) + 1 + lastDays
-        }
+        backgroundColor={backgroundColor}
+        onClick={(e) => handleOpenEditModal(e, event)}
+        gridColumnStart={isEventStartDay ? getDay(startDate) + 1 : 1}
+        gridColumnEnd={getGridColumnEnd()}
         gridRowStart={eventIndex + 1}
         isAllDay={event.isAllDay}
         formattedTime={event.isAllDay ? undefined : format(startDate, 'HH:mm')}
       />
     );
   }
-
-  // 若為當週第一天，且事件起始日 != 該格日期，需判斷該格是否有需要接續的事件
-  if (getDay(cellDate) === 0) {
-    const lastDaysThisWeek =
-      lastDays - differenceInCalendarDays(cellDate, startDate);
-    return (
-      <MonthlyEvent
-        key={event.eventId}
-        event={event}
-        backgroundColor={normalBackground}
-        onClick={(e) => handleClick(e, event)}
-        gridColumnStart={1}
-        gridColumnEnd={lastDaysThisWeek <= 7 ? lastDaysThisWeek + 1 : 8}
-        gridRowStart={eventIndex + 1}
-      />
-    );
-  }
 };
 
-// ================================================================
-// Render weekly events
-// ================================================================
-
+const commonCellStyle =
+  'truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5';
 const eventCellStyles = [
-  'col-start-1 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
-  'col-start-2 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
-  'col-start-3 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
-  'col-start-4 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
-  'col-start-5 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
-  'col-start-6 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
-  'col-start-7 truncate max-h-[20px] hover:cursor-pointer text-white indent-1.5',
+  'col-start-1',
+  'col-start-2',
+  'col-start-3',
+  'col-start-4',
+  'col-start-5',
+  'col-start-6',
+  'col-start-7',
 ];
 
-// 傳入的事件已經篩選過，皆為 all-day 事件
 export const renderWeeklyAllDayEvent = (
   weekDates: Date[],
   index: number,
@@ -292,11 +277,6 @@ export const renderWeeklyAllDayEvent = (
   setIsMoreModalOpen: (isOpen: boolean, events: (Event | null)[]) => void,
   setIsEditModalOpen: (isOpen: boolean, event: Event) => void,
 ) => {
-  const handleClick = (event: React.MouseEvent, e: Event) => {
-    event.stopPropagation();
-    setIsEditModalOpen(true, e);
-  };
-
   return events.map((event, eventIndex) => {
     if (!event || event.isMemo || eventIndex > 2) return;
     if (eventIndex === 2) {
@@ -318,45 +298,31 @@ export const renderWeeklyAllDayEvent = (
     const startDate = event.startAt || new Date();
     const endDate = event.endAt || new Date();
     const lastDays = differenceInCalendarDays(endDate, startDate) + 1;
+    const lastDayThisWeek =
+      lastDays - differenceInCalendarDays(weekDates[index], startDate);
     const normalBackground = themeColors[Number(event.tag)].darkBackground;
 
-    // 事件起始日 = 該格日期
-    // 起始日與結束日不同天，代表是多日事件
-    // 事件長度超過當週可 render 長度，僅能 render 到當週最後一天
-    // 事件長度若沒有超過當週可 render 長度，就 render 事件實際持續天數
-    if (isSameDay(startDate, weekDates[index])) {
-      return (
-        <WeeklyEvent
-          key={event.eventId}
-          event={event}
-          backgroundColor={normalBackground}
-          eventCellStyle={eventCellStyles[index]}
-          onClick={(e) => handleClick(e, event)}
-          gridColumnStart={getDay(startDate) + 1}
-          gridColumnEnd={
-            getDay(startDate) + lastDays > 7
-              ? 8
-              : getDay(startDate) + 1 + lastDays
-          }
-          gridRowStart={eventIndex + 1}
-          isAllDay
-        />
-      );
-    }
+    const isEventStartDay = isSameDay(startDate, weekDates[index]);
+    const isStartOfWeek = getDay(weekDates[index]) === 0;
 
-    // 若為當週第一天，且事件起始日 != 該格日期，需判斷該格是否有需要接續的事件
-    if (getDay(weekDates[index]) === 0) {
-      const lastDayThisWeek =
-        lastDays - differenceInCalendarDays(weekDates[index], startDate);
+    const gridColumnEnd = isEventStartDay
+      ? getDay(startDate) + lastDays > 7
+        ? 8
+        : getDay(startDate) + 1 + lastDays
+      : lastDayThisWeek > 7
+        ? 8
+        : lastDayThisWeek + 1;
+
+    if (isEventStartDay || isStartOfWeek) {
       return (
         <WeeklyEvent
           key={event.eventId}
           event={event}
           backgroundColor={normalBackground}
-          eventCellStyle={eventCellStyles[index]}
-          onClick={(e) => handleClick(e, event)}
-          gridColumnStart={1}
-          gridColumnEnd={lastDayThisWeek <= 7 ? lastDayThisWeek + 1 : 8}
+          eventCellStyle={clsx(eventCellStyles[index], commonCellStyle)}
+          onClick={() => setIsEditModalOpen(true, event)}
+          gridColumnStart={isEventStartDay ? getDay(startDate) + 1 : 1}
+          gridColumnEnd={gridColumnEnd}
           gridRowStart={eventIndex + 1}
           isAllDay
         />
@@ -365,8 +331,6 @@ export const renderWeeklyAllDayEvent = (
   });
 };
 
-// ----------------------------------------------------------------
-// 傳入的事件已經篩選過，皆為 one-day 事件
 const calculateGridRows = (
   startDate: Date,
   endDate: Date,
@@ -408,11 +372,6 @@ export const renderWeeklyOneDayEvent = (
   )
     return;
 
-  const handleClick = (event: React.MouseEvent, e: Event) => {
-    event.stopPropagation();
-    setIsEditModalOpen(true, e);
-  };
-
   const { lightBackground, border } = themeColors[Number(event.tag)];
   const { start, end } = calculateGridRows(
     event.startAt || new Date(),
@@ -426,7 +385,7 @@ export const renderWeeklyOneDayEvent = (
       event={event}
       backgroundColor={lightBackground}
       eventCellStyle={border}
-      onClick={(e) => handleClick(e, event)}
+      onClick={() => setIsEditModalOpen(true, event)}
       gridRowStart={start}
       gridRowEnd={end}
     />
