@@ -8,7 +8,7 @@ export interface EventMessages {
 }
 
 export interface Event {
-  eventId: number;
+  eventId: string;
   title: string;
   startAt: Date | null;
   endAt: Date | null;
@@ -22,7 +22,7 @@ export interface Event {
 }
 
 export const initialEvent = {
-  eventId: 0,
+  eventId: "0",
   title: '',
   startAt: new Date(),
   endAt: addMinutes(new Date(), 15),
@@ -37,7 +37,7 @@ export const initialEvent = {
 
 export interface CreateEvent {
   tag: string;
-  eventId: number;
+  eventId: string;
   title: string;
   startAt: Date;
   endAt: Date;

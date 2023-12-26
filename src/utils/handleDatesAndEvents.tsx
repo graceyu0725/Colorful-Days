@@ -97,18 +97,19 @@ export const getWeekDates = (date: Date) => {
 };
 
 export const getCellStartTime = (
-  date: Date[],
+  weekDates: Date[],
   weekdayIndex: number,
   timeIndex: number,
   minute: number,
 ) => {
   const startTime = new Date(
-    date[weekdayIndex].getFullYear(),
-    date[weekdayIndex].getMonth(),
-    date[weekdayIndex].getDate(),
+    weekDates[weekdayIndex].getFullYear(),
+    weekDates[weekdayIndex].getMonth(),
+    weekDates[weekdayIndex].getDate(),
     timeIndex,
     minute,
   );
+
   return startTime;
 };
 
