@@ -65,6 +65,11 @@ const UserCalendars: React.FC<Props> = ({
     setIsLoading(true);
 
     if (currentUser.userId === calendarDetail.members[0]) {
+      if (currentUser.calendars.length < 2) {
+        toast.error('You are not allowed to delete the only calendar!');
+        return;
+      }
+
       await deleteCalendar(calendarDetail);
       updateCurrentUser(
         currentUser.userId,

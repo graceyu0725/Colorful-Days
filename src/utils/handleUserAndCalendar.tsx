@@ -250,11 +250,6 @@ export const createNewCalendar = async (
 
 // 根據 calendarId & memberIds 刪除 calendar
 export const deleteCalendar = async (calendarDetail: CalendarContent) => {
-  if (calendarDetail.members.length === 1) {
-    toast.error('You are not allowed to delete the only calendar!');
-    return;
-  }
-
   if (calendarDetail.members.length > 1) {
     toast.error(
       "There's still other members in the calendar, you can not delete it!",
