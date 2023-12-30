@@ -35,7 +35,7 @@ export const addEventToCalendar = async (
   await setDoc(eventDocRef, { placeholder: true });
 };
 
-export const addCalendar = async (
+const addCalendar = async (
   userId: string,
   calendarName: string,
   selectedThemeColor: string,
@@ -231,9 +231,6 @@ export const createNewCalendar = async (
   userId: string,
   calendarName: string,
   calendarThemeColor: string,
-  setCurrentCalendarId: (currentCalendarId: string) => void,
-  setCurrentCalendarContent: (currentCalendarContent: CalendarContent) => void,
-  resetAllEvents: () => void,
 ) => {
   if (!userEmail || !userId || !calendarName || !calendarThemeColor) {
     toast.error(
@@ -249,17 +246,22 @@ export const createNewCalendar = async (
   await updateDoc(userRef, {
     calendars: arrayUnion(calendarDocRef.id),
   });
-  resetAllEvents();
-
-  updateCalendarContent(
-    calendarDocRef.id,
-    setCurrentCalendarId,
-    setCurrentCalendarContent,
-  );
 };
 
 // 根據 calendarId & memberIds 刪除 calendar
 export const deleteCalendar = async (calendarDetail: CalendarContent) => {
+  if (calendarDetail.members.length === 1) {
+    toast.error('You are not allowed to delete the only calendar!');
+    return;
+  }
+
+  if (calendarDetail.members.length > 1) {
+    toast.error(
+      "There's still other members in the calendar, you can not delete it!",
+    );
+    return;
+  }
+
   try {
     const eventsCollectionRef = collection(
       db,
@@ -293,8 +295,12 @@ export const deleteCalendar = async (calendarDetail: CalendarContent) => {
         }
       });
     }
+    toast.success('Calendar deleted successfully');
   } catch (error) {
     console.error('Error getting documents: ', error);
+    toast.error(
+      'There is an error when deleting calendar. Please try it again!',
+    );
   }
 };
 
@@ -317,15 +323,27 @@ export const getAllMemberDetail = async (memberIds: string[]) => {
   return userCalendarsDetail as User[];
 };
 
+export type SearchState = {
+  status: 'initial' | 'found' | 'notFound';
+  data: User | null;
+};
+
 // 根據輸入的 email 搜尋該會員資料
-export const getMemberSearchResults = async (memberEmail: string) => {
+export const getMemberSearchResults = async (
+  memberEmail?: string,
+): Promise<SearchState> => {
+  if (!memberEmail) {
+    return { status: 'initial', data: null };
+  }
+
   const usersCollection = collection(db, 'Users');
   const docRef = doc(usersCollection, memberEmail);
   const docSnap = await getDoc(docRef);
+
   if (docSnap.exists()) {
-    return docSnap.data() as User;
+    return { status: 'found', data: docSnap.data() as User };
   } else {
-    return 'nonexistent';
+    return { status: 'notFound', data: null };
   }
 };
 
@@ -386,7 +404,9 @@ export const addNewMemo = async (
   tag: string,
   memoTitle: string,
   currentCalendarId: string,
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
+  setIsLoading(true);
   const currentTime = serverTimestamp();
   const eventsCollection = collection(
     db,
@@ -413,23 +433,5 @@ export const addNewMemo = async (
   };
 
   await setDoc(newEventRef, data);
-};
-
-// For ViewEventModal - comments
-export const addNewComment = async (
-  calendarId: string,
-  eventId: string,
-  userInfo: User,
-  comment: string,
-) => {
-  if (!comment) return;
-  const eventDoc = doc(db, 'Calendars', calendarId, 'events', eventId);
-  const newComment = {
-    arthur: userInfo,
-    content: comment,
-    createdAt: new Date(),
-  };
-  await updateDoc(eventDoc, {
-    messages: arrayUnion(newComment),
-  });
+  setIsLoading(false);
 };

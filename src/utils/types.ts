@@ -8,7 +8,7 @@ export interface EventMessages {
 }
 
 export interface Event {
-  eventId: number;
+  eventId: string;
   title: string;
   startAt: Date | null;
   endAt: Date | null;
@@ -22,7 +22,7 @@ export interface Event {
 }
 
 export const initialEvent = {
-  eventId: 0,
+  eventId: "0",
   title: '',
   startAt: new Date(),
   endAt: addMinutes(new Date(), 15),
@@ -34,6 +34,20 @@ export const initialEvent = {
   updatedAt: null,
   messages: [],
 };
+
+export interface CreateEvent {
+  tag: string;
+  eventId: string;
+  title: string;
+  startAt: Date;
+  endAt: Date;
+  isAllDay: boolean;
+  isMemo: boolean;
+  note: string;
+  createdAt: null;
+  updatedAt: null;
+  messages: never[];
+}
 
 export interface User {
   userId: string;
@@ -51,11 +65,28 @@ export const initialUser = {
   calendars: [''],
 };
 
-// interface CalendarMember {
-//   email: string;
-//   name: string;
-//   id: string;
-// }
+export interface UserSignUp {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export interface UserSignIn {
+  email: string;
+  password: string;
+}
+
+export interface GoogleUserInfo {
+  uid: string;
+  name: string | null;
+  email: string | null;
+  photoURL: string | null;
+}
+
+export interface CalendarInfo {
+  name: string;
+  themeColor: string;
+}
 
 export interface CalendarTag {
   colorCode: string;
@@ -114,29 +145,17 @@ export const initialCalendarContent = {
       name: '',
     },
   ],
-  themeColor: '',
+  themeColor: '0',
   calendarId: '',
 };
 
-export interface UserSignUp {
-  name: string;
-  email: string;
-  password: string;
-}
-
-export interface UserSignIn {
-  email: string;
-  password: string;
-}
-
-export interface CalendarInfo {
-  name: string;
-  themeColor: string;
-}
-
-export interface GoogleUserInfo {
-  uid: string;
-  name: string | null;
-  email: string | null;
-  photoURL: string | null;
+export interface themeColor {
+  lightBackground: string;
+  background: string;
+  darkBackground: string;
+  lightBorder: string;
+  border: string;
+  text: string;
+  hover: string;
+  outline: string;
 }

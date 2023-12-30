@@ -4,90 +4,64 @@ import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../../store/authStore';
-import { useEventsStore } from '../../store/eventsStore';
 import { useModalStore } from '../../store/modalStore';
 import { createNewCalendar } from '../../utils/handleUserAndCalendar';
 import { themeColors } from '../../utils/theme';
-import { CalendarInfo } from '../../utils/types';
 
 export default function AddCalendar() {
-  const { currentUser, setCurrentCalendarId, setCurrentCalendarContent } =
-    useAuthStore();
-  const { resetAllEvents } = useEventsStore();
+  const { currentUser } = useAuthStore();
   const { isAddCalendarModalOpen, setIsAddCalendarModalOpen } = useModalStore();
-  const [calendarInfo, setCalendarInfo] = useState<CalendarInfo>({
-    name: ``,
-    themeColor: '',
-  });
+
+  const MAX_NAME_LENGTH = 30;
+  const getInitialUserSelection = () => {
+    return {
+      calendarName: '',
+      calendarThemeColor: '',
+      borderColor: 'border-slate-200',
+      backgroundColor: 'bg-slate-200',
+      buttonIndex: 99,
+    };
+  };
+  const [userSelection, setUserSelection] = useState(getInitialUserSelection());
   const [isComposing, setIsComposing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleCompositionStart = () => {
-    setIsComposing(true);
-  };
-
-  const handleCompositionEnd = () => {
-    setIsComposing(false);
-  };
-
-  const [isNameValid, setIsNameValid] = useState(true);
-  const updateCalendarInfo = (
-    event:
-      | React.ChangeEvent<HTMLInputElement>
-      | React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    let name: string = '';
-    let value: string = '';
-
-    if (event.target instanceof HTMLInputElement) {
-      name = event.target.name;
-      value = event.target.value;
-    } else if (event.target instanceof HTMLButtonElement) {
-      name = event.currentTarget.name;
-      value = event.currentTarget.value;
-    }
-
-    if (name === 'name' && value.length > 30) {
-      setIsNameValid(false);
-      return;
-    }
-    if (name === 'name' && value.length <= 30) {
-      setIsNameValid(true);
-    }
-
-    setCalendarInfo((prevData) => ({
-      ...prevData,
-      [name]: value,
+  const updateCalendarName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.length > MAX_NAME_LENGTH) return;
+    setUserSelection((prev) => ({
+      ...prev,
+      calendarName: e.target.value,
     }));
   };
 
-  const [borderColor, setBorderColor] = useState('border-slate-200');
-  const [backgroundColor, setBackgroundColor] = useState('bg-slate-200');
-  const [isSelected, setIsSelected] = useState(Array(8).fill(false));
-  const [isLoading, setIsLoading] = useState(false);
-
-  const resetInfo = () => {
-    setCalendarInfo({
-      name: '',
-      themeColor: '',
-    });
-    setBorderColor('border-slate-200');
-    setBackgroundColor('bg-slate-200');
-    setIsSelected(Array(8).fill(false));
+  const changeSelectedTheme = (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    index: number,
+  ) => {
+    const target = e.target as HTMLButtonElement;
+    setUserSelection((prev) => ({
+      ...prev,
+      calendarThemeColor: target.value,
+      borderColor: themeColors[index].border,
+      backgroundColor: themeColors[index].background,
+      buttonIndex: index,
+    }));
   };
 
-  const handleSubmit = async () => {
+  const handleAddNewCalendar = async () => {
     setIsLoading(true);
 
-    if (
-      calendarInfo.name.replace(/\s+/g, '').length === 0 ||
-      !calendarInfo.name
-    ) {
+    const isNameInvalid =
+      !userSelection.calendarName ||
+      userSelection.calendarName.replace(/\s+/g, '').length === 0;
+
+    if (isNameInvalid) {
       toast.error('Calendar name can not be empty!');
       setIsLoading(false);
       return;
     }
 
-    if (!calendarInfo.themeColor) {
+    if (!userSelection.calendarThemeColor) {
       toast.error('Please select a theme color!');
       setIsLoading(false);
       return;
@@ -96,110 +70,87 @@ export default function AddCalendar() {
     await createNewCalendar(
       currentUser.email,
       currentUser.userId,
-      calendarInfo.name.trim(),
-      calendarInfo.themeColor,
-      setCurrentCalendarId,
-      setCurrentCalendarContent,
-      resetAllEvents,
+      userSelection.calendarName.trim(),
+      userSelection.calendarThemeColor,
     );
-    setIsAddCalendarModalOpen(false);
-    resetInfo();
-    setIsLoading(false);
 
+    setIsAddCalendarModalOpen(false);
+    setUserSelection(getInitialUserSelection());
     toast.success('Calendar added successfully');
+    setIsLoading(false);
   };
 
   return (
-    <>
-      <Modal
-        isOpen={isAddCalendarModalOpen}
-        onOpenChange={(isOpen) => {
-          setIsAddCalendarModalOpen(isOpen);
-          if (!isOpen) {
-            resetInfo();
-          }
-        }}
-        size='4xl'
+    <Modal
+      isOpen={isAddCalendarModalOpen}
+      onOpenChange={(isOpen) => {
+        setIsAddCalendarModalOpen(isOpen);
+        if (!isOpen) {
+          setUserSelection(getInitialUserSelection());
+        }
+      }}
+      size='4xl'
+    >
+      <ModalContent
+        className={clsx(
+          'max-h-[calc(100vh_-_120px)] flex flex-col justify-center items-center p-8 overflow-y-auto gap-6 border-[30px] transition-colors',
+          userSelection.borderColor,
+        )}
       >
-        <ModalContent
-          className={clsx(
-            'max-h-[calc(100vh_-_120px)] flex flex-col justify-center items-center p-8 overflow-y-auto gap-6 border-[30px] transition-colors',
-            borderColor,
-          )}
-        >
-          <div className='h-2/3 flex flex-col items-center gap-5 min-h-fit w-full'>
-            <div className='text-2xl font-bold'>Name Your Calendar</div>
-            <input
-              name='name'
-              className={clsx(
-                'border-2 w-80 sm:w-96 h-16 leading-[64px] rounded-lg px-5 text-lg focus:outline-none',
-                borderColor,
-              )}
-              value={calendarInfo.name}
-              onChange={updateCalendarInfo}
-              onKeyDown={(e) => {
-                if (
-                  e.key === 'Enter' &&
-                  !isComposing &&
-                  calendarInfo.name &&
-                  calendarInfo.themeColor
-                ) {
-                  handleSubmit();
-                }
-              }}
-              onCompositionStart={handleCompositionStart}
-              onCompositionEnd={handleCompositionEnd}
-            />
-            {!isNameValid && (
-              <div className='text-sm text-red-500 -mt-3 -mb-7'>
-                Maximum length of calendar name is 30 characters.
-              </div>
+        <div className='h-2/3 flex flex-col items-center gap-5 min-h-fit w-full'>
+          <div className='text-2xl font-bold'>Name Your Calendar</div>
+          <input
+            className={clsx(
+              'border-2 w-80 sm:w-96 h-16 leading-[64px] rounded-lg px-5 text-lg focus:outline-none',
+              userSelection.borderColor,
             )}
-          </div>
-          <div className='flex flex-col items-center gap-5 h-1/3 w-full'>
-            <div className='text-2xl font-bold'>Choose a Theme Color</div>
-            <div className='flex justify-center gap-2.5 md:gap-4 h-full w-full'>
-              {themeColors.map((color, index) => (
-                <button
-                  key={index}
-                  className={clsx(
-                    '-skew-x-6 md:-skew-x-12 bg-slate-200 w-8 sm:w-12 h-full min-h-[140px] max-h-[192px] rounded',
-                    color.background,
-                    {
-                      ['outline outline-3 outline-offset-2 outline-slate-300']:
-                        isSelected[index],
-                    },
-                  )}
-                  name='themeColor'
-                  value={index}
-                  onClick={(e) => {
-                    setIsSelected((prevState) =>
-                      prevState.map((_, idx) => (idx === index ? true : false)),
-                    );
-                    updateCalendarInfo(e);
-                    setBorderColor(themeColors[index].border);
-                    setBackgroundColor(themeColors[index].background);
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+            value={userSelection.calendarName}
+            onChange={(e) => updateCalendarName(e)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !isComposing) {
+                handleAddNewCalendar();
+              }
+            }}
+            onCompositionStart={() => setIsComposing(true)}
+            onCompositionEnd={() => setIsComposing(false)}
+          />
+        </div>
 
-          <div>
-            <Button
-              isLoading={isLoading}
-              color='default'
-              className={clsx(
-                'w-32 text-slate-700 text-base transition-colors',
-                backgroundColor,
-              )}
-              onClick={handleSubmit}
-            >
-              Submit
-            </Button>
+        <div className='flex flex-col items-center gap-5 h-1/3 w-full'>
+          <div className='text-2xl font-bold'>Choose a Theme Color</div>
+          <div className='flex justify-center gap-2.5 md:gap-4 h-full w-full'>
+            {themeColors.map((color, index) => (
+              <button
+                key={index}
+                className={clsx(
+                  '-skew-x-6 md:-skew-x-12 bg-slate-200 w-8 sm:w-12 h-full min-h-[140px] max-h-[192px] rounded',
+                  color.background,
+                  {
+                    ['outline outline-3 outline-offset-2 outline-slate-300']:
+                      index === userSelection.buttonIndex,
+                  },
+                )}
+                value={index}
+                onClick={(e) => changeSelectedTheme(e, index)}
+              />
+            ))}
           </div>
-        </ModalContent>
-      </Modal>
-    </>
+        </div>
+
+        <div>
+          <Button
+            isLoading={isLoading}
+            color='default'
+            className={clsx(
+              'w-32 text-slate-700 text-base transition-colors',
+              userSelection.backgroundColor,
+            )}
+            onClick={handleAddNewCalendar}
+          >
+            Submit
+          </Button>
+        </div>
+      </ModalContent>
+    </Modal>
   );
 }

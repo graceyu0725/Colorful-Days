@@ -5,18 +5,8 @@ import {
   User,
   initialCalendarContent,
   initialUser,
+  themeColor
 } from '../utils/types';
-
-interface themeColor {
-  lightBackground: string;
-  background: string;
-  darkBackground: string;
-  lightBorder: string;
-  border: string;
-  text: string;
-  hover: string;
-  outline: string;
-}
 
 interface authState {
   isLogin: boolean;

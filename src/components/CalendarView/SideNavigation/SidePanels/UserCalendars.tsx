@@ -20,7 +20,11 @@ import {
   updateCalendarContent,
   updateCurrentUser,
 } from '../../../../utils/handleUserAndCalendar';
-import { CalendarContent } from '../../../../utils/types';
+import {
+  CalendarContent,
+  initialCalendarContent,
+} from '../../../../utils/types';
+import EditCalendar from '../../../CalendarModals/EditCalendar';
 
 type Props = {
   currentCalendarId: string;
@@ -41,45 +45,49 @@ const UserCalendars: React.FC<Props> = ({
   const { setIsAddCalendarModalOpen } = useModalStore();
   const { setCalendarAllEvents } = useEventsStore();
 
-  const [hoveredCalendarId, setHoveredCalendarId] = useState<string | null>(
-    null,
+  const [hoveredCalendar, setHoveredCalendar] = useState<CalendarContent>(
+    initialCalendarContent,
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [isEditCalendarModalOpen, setIsEditCalendarModalOpen] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  const handleEditCalendar = () => {
+    if (currentUser.userId === hoveredCalendar.members[0]) {
+      setIsEditCalendarModalOpen(true);
+      setIsPopoverOpen(false);
+      return;
+    }
+    toast.error('You are not allowed to edit this calendar!');
+  };
 
   const handleDeleteCalendar = async (calendarDetail: CalendarContent) => {
     setIsLoading(true);
-    await deleteCalendar(calendarDetail);
-    // updateCalendarContent(
-    //   previousCalendarId,
-    //   setCurrentCalendarId,
-    //   setCurrentCalendarContent,
-    //   setCalendarAllEvents,
-    // );
-    updateCurrentUser(
-      currentUser.userId,
-      setCurrentUser,
-      setCurrentCalendarId,
-      setCurrentCalendarContent,
-    );
-    setIsLoading(false);
 
-    toast.success('Calendar removed successfully');
+    if (currentUser.userId === calendarDetail.members[0]) {
+      await deleteCalendar(calendarDetail);
+      updateCurrentUser(
+        currentUser.userId,
+        setCurrentUser,
+        setCurrentCalendarId,
+        setCurrentCalendarContent,
+      );
+      setIsLoading(false);
+      return;
+    }
+
+    toast.error('You are not allowed to delete this calendar!');
+    setIsLoading(false);
+    setIsPopoverOpen(false);
   };
 
-  return (
-    <div className='py-4 px-3 flex flex-col gap-3 overflow-y-auto'>
-      <div
-        className={clsx(
-          'mb-2 shadow-md flex items-center justify-center gap-2 h-10 text-lg leading-10 bg-slate-200 rounded-xl outline outline-1 outline-offset-2 text-white transition',
-          currentThemeColor.darkBackground,
-          currentThemeColor.outline,
-        )}
-      >
-        <UilSchedule />
-        My Calendars
-      </div>
+  const renderCalendarList = () => {
+    return calendarDetails.map((calendarDetail, index) => {
+      const shouldShowMenu =
+        hoveredCalendar &&
+        hoveredCalendar.calendarId === calendarDetail.calendarId;
 
-      {calendarDetails.map((calendarDetail, index) => (
+      return (
         <Card
           key={index}
           className={clsx(
@@ -89,8 +97,12 @@ const UserCalendars: React.FC<Props> = ({
                 calendarDetail.calendarId === currentCalendarId,
             },
           )}
-          onMouseEnter={() => setHoveredCalendarId(calendarDetail.calendarId)}
-          onMouseLeave={() => setHoveredCalendarId(null)}
+          onMouseEnter={() => {
+            setHoveredCalendar(calendarDetail);
+          }}
+          onMouseLeave={() => {
+            setIsPopoverOpen(false);
+          }}
         >
           <div
             className='flex items-center justify-between gap-2 w-full h-full p-3'
@@ -116,31 +128,58 @@ const UserCalendars: React.FC<Props> = ({
               </ScrollShadow>
             </div>
 
-            {(hoveredCalendarId === calendarDetail.calendarId ||
-              currentCalendarId === calendarDetail.calendarId) &&
-              calendarDetails.length > 1 && (
-                <Popover placement='bottom'>
-                  <PopoverTrigger className='border-none outline-none'>
-                    <button>
-                      <PhDotsThreeVerticalBold className='w-4 h-4 p-0' />
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent className='p-0 rounded-lg'>
-                    <Button
-                      isLoading={isLoading}
-                      color='danger'
-                      variant='bordered'
-                      className='p-0 border-0'
-                      onClick={() => handleDeleteCalendar(calendarDetail)}
-                    >
-                      delete
-                    </Button>
-                  </PopoverContent>
-                </Popover>
-              )}
+            {shouldShowMenu && (
+              <Popover
+                placement='bottom'
+                isOpen={isPopoverOpen}
+                onOpenChange={() => setIsPopoverOpen((isOpen) => !isOpen)}
+              >
+                <PopoverTrigger className='border-none outline-none'>
+                  <button>
+                    <PhDotsThreeVerticalBold className='w-4 h-4 p-0' />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className='px-0 py-2 rounded-lg flex flex-col'>
+                  <Button
+                    color='default'
+                    variant='bordered'
+                    className='p-0 border-0 h-7 hover:bg-slate-100 rounded'
+                    onClick={handleEditCalendar}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    isLoading={isLoading}
+                    color='danger'
+                    variant='bordered'
+                    className='p-0 border-0 h-7 hover:bg-slate-100 rounded'
+                    onClick={() => handleDeleteCalendar(calendarDetail)}
+                  >
+                    delete
+                  </Button>
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
         </Card>
-      ))}
+      );
+    });
+  };
+
+  return (
+    <div className='py-4 px-3 flex flex-col gap-3 overflow-y-auto'>
+      <div
+        className={clsx(
+          'mb-2 shadow-md flex items-center justify-center gap-2 h-10 text-lg leading-10 bg-slate-200 rounded-xl outline outline-1 outline-offset-2 text-white transition',
+          currentThemeColor.darkBackground,
+          currentThemeColor.outline,
+        )}
+      >
+        <UilSchedule />
+        My Calendars
+      </div>
+
+      {renderCalendarList()}
 
       <Card className='shrink-0 h-12 rounded-xl shadow border hover:cursor-pointer flex-row items-center justify-center gap-2 transform transition hover:scale-105'>
         <div
@@ -149,12 +188,19 @@ const UserCalendars: React.FC<Props> = ({
             setIsAddCalendarModalOpen(true);
           }}
         >
-          <MaterialSymbolsAddBoxOutlineRounded className='w-5 h-5 text-slate-400'></MaterialSymbolsAddBoxOutlineRounded>
+          <MaterialSymbolsAddBoxOutlineRounded className='w-5 h-5 text-slate-400' />
           <div className='text-slate-400'>Add Calendar</div>
         </div>
       </Card>
+
+      <EditCalendar
+        isEditCalendarModalOpen={isEditCalendarModalOpen}
+        setIsEditCalendarModalOpen={setIsEditCalendarModalOpen}
+        hoveredCalendar={hoveredCalendar}
+        setHoveredCalendar={setHoveredCalendar}
+      />
     </div>
   );
 };
 
-export default UserCalendars;
+export { UserCalendars };

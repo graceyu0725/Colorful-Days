@@ -10,7 +10,7 @@ import TopNavigation from './TopNavigation';
 import WeeklyView from './WeeklyView';
 
 function CalendarView() {
-  const { currentUser, currentCalendarId } = useAuthStore();
+  const { currentCalendarId } = useAuthStore();
   const { currentView } = useViewStore();
   const [isSideBarOpen, setIsSideBarOpen] = useState(false);
   const [isSideNavigationOpen, setIsSideNavigationOpen] = useState(true);

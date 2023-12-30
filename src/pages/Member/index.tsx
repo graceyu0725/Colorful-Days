@@ -31,7 +31,7 @@ function Login() {
 
         <div className='relative hidden w-0 flex-1 lg:block lg:grow lg:w-7/12 xl:w-8/12'>
           <img
-            className='absolute h-full w-full object-cover'
+            className='absolute h-full w-full object-cover bg-theme-1-100'
             src={signinImage}
             alt=''
           />

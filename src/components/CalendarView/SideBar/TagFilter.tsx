@@ -1,10 +1,12 @@
 import {
+  Button,
   Card,
   CardBody,
   CardHeader,
   Checkbox,
   CheckboxGroup,
   Divider,
+  Tooltip,
 } from '@nextui-org/react';
 import clsx from 'clsx';
 import MaterialSymbolsRemoveSelection from '~icons/material-symbols/remove-selection';
@@ -32,17 +34,27 @@ const TagFilter: React.FC<Props> = ({ calendarTags }) => {
       >
         <CardHeader className='flex justify-between'>
           <p>Tag Filter</p>
-          <div className='flex gap-2'>
-            <MaterialSymbolsSelectCheckBox
-              className='hover:cursor-pointer'
-              onClick={() =>
-                setSelectedEventTags(['0', '1', '2', '3', '4', '5', '6', '7'])
-              }
-            />
-            <MaterialSymbolsRemoveSelection
-              className='hover:cursor-pointer'
-              onClick={() => setSelectedEventTags([])}
-            />
+          <div className='flex'>
+            <Tooltip showArrow={true} placement='bottom' content='Select all'>
+              <Button
+                variant='bordered'
+                className='p-0 min-w-unit-7 h-6 border-none'
+                onClick={() =>
+                  setSelectedEventTags(['0', '1', '2', '3', '4', '5', '6', '7'])
+                }
+              >
+                <MaterialSymbolsSelectCheckBox className='w-7' />
+              </Button>
+            </Tooltip>
+            <Tooltip showArrow={true} placement='bottom' content='Deselect all'>
+              <Button
+                variant='bordered'
+                className='p-0 min-w-unit-7 h-6 border-none'
+                onClick={() => setSelectedEventTags([])}
+              >
+                <MaterialSymbolsRemoveSelection className='w-7' />
+              </Button>
+            </Tooltip>
           </div>
         </CardHeader>
         <Divider />

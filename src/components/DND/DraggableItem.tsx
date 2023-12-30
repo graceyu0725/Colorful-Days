@@ -1,5 +1,7 @@
 import { useDraggable } from '@dnd-kit/core';
+import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
+import { isSameWeek } from 'date-fns';
 import IcBaselineDragIndicator from '~icons/ic/baseline-drag-indicator';
 import { CalendarViewCategory, useViewStore } from '../../store/viewStore';
 import { themeColors } from '../../utils/theme';
@@ -25,10 +27,16 @@ const DraggableItem: React.FC<Props> = ({
   isOverlay,
 }) => {
   const { currentView } = useViewStore();
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: id,
-    data: event,
-  });
+  const { attributes, listeners, setNodeRef, isDragging, transform } =
+    useDraggable({
+      id: id,
+      data: event,
+    });
+
+  const areDatesSameWeek = isSameWeek(
+    event.endAt || new Date(),
+    event.startAt || new Date(),
+  );
 
   return (
     <>
@@ -70,7 +78,10 @@ const DraggableItem: React.FC<Props> = ({
           )}
           style={{
             ...style,
-            opacity: isDragging ? 0.5 : 1,
+            opacity: isDragging && areDatesSameWeek ? 0.5 : 1,
+            transform: !areDatesSameWeek
+              ? CSS.Translate.toString(transform)
+              : '',
           }}
         >
           <IcBaselineDragIndicator

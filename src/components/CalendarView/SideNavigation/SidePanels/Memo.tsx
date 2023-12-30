@@ -28,43 +28,172 @@ type Props = {
   currentCalendarContent: CalendarContent;
 };
 
+interface MemoContent {
+  tag: string;
+  title: string;
+}
+
+enum CardType {
+  Add = 'Add Memo',
+  List = 'Memo List',
+}
+
 const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
   const { setIsEditModalOpen } = useModalStore();
   const { currentThemeColor } = useAuthStore();
-  const [selectedTag, setSelectedTag] = useState('0');
-  const [memoInput, setMemoInput] = useState('');
+  const [memoContent, setMemoContent] = useState({ tag: '0', title: '' });
   const [isComposing, setIsComposing] = useState(false);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleCompositionStart = () => {
-    setIsComposing(true);
-  };
-
-  const handleCompositionEnd = () => {
-    setIsComposing(false);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMemoInput(e.target.value);
-  };
-
-  const handleAddMemo = async () => {
-    if (memoInput.replace(/\s+/g, '').length === 0) {
+  const handleAddMemo = async (
+    memoContent: MemoContent,
+    isComposing?: boolean,
+    e?: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (isComposing) return;
+    if (e && e.key !== 'Enter') return;
+    if (
+      !memoContent.title ||
+      memoContent.title.replace(/\s+/g, '').length === 0
+    ) {
       toast.error('Memo title can not be empty!');
       return;
     }
 
-    setIsSubmitting(true);
     await addNewMemo(
-      selectedTag,
-      memoInput.trim(),
+      memoContent.tag,
+      memoContent.title.trim(),
       currentCalendarContent.calendarId,
+      setIsSubmitting,
     );
-    setMemoInput('');
-    setSelectedTag('0');
-    setIsSubmitting(false);
+    setMemoContent({ tag: '0', title: '' });
     toast.success('Memo added successfully');
+  };
+
+  const renderCardBody = (type: CardType) => {
+    if (type === CardType.Add) {
+      return (
+        <>
+          <div className='w-full flex items-center mb-2 justify-between'>
+            <Popover
+              placement='bottom-start'
+              isOpen={isPopoverOpen}
+              onOpenChange={(open) => setIsPopoverOpen(open)}
+            >
+              <PopoverTrigger className='hover:cursor-pointer'>
+                <div>
+                  <MdiTag
+                    className={clsx(
+                      'relative mr-px',
+                      themeColors[Number(memoContent.tag)].text,
+                    )}
+                  />
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className='rounded-lg p-4 z-10'>
+                <RadioGroup
+                  size='sm'
+                  value={memoContent.tag}
+                  onValueChange={(e) => {
+                    setMemoContent({ ...memoContent, tag: e });
+                    setIsPopoverOpen(false);
+                  }}
+                  color='default'
+                >
+                  {currentCalendarContent.tags.map((tag, index) => (
+                    <Radio key={index} value={tag.colorCode} className='p-2'>
+                      <div className='flex items-center gap-1 ml-2'>
+                        <div
+                          className={clsx(
+                            'w-3 h-3 rounded-full',
+                            themeColors[Number(tag.colorCode)].darkBackground,
+                          )}
+                        />
+                        <div className='text-base'>{tag.name}</div>
+                      </div>
+                    </Radio>
+                  ))}
+                </RadioGroup>
+              </PopoverContent>
+            </Popover>
+            <input
+              className={clsx(
+                'border rounded-lg px-2 max-w-[150px] text-sm h-9 leading-9 placeholder:h-9',
+                currentThemeColor.outline,
+              )}
+              placeholder='Press Enter to input'
+              value={memoContent.title}
+              onChange={(e) =>
+                setMemoContent({ ...memoContent, title: e.target.value })
+              }
+              onKeyDown={(e) => {
+                handleAddMemo(memoContent, isComposing, e);
+              }}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={() => setIsComposing(false)}
+            />
+          </div>
+          <Button
+            isLoading={isSubmitting}
+            className={clsx(
+              'w-full h-6 rounded-lg',
+              currentThemeColor.lightBackground,
+            )}
+            onClick={() => handleAddMemo(memoContent)}
+          >
+            Submit
+          </Button>
+        </>
+      );
+    }
+
+    if (type === CardType.List) {
+      return memoEvents.length > 0 ? (
+        <div className='flex flex-col gap-2'>
+          {memoEvents.map((event, index) => (
+            <DraggableItem
+              id={event.eventId.toString()}
+              key={index}
+              className={clsx(
+                'relative transition hover:scale-105 flex items-center justify-center gap-2 w-full p-3 h-12 rounded-lg shadow-md hover:cursor-pointer',
+                themeColors[Number(event.tag)].lightBackground,
+              )}
+              onClick={() => setIsEditModalOpen(true, event)}
+              event={event}
+            >
+              {event.title}
+            </DraggableItem>
+          ))}
+        </div>
+      ) : (
+        <div className='flex flex-col items-center justify-center'>
+          <MaterialSymbolsNoteStackAddRounded className='text-2xl mb-1 text-slate-400' />
+          <div className='text-slate-400'>No memos yet.</div>
+          <div className='text-slate-400'>Add one!</div>
+        </div>
+      );
+    }
+  };
+
+  const renderCards = (type: CardType) => {
+    return (
+      <Card
+        className={clsx(
+          'shadow border-2',
+          currentThemeColor.lightBorder,
+          type === CardType.Add ? 'mt-2' : 'mt-4 relative',
+        )}
+      >
+        <CardHeader>
+          {type === CardType.Add
+            ? CardType.Add
+            : `${CardType.List} (${memoEvents.length})`}
+        </CardHeader>
+        <Divider />
+        <CardBody>{renderCardBody(type)}</CardBody>
+      </Card>
+    );
   };
 
   return (
@@ -80,133 +209,11 @@ const Memo: React.FC<Props> = ({ memoEvents, currentCalendarContent }) => {
         Memos
       </div>
       <div className='flex-col items-center justify-center gap-2'>
-        <Card
-          className={clsx(
-            'mt-2 shadow border-2',
-            currentThemeColor.lightBorder,
-          )}
-        >
-          <CardHeader>
-            <div>Add Memo</div>
-          </CardHeader>
-          <Divider />
-          <CardBody>
-            <div className='w-full flex items-center mb-2 justify-between'>
-              <Popover
-                placement='bottom-start'
-                isOpen={isPopoverOpen}
-                onOpenChange={(open) => setIsPopoverOpen(open)}
-              >
-                <PopoverTrigger className='hover:cursor-pointer'>
-                  <div>
-                    <MdiTag
-                      className={clsx(
-                        'relative mr-px',
-                        themeColors[Number(selectedTag)].text,
-                      )}
-                    />
-                  </div>
-                </PopoverTrigger>
-                <PopoverContent className='rounded-lg p-4 z-10'>
-                  <RadioGroup
-                    size='sm'
-                    value={selectedTag}
-                    onValueChange={(e) => {
-                      setSelectedTag(e);
-                      setIsPopoverOpen(false);
-                    }}
-                    color='default'
-                  >
-                    {currentCalendarContent.tags.map((tag, index) => (
-                      <Radio key={index} value={tag.colorCode} className='p-2'>
-                        <div className='flex items-center gap-1 ml-2'>
-                          <div
-                            className={clsx(
-                              'w-3 h-3 rounded-full',
-                              themeColors[Number(tag.colorCode)].darkBackground,
-                            )}
-                          />
-                          <div className='text-base'>{tag.name}</div>
-                        </div>
-                      </Radio>
-                    ))}
-                  </RadioGroup>
-                </PopoverContent>
-              </Popover>
-              <input
-                className={clsx(
-                  'border rounded-lg px-2 max-w-[150px] text-sm h-9 leading-9 placeholder:h-9',
-                  currentThemeColor.outline,
-                )}
-                placeholder='Press Enter to input'
-                value={memoInput}
-                onChange={(e) => handleInputChange(e)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !isComposing && memoInput) {
-                    handleAddMemo();
-                  }
-                }}
-                onCompositionStart={handleCompositionStart}
-                onCompositionEnd={handleCompositionEnd}
-              />
-            </div>
-            <Button
-              isLoading={isSubmitting}
-              className={clsx(
-                'w-full h-6 rounded-lg',
-                currentThemeColor.lightBackground,
-              )}
-              onClick={handleAddMemo}
-              disabled={!memoInput}
-            >
-              Submit
-            </Button>
-          </CardBody>
-        </Card>
-
-        <Card
-          className={clsx(
-            'mt-4 shadow border-2 relative',
-            currentThemeColor.lightBorder,
-          )}
-        >
-          <CardHeader>
-            <div>Memo List ({memoEvents.length})</div>
-          </CardHeader>
-          <Divider />
-          <CardBody>
-            {memoEvents.length > 0 ? (
-              <div className='flex flex-col gap-2'>
-                {memoEvents.map((event, index) => (
-                  <DraggableItem
-                    id={event.eventId.toString()}
-                    key={index}
-                    className={clsx(
-                      'relative transition hover:scale-105 flex items-center justify-center gap-2 w-full p-3 h-12 rounded-lg shadow-md hover:cursor-pointer',
-                      themeColors[Number(event.tag)].lightBackground,
-                    )}
-                    onClick={() => {
-                      setIsEditModalOpen(true, event);
-                    }}
-                    event={event}
-                    style={{}}
-                  >
-                    {event.title}
-                  </DraggableItem>
-                ))}
-              </div>
-            ) : (
-              <div className='flex flex-col items-center justify-center'>
-                <MaterialSymbolsNoteStackAddRounded className='text-2xl mb-1 text-slate-400' />
-                <div className='text-slate-400'>No memos yet.</div>
-                <div className='text-slate-400'>Add one!</div>
-              </div>
-            )}
-          </CardBody>
-        </Card>
+        {renderCards(CardType.Add)}
+        {renderCards(CardType.List)}
       </div>
     </div>
   );
 };
 
-export default Memo;
+export { Memo };

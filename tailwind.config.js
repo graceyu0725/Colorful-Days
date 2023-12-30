@@ -9,6 +9,9 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        xs: '480px',
+      },
       fontFamily: {
         sans: ['openhuninn', 'ui-sans-serif', 'system-ui'],
         custom: ['Alkatra', 'sans-serif'],

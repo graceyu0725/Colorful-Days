@@ -1,13 +1,25 @@
-import { Button, ButtonGroup, Tooltip } from '@nextui-org/react';
+import {
+  Avatar,
+  Button,
+  ButtonGroup,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+} from '@nextui-org/react';
 import clsx from 'clsx';
 import { addDays, addMonths, subDays, subMonths } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import CodiconFilter from '~icons/codicon/filter';
 import LucideAlignJustify from '~icons/lucide/align-justify';
+import MaterialSymbolsExitToAppRounded from '~icons/material-symbols/exit-to-app-rounded';
 import TdesignAdd from '~icons/tdesign/add';
 import { useAuthStore } from '../../store/authStore';
+import { useEventsStore } from '../../store/eventsStore';
 import { useModalStore } from '../../store/modalStore';
 import { CalendarViewCategory, useViewStore } from '../../store/viewStore';
+import { firebase } from '../../utils/firebase';
+import AvatarImage from './SideNavigation/img/avatar.png';
 
 type Props = {
   value?: Date;
@@ -27,7 +39,8 @@ const Navigation: React.FC<Props> = ({
     setCurrentDate,
     formateDate,
   } = useViewStore();
-  const { currentThemeColor } = useAuthStore();
+  const { currentThemeColor, resetUser, currentUser } = useAuthStore();
+  const { resetAllEvents } = useEventsStore();
   const navigate = useNavigate();
 
   const styles = {
@@ -41,7 +54,7 @@ const Navigation: React.FC<Props> = ({
       currentThemeColor.hover,
     ),
     wrapper: 'flex items-center',
-    title: 'font-bold mx-2 text-xl w-44 text-center',
+    title: 'font-bold mx-2 text-lg xs:text-xl w-44 text-center',
     viewButton: clsx(
       'h-8 text-base border-0 bg-white text-slate-700 hover:text-slate-500 hover:cursor-pointer rounded-md',
       currentThemeColor.hover,
@@ -81,19 +94,25 @@ const Navigation: React.FC<Props> = ({
     }
   };
 
+  const handleLogout = () => {
+    firebase.logOut();
+    resetUser();
+    resetAllEvents();
+  };
+
   return (
     <div className={styles.container}>
       <div className='flex items-center'>
         <LucideAlignJustify
-          className='mr-4 text-xl text-slate-700 hover:cursor-pointer'
+          className='hidden md:block mr-4 text-xl text-slate-700 hover:cursor-pointer'
           onClick={() => setIsSideNavigationOpen((prev) => !prev)}
         />
 
         <div className='flex items-center justify-center'>
-          <div className='items-end hidden md:flex'>
+          <div className='items-end hidden xs:flex'>
             <img
               src='/assets/logo.png'
-              className='hover:cursor-pointer w-9 ml-6 mr-2 lg:mr-0'
+              className='hover:cursor-pointer w-9 min-w-[36px] md:ml-6 md:mr-2 lg:mr-0'
               onClick={() => navigate('/calendar')}
             />
             <h1
@@ -164,7 +183,7 @@ const Navigation: React.FC<Props> = ({
         <Tooltip showArrow={true} placement='bottom' content='Create an event'>
           <Button
             variant='bordered'
-            className={styles.addButton}
+            className={clsx('hidden xs:flex', styles.addButton)}
             onClick={() =>
               setIsCreateModalOpen(true, new Date(), new Date(), false)
             }
@@ -176,12 +195,47 @@ const Navigation: React.FC<Props> = ({
         <Tooltip showArrow={true} placement='bottom' content='Filter'>
           <Button
             variant='bordered'
-            className={styles.addButton}
+            className={clsx('hidden lg:flex', styles.addButton)}
             onClick={() => setIsSideBarOpen((prev) => !prev)}
           >
             <CodiconFilter className='text-xl text-slate-700 hover:cursor-pointer' />
           </Button>
         </Tooltip>
+
+        <div className='flex border-none xs:hidden'>
+          <Popover placement='bottom-start'>
+            <PopoverTrigger>
+              <button className='outline-none mt-1 w-full flex justify-center mr-px'>
+                {currentUser.avatar ? (
+                  <Avatar
+                    className={clsx(
+                      'w-9 h-9 p-0 border-2 object-cover object-center',
+                      currentThemeColor.border,
+                    )}
+                    src={currentUser.avatar}
+                  />
+                ) : (
+                  <img
+                    className={clsx(
+                      'w-9 h-9 p-0 border-2 rounded-full object-cover object-center',
+                      currentThemeColor.border,
+                    )}
+                    src={AvatarImage}
+                  />
+                )}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className='p-1 flex flex-col'>
+              <Button
+                startContent={<MaterialSymbolsExitToAppRounded />}
+                className='bg-white hover:bg-slate-100'
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+            </PopoverContent>
+          </Popover>
+        </div>
       </div>
     </div>
   );
