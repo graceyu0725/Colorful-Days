@@ -60,12 +60,12 @@ export const firebase = {
           localStorage.removeItem('uid');
           return;
         }
-        toast.error('The data format is incorrect, please try again!');
+        toast.error('The data format is incorrect, please try it again!');
         console.error(e.message);
         localStorage.removeItem('uid');
         throw new Error(e.message);
       } else {
-        toast.error('An unknown error occurred, please try again!');
+        toast.error('An unknown error occurred, please try it again!');
         console.error('An unknown error occurred');
         localStorage.removeItem('uid');
         throw new Error('An unknown error occurred');
@@ -115,7 +115,7 @@ export const firebase = {
     } catch (error) {
       console.error('Error updating profile picture:', error);
       toast.error(
-        'There is an error when updating profile picture. Please try again!',
+        'There is an error when updating profile picture. Please try it again!',
       );
     }
   },

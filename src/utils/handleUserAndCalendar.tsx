@@ -250,6 +250,18 @@ export const createNewCalendar = async (
 
 // 根據 calendarId & memberIds 刪除 calendar
 export const deleteCalendar = async (calendarDetail: CalendarContent) => {
+  if (calendarDetail.members.length === 1) {
+    toast.error('You are not allowed to delete the only calendar!');
+    return;
+  }
+
+  if (calendarDetail.members.length > 1) {
+    toast.error(
+      "There's still other members in the calendar, you can not delete it!",
+    );
+    return;
+  }
+
   try {
     const eventsCollectionRef = collection(
       db,
@@ -283,8 +295,12 @@ export const deleteCalendar = async (calendarDetail: CalendarContent) => {
         }
       });
     }
+    toast.success('Calendar deleted successfully');
   } catch (error) {
     console.error('Error getting documents: ', error);
+    toast.error(
+      'There is an error when deleting calendar. Please try it again!',
+    );
   }
 };
 

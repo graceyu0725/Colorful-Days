@@ -72,7 +72,6 @@ const UserCalendars: React.FC<Props> = ({
         setCurrentCalendarId,
         setCurrentCalendarContent,
       );
-      toast.success('Calendar removed successfully');
       setIsLoading(false);
       return;
     }
@@ -86,8 +85,7 @@ const UserCalendars: React.FC<Props> = ({
     return calendarDetails.map((calendarDetail, index) => {
       const shouldShowMenu =
         hoveredCalendar &&
-        hoveredCalendar.calendarId === calendarDetail.calendarId &&
-        calendarDetails.length > 1;
+        hoveredCalendar.calendarId === calendarDetail.calendarId;
 
       return (
         <Card

@@ -35,6 +35,10 @@ const Signin: React.FC<Props> = ({ isFlipped, setIsFlipped }) => {
   } = useForm<ValidationSchema>({
     resolver: zodResolver(validationSchema),
     mode: 'onBlur',
+    defaultValues: {
+      email: 'user01@gmail.com',
+      password: 'colorfuldays2023',
+    },
   });
   const navigate = useNavigate();
   const [isButtonLoading, setIsButtonLoading] = useState(false);
