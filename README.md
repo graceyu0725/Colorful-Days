@@ -3,11 +3,11 @@
 ![Logo](./public/assets/ColorfulDaysLogo.png)
 
   <p align="center">
-   <a href="https://github.com/graceyu0725/Colorful-Days#About-Colorful-Days">About</a>
+   <a href="https://github.com/graceyu0725/Colorful-Days?tab=readme-ov-file#about-colorful-days">About</a>
     |
-    <a href="https://github.com/graceyu0725/Colorful-Days#Demo">Demo</a>
+    <a href="https://github.com/graceyu0725/Colorful-Days?tab=readme-ov-file#demo">Demo</a>
     |
-    <a href="https://github.com/graceyu0725/Colorful-Days#Contact">Contact</a>
+    <a href="https://github.com/graceyu0725/Colorful-Days?tab=readme-ov-file#contact">Contact</a>
   </p>
 </div>
 
@@ -55,35 +55,35 @@
 
 <img src="./public/assets/flowChart.png" width="830px" />
 
-
 ## Live Demo
+
 - Website
-    - [Colorful Days](https://colorful-days.web.app)
+  - [Colorful Days](https://colorful-days.web.app)
 - Test account
-    -  Email: user01@gmail.com
-    - Password: colorfuldays2023
+  - Email: user01@gmail.com
+  - Password: colorfuldays2023
 
 ## Demo
 
 1. **Personalization**｜ Name the calendar and select one theme color upon registration
 
-    <img src="./public/assets/demo/selectTheme.gif" width="800px" />
+<img src="./public/assets/demo/selectTheme.gif" width="800px" />
 
 2. **Event Management**｜Add detailed events with options for dates, times, tags, and notes; edit as needed
 
-    <img src="./public/assets/demo/eventManagement.gif" width="800px" />
+<img src="./public/assets/demo/eventManagement.gif" width="800px" />
 
 3. **Flexible Views**｜Switch seamlessly between monthly and weekly views for better planning
 
-    <img src="./public/assets/demo/flexibleViews.gif" width="800px" />
+<img src="./public/assets/demo/flexibleViews.gif" width="800px" />
 
 4. **Notes for Plans**｜Add memos for tentative plans not yet scheduled
 
-    <img src="./public/assets/demo/addMemo.gif" width="800px" />
+<img src="./public/assets/demo/addMemo.gif" width="800px" />
 
 5. **Multiple Calendars**｜Create and manage different calendars for varied aspects of life
 
-    <img src="./public/assets/demo/addCalendar.gif" width="800px" />
+<img src="./public/assets/demo/addCalendar.gif" width="800px" />
 
 6. **Collaboration**｜Share calendars with friends, family, or colleagues and plan together
 
