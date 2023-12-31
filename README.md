@@ -1,6 +1,6 @@
 <div align="center">
 
-![Logo](./public/assets/ColorfulDaysLogo.png)
+<img src="./public/assets/ColorfulDaysLogo.png" width="360px" />
 
   <p align="center">
    <a href="https://github.com/graceyu0725/Colorful-Days?tab=readme-ov-file#about-colorful-days">About</a>
