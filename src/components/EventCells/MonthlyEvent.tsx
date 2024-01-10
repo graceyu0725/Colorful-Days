@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { isSameDay } from 'date-fns';
 import { Event } from '../../utils/types';
-import { DraggableItem } from '../DND';
+import { DraggableItem } from '../Dnd';
 
 type Props = {
   event: Event;

@@ -21,7 +21,7 @@ import { useModalStore } from '../../../../store/modalStore';
 import { addNewMemo } from '../../../../utils/handleUserAndCalendar';
 import { themeColors } from '../../../../utils/theme';
 import { CalendarContent, Event } from '../../../../utils/types';
-import { DraggableItem } from '../../../DND';
+import { DraggableItem } from '../../../Dnd';
 
 type Props = {
   memoEvents: Event[];
