@@ -83,22 +83,10 @@ const InfoModal: React.FC<Props> = ({
         <ModalBody className='pb-6'>
           {selectedCell && (
             <div className='flex flex-col gap-4'>
-              {/* <div
-                className='h-80 rounded-xl border'
-                style={{
-                  backgroundImage: `url(${Info[selectedCell].image})`,
-                  backgroundSize: 'cover',
-                  backgroundRepeat: 'no-repeat',
-                  backgroundPosition: 'center',
-                }}
-              ></div> */}
-              {/* {isLoading && <TwemojiChristmasTree />} */}
               <img
                 src={Info[selectedCell].image}
                 alt={Info[selectedCell].title}
                 className='h-80 rounded-xl border object-cover w-full bg-slate-200'
-                // onLoad={() => setIsLoading(false)}
-                // style={{ display: isLoading ? 'none' : 'block' }}
               />
               <div className=' whitespace-pre-line'>
                 {Info[selectedCell].content}
