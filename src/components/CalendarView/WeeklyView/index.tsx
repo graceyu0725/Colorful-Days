@@ -13,7 +13,7 @@ import {
   getCellStartTime,
   getWeekDates,
 } from '../../../utils/handleDatesAndEvents';
-import { DroppableArea } from '../../DND';
+import { DroppableArea } from '../../Dnd';
 import AllDayEventCells from './AllDayEventCells';
 import OneDayEventCells from './OneDayEventCells';
 

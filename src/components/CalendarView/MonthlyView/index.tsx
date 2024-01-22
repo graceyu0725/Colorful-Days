@@ -8,7 +8,7 @@ import {
   getSplitEvents,
   splitDatesIntoWeeks,
 } from '../../../utils/handleDatesAndEvents';
-import { DroppableArea } from '../../DND';
+import { DroppableArea } from '../../Dnd';
 import Cell from './Cell';
 import EventCells from './EventCells';
 

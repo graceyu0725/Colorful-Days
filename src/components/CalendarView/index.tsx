@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { CalendarViewCategory, useViewStore } from '../../store/viewStore';
-import { ContextProvider } from '../DND';
+import { ContextProvider } from '../Dnd';
 import Loading from './Loading';
 import MonthlyView from './MonthlyView';
 import SideBar from './SideBar';
