@@ -9,13 +9,14 @@ import { firebase } from '../../utils/firebase';
 import { addUserForGoogle } from '../../utils/handleUserAndCalendar';
 import { themeColors } from '../../utils/theme';
 
+const MAX_NAME_LENGTH = 30;
+
 export default function SelectTheme() {
   const { state } = useLocation();
   const navigate = useNavigate();
 
   if (!state) return <Navigate to='/signin' replace />;
 
-  const MAX_NAME_LENGTH = 30;
   const getInitialUserSelection = () => {
     return {
       calendarName: `${state.userInfo.name}'s Calendar`,
