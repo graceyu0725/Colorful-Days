@@ -18,6 +18,8 @@ import AllDayEventCells from './AllDayEventCells';
 import OneDayEventCells from './OneDayEventCells';
 
 const HOURS_PER_DAY = 24;
+const MINUTES_PER_DAY = 1440;
+const MILLISECONDS_PER_MINUTE = 60000;
 const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const commonTimeStyles =
   'text-end row-span-2 col-start-1 relative -top-3 px-4 text-slate-500 text-sm';
@@ -54,17 +56,18 @@ const WeeklyView: React.FC = () => {
     [weekDates],
   );
 
-  const [topPosition, setTopPosition] = useState(1440);
+  const [topPosition, setTopPosition] = useState(MINUTES_PER_DAY);
   useEffect(() => {
     const updatePosition = () => {
       const today = startOfToday();
       const now = new Date();
-      const minutesPassed = (now.getTime() - today.getTime()) / 60000;
+      const minutesPassed =
+        (now.getTime() - today.getTime()) / MILLISECONDS_PER_MINUTE;
       const pixelsPerMinute = 1.6;
       setTopPosition(minutesPassed * pixelsPerMinute);
     };
 
-    const intervalId = setInterval(updatePosition, 60000);
+    const intervalId = setInterval(updatePosition, MILLISECONDS_PER_MINUTE);
     updatePosition();
 
     return () => clearInterval(intervalId);

@@ -38,6 +38,11 @@ enum CardType {
   List = 'Member List',
 }
 
+const initialSearchResult: SearchState = {
+  status: 'initial',
+  data: null,
+};
+
 const Members: React.FC<Props> = ({ memberDetails }) => {
   const {
     currentUser,
@@ -45,13 +50,9 @@ const Members: React.FC<Props> = ({ memberDetails }) => {
     currentCalendarContent,
     currentThemeColor,
   } = useAuthStore();
+
   const [searchInput, setSearchInput] = useState('');
-  const initialSearchResult: SearchState = {
-    status: 'initial',
-    data: null,
-  };
-  const [searchResult, setSearchResult] =
-    useState<SearchState>(initialSearchResult);
+  const [searchResult, setSearchResult] = useState(initialSearchResult);
   const [isLoading, setIsLoading] = useState(false);
   const [isMemberExist, setIsMemberExist] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
@@ -68,6 +69,7 @@ const Members: React.FC<Props> = ({ memberDetails }) => {
     if (!searchInput) return;
     if (isComposing) return;
     if (e && e.key !== 'Enter') return;
+  
     setIsLoading(true);
     const result = await getMemberSearchResults(searchInput);
     setSearchResult(result);
