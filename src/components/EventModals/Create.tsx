@@ -32,7 +32,7 @@ export default function Create() {
       endAt: addMinutes(selectedStartDate, 15),
       isAllDay: selectedIsAllDay,
     }));
-  }, [selectedStartDate, selectedEndDate]);
+  }, [selectedStartDate]);
 
   const handleSubmit = async () => {
     const isTitleInvalid =

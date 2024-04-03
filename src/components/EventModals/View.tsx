@@ -30,6 +30,26 @@ interface Props {
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+const formatTime = (time: Timestamp | null) => {
+  const originTime = time?.toDate() || new Date();
+  const now = new Date();
+
+  const secondsDiff = differenceInSeconds(now, originTime);
+  const minutesDiff = differenceInMinutes(now, originTime);
+  const hoursDiff = differenceInHours(now, originTime);
+  const daysDiff = differenceInDays(now, originTime);
+
+  if (secondsDiff < 30) return 'just now';
+  if (secondsDiff < 120) return '1 min ago';
+  if (minutesDiff < 45) return `${minutesDiff} mins ago`;
+  if (minutesDiff < 120) return '1 hr ago';
+  if (hoursDiff < 24) return `${hoursDiff} hrs ago`;
+  if (hoursDiff < 48) return '1 day ago';
+  if (daysDiff < 30) return `${daysDiff} days ago`;
+  if (daysDiff < 45) return '1 month ago';
+  if (daysDiff >= 45) return format(originTime, 'LLL dd, yyyy');
+};
+
 export const View: React.FC<Props> = ({ setIsEditing }) => {
   const { selectedEvent, setIsEditModalOpen } = useModalStore();
   const { currentUser, currentCalendarId, currentCalendarContent } =
@@ -62,26 +82,6 @@ export const View: React.FC<Props> = ({ setIsEditing }) => {
       commentInput,
     );
     setCommentInput('');
-  };
-
-  const formatTime = (time: Timestamp | null) => {
-    const originTime = time?.toDate() || new Date();
-    const now = new Date();
-
-    const secondsDiff = differenceInSeconds(now, originTime);
-    const minutesDiff = differenceInMinutes(now, originTime);
-    const hoursDiff = differenceInHours(now, originTime);
-    const daysDiff = differenceInDays(now, originTime);
-
-    if (secondsDiff < 30) return 'just now';
-    if (secondsDiff < 120) return '1 min ago';
-    if (minutesDiff < 45) return `${minutesDiff} mins ago`;
-    if (minutesDiff < 120) return '1 hr ago';
-    if (hoursDiff < 24) return `${hoursDiff} hrs ago`;
-    if (hoursDiff < 48) return '1 day ago';
-    if (daysDiff < 30) return `${daysDiff} days ago`;
-    if (daysDiff < 45) return '1 month ago';
-    if (daysDiff >= 45) return format(originTime, 'LLL dd, yyyy');
   };
 
   const renderTime = () => {

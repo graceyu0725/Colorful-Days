@@ -21,13 +21,14 @@ type Props = {
   setHoveredCalendar: React.Dispatch<React.SetStateAction<CalendarContent>>;
 };
 
+const MAX_NAME_LENGTH = 30;
+
 const EditCalendar: React.FC<Props> = ({
   isEditCalendarModalOpen,
   setIsEditCalendarModalOpen,
   hoveredCalendar,
   setHoveredCalendar,
 }) => {
-  const MAX_NAME_LENGTH = 30;
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSaveCalendar = async () => {
