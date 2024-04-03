@@ -2,15 +2,15 @@ import { Button } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const phrases = [
+  'Dynamic Scheduling',
+  'Custom Themes',
+  'Shared Calendars',
+  'Your Style',
+];
+
 export default function Content() {
   const navigate = useNavigate();
-
-  const phrases = [
-    'Dynamic Scheduling',
-    'Custom Themes',
-    'Shared Calendars',
-    'Your Style',
-  ];
 
   const [activeIndex, setActiveIndex] = useState(0);
 

@@ -8,33 +8,36 @@ import { useModalStore } from '../../store/modalStore';
 import { createNewCalendar } from '../../utils/handleUserAndCalendar';
 import { themeColors } from '../../utils/theme';
 
+const MAX_NAME_LENGTH = 30;
+
+const getInitialUserSelection = () => {
+  return {
+    calendarName: '',
+    calendarThemeColor: '',
+    borderColor: 'border-slate-200',
+    backgroundColor: 'bg-slate-200',
+    buttonIndex: 99,
+  };
+};
+
 export default function AddCalendar() {
   const { currentUser } = useAuthStore();
   const { isAddCalendarModalOpen, setIsAddCalendarModalOpen } = useModalStore();
 
-  const MAX_NAME_LENGTH = 30;
-  const getInitialUserSelection = () => {
-    return {
-      calendarName: '',
-      calendarThemeColor: '',
-      borderColor: 'border-slate-200',
-      backgroundColor: 'bg-slate-200',
-      buttonIndex: 99,
-    };
-  };
   const [userSelection, setUserSelection] = useState(getInitialUserSelection());
   const [isComposing, setIsComposing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const updateCalendarName = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length > MAX_NAME_LENGTH) return;
+
     setUserSelection((prev) => ({
       ...prev,
       calendarName: e.target.value,
     }));
   };
 
-  const changeSelectedTheme = (
+  const updateSelectedTheme = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
     index: number,
   ) => {
@@ -131,7 +134,7 @@ export default function AddCalendar() {
                   },
                 )}
                 value={index}
-                onClick={(e) => changeSelectedTheme(e, index)}
+                onClick={(e) => updateSelectedTheme(e, index)}
               />
             ))}
           </div>

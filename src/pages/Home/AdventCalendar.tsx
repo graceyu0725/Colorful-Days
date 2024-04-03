@@ -8,29 +8,30 @@ import InfoModal from './InfoModal';
 import backgroundImage from './img/background.png';
 import specialBackgroundImage from './img/special-background.png';
 
-export default function AdventCalendar() {
-  const createSpecialArray = () => {
-    const result = [];
-    let start = 1;
-    let itemsInRow = 1;
+const createSpecialArray = () => {
+  const result = [];
+  let start = 1;
+  let itemsInRow = 1;
 
-    while (start <= 25) {
-      let row = [];
-      for (let i = 0; i < itemsInRow && start <= 25; i++) {
-        row.push(start++);
-      }
-      result.push(row);
-      itemsInRow = itemsInRow === 6 ? 2 : itemsInRow + 1;
+  while (start <= 25) {
+    let row = [];
+    for (let i = 0; i < itemsInRow && start <= 25; i++) {
+      row.push(start++);
     }
+    result.push(row);
+    itemsInRow = itemsInRow === 6 ? 2 : itemsInRow + 1;
+  }
 
-    return result;
-  };
+  return result;
+};
 
+const specialDates = [1, 5, 7, 14, 18, 25];
+
+export default function AdventCalendar() {
   const datesArray = createSpecialArray();
-  const specialDates = [1, 5, 7, 14, 18, 25];
+
   const [isFlipped, setIsFlipped] = useState(false);
   const [isGuided, setIsGuided] = useState(false);
-
   const [selectedCell, setSelectedCell] = useState<null | number>(null);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 

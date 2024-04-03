@@ -85,7 +85,6 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
     calendarAllEvents,
   ]);
 
-  const iconStyle = 'text-2xl text-slate-700 hover:cursor-pointer m-auto';
   const updateCurrentPanel = (type: PanelType) => {
     setCurrentPanel((prev) => (prev && prev === type ? PanelType.None : type));
   };
@@ -191,7 +190,7 @@ const SideNavigation: React.FC<Props> = ({ isSideNavigationOpen }) => {
           )}
         >
           <panelIcon.icon
-            className={iconStyle}
+            className='text-2xl text-slate-700 hover:cursor-pointer m-auto'
             onClick={() => updateCurrentPanel(panelIcon.type)}
           />
         </button>
